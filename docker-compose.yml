@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lushnails-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: lushnails_spa
+      POSTGRES_USER: lushnails_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-LushNails2024}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - lushnails-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lushnails_admin -d lushnails_spa"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  lushnails-network:
+    driver: bridge

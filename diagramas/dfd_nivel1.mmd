@@ -1,0 +1,43 @@
+---
+title: DFD Nivel 1 - Procesos Principales
+---
+flowchart TD
+    %% Entidades externas
+    Cliente(["Cliente"])
+    Admin(["Administrador"])
+
+    %% Procesos
+    P1["1. Validar<br/>Disponibilidad"]
+    P2["2. Registrar<br/>Cita"]
+    P3["3. Gestionar<br/>Cliente"]
+    P4["4. Gestionar<br/>Contenido"]
+
+    %% Almacenes
+    D1[("D_CITAS")]
+    D2[("D_CLIENTES")]
+    D3[("D_CONTENIDO<br/>Servicios, Sucursales,<br/>Galería, Config")]
+
+    %% Flujos nivel 1
+    Cliente -->|Solicitud cita| P1
+    P1 -->|Disponibilidad| Cliente
+    P1 -->|Confirmación| P2
+    P2 -->|Guardar cita| D1
+    D1 -->|Datos cita| P2
+    P2 -->|Confirmación| Cliente
+
+    Admin -->|Datos cliente| P3
+    P3 -->|Guardar cliente| D2
+    D2 -->|Info cliente| P3
+    P3 -->|Datos cliente| P2
+
+    Admin -->|Gestionar servicios,<br/>sucursales, galería| P4
+    P4 -->|Guardar cambios| D3
+    D3 -->|Contenido actualizado| P4
+
+    classDef entidad fill:#1A3C34,color:#fff,stroke:#0D261F,stroke-width:2px
+    classDef proceso fill:#E8F5E9,color:#1A3C34,stroke:#2F4A34,stroke-width:2px
+    classDef almacen fill:#FFF3E0,color:#1A3C34,stroke:#E65100,stroke-width:2px
+
+    class Cliente,Admin entidad
+    class P1,P2,P3,P4 proceso
+    class D1,D2,D3 almacen

@@ -1,0 +1,28 @@
+---
+title: DFD Nivel 0 - Diagrama de Contexto
+---
+flowchart LR
+    subgraph Sistema["PORTAL EMPRESARIAL LUSH NAILS SPA"]
+        P["Sistema<br/>de Gestión"]
+    end
+
+    Admin(["Dueña / Administrador"])
+    Cliente(["Cliente"])
+    Visitante(["Visitante"])
+
+    Admin -->|Gestión de servicios, sucursales,<br/>empleados, clientes, citas| P
+    P -->|Información del sistema| Admin
+
+    Cliente -->|Consulta servicios,<br/>agenda citas| P
+    P -->|Confirmación de cita,<br/>información de servicios| Cliente
+
+    Visitante -->|Navegación web,<br/>envío de postulación| P
+    P -->|Contenido público,<br/>confirmación de envío| Visitante
+
+    classDef entidad fill:#1A3C34,color:#fff,stroke:#0D261F,stroke-width:2px
+    classDef proceso fill:#E8F5E9,color:#1A3C34,stroke:#2F4A34,stroke-width:2px
+    classDef sistema fill:#2F4A34,color:#fff,stroke:#1A3C34,stroke-width:2px
+
+    class Admin,Cliente,Visitante entidad
+    class P proceso
+    class Sistema sistema

@@ -1,0 +1,49 @@
+---
+title: Diagrama de Casos de Uso - Portal Lush Nails Spa
+---
+flowchart TD
+    %% Actores con estilo
+    Admin(["👤 Administrador"])
+    Cliente(["👤 Cliente"])
+    Visitante(["👤 Visitante"])
+
+    %% Casos de uso
+    UC1["( Iniciar Sesión )"]
+    UC2["( Gestionar Servicios )"]
+    UC3["( Gestionar Sucursales )"]
+    UC4["( Gestionar Empleados )"]
+    UC5["( Gestionar Clientes )"]
+    UC6["( Gestionar Citas )"]
+    UC7["( Gestionar Galería )"]
+    UC8["( Ver Postulaciones )"]
+    UC9["( Consultar Servicios )"]
+    UC10["( Agendar Cita )"]
+    UC11["( Registrar Datos Personales )"]
+    UC12["( Navegar Sitio Web )"]
+    UC13["( Enviar Postulación )"]
+
+    %% Relaciones Administrador
+    Admin --- UC1
+    Admin --- UC2
+    Admin --- UC3
+    Admin --- UC4
+    Admin --- UC5
+    Admin --- UC6
+    Admin --- UC7
+    Admin --- UC8
+
+    %% Relaciones Cliente
+    Cliente --- UC9
+    Cliente --- UC10
+    Cliente --- UC11
+
+    %% Relaciones Visitante
+    Visitante --- UC12
+    Visitante --- UC13
+
+    %% Estilos
+    classDef actor fill:#1A3C34,color:#fff,stroke:#0D261F,stroke-width:2px
+    classDef uso fill:#E8F5E9,color:#1A3C34,stroke:#2F4A34,stroke-width:1px
+
+    class Admin,Cliente,Visitante actor
+    class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12,UC13 uso

@@ -1,0 +1,40 @@
+---
+title: Diagrama de Funciones - Portal Lush Nails Spa
+---
+flowchart TD
+    Portal["Portal Empresarial<br/>Lush Nails Spa"] --> MC["Módulo<br/>Contenido"]
+    Portal --> MCl["Módulo<br/>Clientes"]
+    Portal --> MCi["Módulo<br/>Citas"]
+    Portal --> MP["Módulo<br/>Personal"]
+    Portal --> MS["Módulo<br/>Seguridad"]
+
+    MC --> S1["Servicios"]
+    MC --> S2["Sucursales"]
+    MC --> S3["Galería"]
+    MC --> S4["Configuración"]
+
+    MCl --> C1["Registro"]
+    MCl --> C2["Historial"]
+    MCl --> C3["Alergias"]
+    MCl --> C4["Notas"]
+
+    MCi --> Ci1["Agendar"]
+    MCi --> Ci2["Consultar"]
+    MCi --> Ci3["Cancelar"]
+    MCi --> Ci4["Recordatorios"]
+
+    MP --> P1["Empleados"]
+    MP --> P2["Asignación"]
+    MP --> P3["Horarios"]
+
+    MS --> Sec1["Login"]
+    MS --> Sec2["Roles"]
+    MS --> Sec3["Sesión"]
+
+    classDef portal fill:#1A3C34,color:#fff,stroke:#0D261F,stroke-width:2px
+    classDef modulo fill:#2F4A34,color:#fff,stroke:#1A3C34
+    classDef funcion fill:#E8F5E9,color:#1A3C34,stroke:#2F4A34
+
+    class Portal portal
+    class MC,MCl,MCi,MP,MS modulo
+    class S1,S2,S3,S4,C1,C2,C3,C4,Ci1,Ci2,Ci3,Ci4,P1,P2,P3,Sec1,Sec2,Sec3 funcion
