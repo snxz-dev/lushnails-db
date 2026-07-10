@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Dashboard</h1>
+</div>
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="num"><%= stats.servicios %></div>
+    <div class="label">Servicios Activos</div>
+  </div>
+  <div class="stat-card">
+    <div class="num"><%= stats.sucursales %></div>
+    <div class="label">Sucursales</div>
+  </div>
+  <div class="stat-card">
+    <div class="num"><%= stats.citas %></div>
+    <div class="label">Citas Pendientes</div>
+  </div>
+  <div class="stat-card">
+    <div class="num"><%= stats.postulaciones %></div>
+    <div class="label">Postulaciones No Leídas</div>
+  </div>
+</div>
+<%- include('partials/footer') %>

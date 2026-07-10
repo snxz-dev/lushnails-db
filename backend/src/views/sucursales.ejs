@@ -1,0 +1,44 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Sucursales</h1>
+</div>
+
+<form method="POST" action="/sucursales" class="form-grid">
+  <div class="field"><label>Nombre</label><input name="nombre" required></div>
+  <div class="field"><label>Dirección</label><input name="direccion" required></div>
+  <div class="field"><label>Teléfono</label><input name="telefono"></div>
+  <div class="field"><label>WhatsApp Link</label><input name="link_whatsapp"></div>
+  <div class="field"><label>Horario</label><input name="horario" placeholder="Lun-Sáb 9:00-19:00"></div>
+  <div class="field"><label>Latitud</label><input name="latitud" type="number" step="0.0000001"></div>
+  <div class="field"><label>Longitud</label><input name="longitud" type="number" step="0.0000001"></div>
+  <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
+  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
+</form>
+
+<table>
+  <thead><tr><th>Nombre</th><th>Dirección</th><th>WhatsApp</th><th>Activo</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (sucursales.length === 0) { %>
+    <tr><td colspan="5" class="empty">Sin sucursales registradas</td></tr>
+    <% } %>
+    <% sucursales.forEach(s => { %>
+    <tr>
+      <td><%= s.nombre %></td>
+      <td><%= s.direccion %></td>
+      <td><%= s.link_whatsapp ? '✅' : '—' %></td>
+      <td><span class="badge badge-<%= s.activo %>"><%= s.activo ? 'Sí' : 'No' %></span></td>
+      <td>
+        <form method="POST" action="/sucursales/<%= s.id %>/toggle" style="display:inline">
+          <button type="submit" class="btn btn-sm <%= s.activo ? 'btn-warning' : 'btn-success' %>">
+            <%= s.activo ? 'Desactivar' : 'Activar' %>
+          </button>
+        </form>
+        <form method="POST" action="/sucursales/<%= s.id %>/delete" style="display:inline" onsubmit="return confirm('¿Eliminar?')">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

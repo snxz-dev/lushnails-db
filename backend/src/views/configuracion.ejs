@@ -1,0 +1,16 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Configuración</h1>
+</div>
+
+<form method="POST" action="/configuracion" class="form-grid" style="display:flex;flex-direction:column;gap:12px">
+  <% configs.forEach(c => { %>
+  <div class="field">
+    <label><%= c.clave.replace(/_/g, ' ') %></label>
+    <input name="<%= c.clave %>" value="<%= c.valor %>" style="width:100%">
+    <% if (c.descripcion) { %><small style="color:#999"><%= c.descripcion %></small><% } %>
+  </div>
+  <% }) %>
+  <div><button type="submit" class="btn btn-primary">Guardar Cambios</button></div>
+</form>
+<%- include('partials/footer') %>

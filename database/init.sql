@@ -9,6 +9,16 @@
 -- Habilitar extensiones necesarias
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Tabla de sesiones para el panel admin
+CREATE TABLE IF NOT EXISTS "session" (
+    sid         VARCHAR NOT NULL COLLATE "default",
+    sess        JSON NOT NULL,
+    expire      TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (sid)
+) WITH (OIDS=FALSE);
+
+CREATE INDEX IF NOT EXISTS idx_session_expire ON "session" (expire);
+
 -- ============================================================================
 -- 1. TABLAS DEL SISTEMA (CATÁLOGOS BASE)
 -- ============================================================================

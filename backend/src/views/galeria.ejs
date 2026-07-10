@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Galería</h1>
+</div>
+
+<form method="POST" action="/galeria" class="form-grid">
+  <div class="field"><label>Título</label><input name="titulo"></div>
+  <div class="field"><label>URL Imagen</label><input name="url_imagen" required></div>
+  <div class="field"><label>Categoría</label><input name="categoria" placeholder="uñas, cabello, etc"></div>
+  <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
+  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
+</form>
+
+<table>
+  <thead><tr><th>Título</th><th>URL</th><th>Categoría</th><th>Activo</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (imagenes.length === 0) { %>
+    <tr><td colspan="5" class="empty">Sin imágenes</td></tr>
+    <% } %>
+    <% imagenes.forEach(i => { %>
+    <tr>
+      <td><%= i.titulo || '(sin título)' %></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis"><%= i.url_imagen %></td>
+      <td><%= i.categoria || '—' %></td>
+      <td><span class="badge badge-<%= i.activo %>"><%= i.activo ? 'Sí' : 'No' %></span></td>
+      <td>
+        <form method="POST" action="/galeria/<%= i.id %>/delete" style="display:inline" onsubmit="return confirm('¿Eliminar?')">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

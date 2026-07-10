@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Servicios</h1>
+</div>
+
+<h3 style="margin-bottom:12px">Nueva Categoría</h3>
+<form method="POST" action="/servicios/categoria" class="form-grid">
+  <div class="field"><label>Nombre</label><input name="nombre" required></div>
+  <div class="field"><label>Label (opcional)</label><input name="label" placeholder="Ej: PESTAÑAS Y CEJAS"></div>
+  <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
+  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
+</form>
+
+<h3 style="margin:24px 0 12px">Nuevo Servicio</h3>
+<form method="POST" action="/servicios" class="form-grid">
+  <div class="field"><label>Categoría</label>
+    <select name="id_categoria" required>
+      <% categorias.forEach(c => { %>
+      <option value="<%= c.id %>"><%= c.nombre %><%= c.label ? ' (' + c.label + ')' : '' %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field"><label>Nombre</label><input name="nombre" required></div>
+  <div class="field"><label>Precio</label><input name="precio" type="number" step="0.01" placeholder="0.00"></div>
+  <div class="field"><label>Duración (min)</label><input name="duracion_minutos" type="number" placeholder="60"></div>
+  <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
+  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
+</form>
+
+<table>
+  <thead><tr><th>Categoría</th><th>Servicio</th><th>Precio</th><th>Duración</th><th>Activo</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (servicios.length === 0) { %>
+    <tr><td colspan="6" class="empty">Sin servicios registrados</td></tr>
+    <% } %>
+    <% servicios.forEach(s => { %>
+    <tr>
+      <td><%= s.categoria_nombre %></td>
+      <td><%= s.nombre %></td>
+      <td><%= s.precio ? '$' + parseFloat(s.precio).toFixed(2) : '-' %></td>
+      <td><%= s.duracion_minutos ? s.duracion_minutos + ' min' : '-' %></td>
+      <td><span class="badge badge-<%= s.activo %>"><%= s.activo ? 'Sí' : 'No' %></span></td>
+      <td>
+        <form method="POST" action="/servicios/<%= s.id %>/toggle" style="display:inline">
+          <button type="submit" class="btn btn-sm <%= s.activo ? 'btn-warning' : 'btn-success' %>">
+            <%= s.activo ? 'Desactivar' : 'Activar' %>
+          </button>
+        </form>
+        <form method="POST" action="/servicios/<%= s.id %>/delete" style="display:inline" onsubmit="return confirm('¿Eliminar?')">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

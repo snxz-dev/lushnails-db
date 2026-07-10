@@ -1,0 +1,33 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Postulaciones</h1>
+</div>
+
+<table>
+  <thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Fecha</th><th>Leída</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (postulaciones.length === 0) { %>
+    <tr><td colspan="6" class="empty">Sin postulaciones</td></tr>
+    <% } %>
+    <% postulaciones.forEach(p => { %>
+    <tr>
+      <td><%= p.nombre %></td>
+      <td><%= p.correo %></td>
+      <td><%= p.telefono %></td>
+      <td><%= p.fecha %></td>
+      <td><span class="badge badge-<%= p.leida %>"><%= p.leida ? 'Leída' : 'Nueva' %></span></td>
+      <td>
+        <% if (!p.leida) { %>
+        <form method="POST" action="/postulaciones/<%= p.id %>/leida" style="display:inline">
+          <button type="submit" class="btn btn-sm btn-success">Marcar Leída</button>
+        </form>
+        <% } %>
+        <form method="POST" action="/postulaciones/<%= p.id %>/delete" style="display:inline" onsubmit="return confirm('¿Eliminar?')">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

@@ -1,0 +1,36 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Citas</h1>
+</div>
+
+<table>
+  <thead><tr><th>Cliente</th><th>Teléfono</th><th>Sucursal</th><th>Fecha</th><th>Hora</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (citas.length === 0) { %>
+    <tr><td colspan="8" class="empty">Sin citas registradas</td></tr>
+    <% } %>
+    <% citas.forEach(c => { %>
+    <tr>
+      <td><%= c.cliente %></td>
+      <td><%= c.cliente_telefono %></td>
+      <td><%= c.sucursal %></td>
+      <td><%= c.fecha %></td>
+      <td><%= c.hora %></td>
+      <td><%= c.servicio %></td>
+      <td><span class="badge badge-<%= c.estado %>"><%= c.estado %></span></td>
+      <td>
+        <form method="POST" action="/citas/<%= c.cita_id %>/estado" style="display:inline">
+          <select name="estado" style="padding:4px 8px;font-size:0.75rem">
+            <option value="pendiente" <%= c.estado === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
+            <option value="confirmada" <%= c.estado === 'confirmada' ? 'selected' : '' %>>Confirmada</option>
+            <option value="completada" <%= c.estado === 'completada' ? 'selected' : '' %>>Completada</option>
+            <option value="cancelada" <%= c.estado === 'cancelada' ? 'selected' : '' %>>Cancelada</option>
+          </select>
+          <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>
