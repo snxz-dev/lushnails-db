@@ -24,7 +24,7 @@
       <td><%= i.categoria || '—' %></td>
       <td><span class="badge badge-<%= i.activo %>"><%= i.activo ? 'Sí' : 'No' %></span></td>
       <td>
-        <form method="POST" action="/galeria/<%= i.id %>/delete" style="display:inline" onsubmit="return confirm('¿Eliminar?')">
+        <form method="POST" action="/galeria/<%= i.id %>/delete" style="display:inline" data-confirm="¿Eliminar esta imagen?">
           <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
         </form>
       </td>

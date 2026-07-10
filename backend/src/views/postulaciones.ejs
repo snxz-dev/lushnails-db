@@ -22,7 +22,7 @@
           <button type="submit" class="btn btn-sm btn-success">Marcar Leída</button>
         </form>
         <% } %>
-        <form method="POST" action="/postulaciones/<%= p.id %>/delete" style="display:inline" onsubmit="return confirm('¿Eliminar?')">
+        <form method="POST" action="/postulaciones/<%= p.id %>/delete" style="display:inline" data-confirm="¿Eliminar esta postulación?">
           <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
         </form>
       </td>

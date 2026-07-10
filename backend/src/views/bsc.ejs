@@ -58,13 +58,13 @@
 <table>
   <thead><tr><th>Perspectiva</th><th>Indicador</th><th>Valor Actual</th><th>Estándar</th><th>Estado</th></tr></thead>
   <tbody>
-    <tr><td>Financiera</td><td>Servicios activos</td><td><%= kpi.total_servicios %></td><td>≥ 30</td><td><span class="badge <%= kpi.total_servicios >= 30 ? 'badge-true' : 'badge-false' %>"><%= kpi.total_servicios >= 30 ? 'Cumple' : 'Mejorable' %></span></td></tr>
-    <tr><td>Financiera</td><td>Sucursales operativas</td><td><%= kpi.sucursales_activas %></td><td>≥ 3</td><td><span class="badge <%= kpi.sucursales_activas >= 3 ? 'badge-true' : 'badge-false' %>"><%= kpi.sucursales_activas >= 3 ? 'Cumple' : 'Mejorable' %></span></td></tr>
-    <tr><td>Clientes</td><td>Clientes registrados</td><td><%= kpi.total_clientes %></td><td>≥ 10</td><td><span class="badge <%= kpi.total_clientes >= 10 ? 'badge-true' : 'badge-false' %>"><%= kpi.total_clientes >= 10 ? 'Cumple' : 'Mejorable' %></span></td></tr>
-    <tr><td>Clientes</td><td>Citas últimas 30 días</td><td><%= kpi.citas_30dias %></td><td>≥ 5</td><td><span class="badge <%= kpi.citas_30dias >= 5 ? 'badge-true' : 'badge-false' %>"><%= kpi.citas_30dias >= 5 ? 'Cumple' : 'Mejorable' %></span></td></tr>
-    <tr><td>Procesos</td><td>Galería activa</td><td><%= kpi.total_galeria %></td><td>≥ 5</td><td><span class="badge <%= kpi.total_galeria >= 5 ? 'badge-true' : 'badge-false' %>"><%= kpi.total_galeria >= 5 ? 'Cumple' : 'Mejorable' %></span></td></tr>
-    <tr><td>Procesos</td><td>Citas canceladas</td><td><%= kpi.citas_canceladas %></td><td>≤ 2</td><td><span class="badge <%= kpi.citas_canceladas <= 2 ? 'badge-true' : 'badge-false' %>"><%= kpi.citas_canceladas <= 2 ? 'Cumple' : 'Mejorable' %></span></td></tr>
-    <tr><td>Aprendizaje</td><td>Postulaciones recibidas</td><td><%= kpi.total_postulaciones %></td><td>≥ 1</td><td><span class="badge <%= kpi.total_postulaciones >= 1 ? 'badge-true' : 'badge-false' %>"><%= kpi.total_postulaciones >= 1 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Financiera</td><td>Servicios activos</td><td><%= kpi.total_servicios %></td><td>≥ 30</td><td><span class="badge <%= kpi.total_servicios >= 30 ? 'badge-true' : 'badge-mejorable' %>"><%= kpi.total_servicios >= 30 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Financiera</td><td>Sucursales operativas</td><td><%= kpi.sucursales_activas %></td><td>≥ 3</td><td><span class="badge <%= kpi.sucursales_activas >= 3 ? 'badge-true' : 'badge-mejorable' %>"><%= kpi.sucursales_activas >= 3 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Clientes</td><td>Clientes registrados</td><td><%= kpi.total_clientes %></td><td>≥ 10</td><td><span class="badge <%= kpi.total_clientes >= 10 ? 'badge-true' : 'badge-mejorable' %>"><%= kpi.total_clientes >= 10 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Clientes</td><td>Citas últimas 30 días</td><td><%= kpi.citas_30dias %></td><td>≥ 5</td><td><span class="badge <%= kpi.citas_30dias >= 5 ? 'badge-true' : 'badge-mejorable' %>"><%= kpi.citas_30dias >= 5 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Procesos</td><td>Galería activa</td><td><%= kpi.total_galeria %></td><td>≥ 5</td><td><span class="badge <%= kpi.total_galeria >= 5 ? 'badge-true' : 'badge-mejorable' %>"><%= kpi.total_galeria >= 5 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Procesos</td><td>Citas canceladas</td><td><%= kpi.citas_canceladas %></td><td>≤ 2</td><td><span class="badge <%= kpi.citas_canceladas <= 2 ? 'badge-true' : 'badge-mejorable' %>"><%= kpi.citas_canceladas <= 2 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Aprendizaje</td><td>Postulaciones recibidas</td><td><%= kpi.total_postulaciones %></td><td>≥ 1</td><td><span class="badge <%= kpi.total_postulaciones >= 1 ? 'badge-true' : 'badge-mejorable' %>"><%= kpi.total_postulaciones >= 1 ? 'Cumple' : 'Mejorable' %></span></td></tr>
   </tbody>
 </table>
 <%- include('partials/footer') %>

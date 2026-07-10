@@ -46,7 +46,7 @@
             <%= s.activo ? 'Desactivar' : 'Activar' %>
           </button>
         </form>
-        <form method="POST" action="/servicios/<%= s.id %>/delete" style="display:inline" onsubmit="return confirm('¿Eliminar?')">
+        <form method="POST" action="/servicios/<%= s.id %>/delete" style="display:inline" data-confirm="¿Eliminar este servicio?">
           <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
         </form>
       </td>
