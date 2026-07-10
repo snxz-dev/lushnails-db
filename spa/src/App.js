@@ -28,8 +28,6 @@ const fotosUñas = [
   unas1000, unas101, unas202, unas303, unas404, unas505, unas606, unas707
 ];
 
-const CORREO_TRABAJO = 'ibethcabrera1@gmail.com';
-
 const WHATSAPP_LINKS = {
   general: 'https://wa.me/message/C756ADRGK277F1',
   sanAntonio: 'https://wa.me/message/C756ADRGK277F1',
