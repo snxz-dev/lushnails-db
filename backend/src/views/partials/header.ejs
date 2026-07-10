@@ -186,6 +186,73 @@
     *:focus-visible { outline: 3px solid #2F4A34; outline-offset: 2px; }
     button:focus:not(:focus-visible) { outline: none; }
     a:focus:not(:focus-visible) { outline: none; }
+
+    /* Accessibility toolbar */
+    .acc-toolbar {
+      position: fixed; bottom: 20px; left: 260px; z-index: 9997;
+      display: flex; gap: 6px; background: white; padding: 8px 12px;
+      border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      align-items: center;
+    }
+    .acc-toolbar button {
+      width: 34px; height: 34px; border-radius: 50%; border: none;
+      cursor: pointer; font-size: 0.9rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; background: #f0ebe3; color: #2F4A34;
+    }
+    .acc-toolbar button:hover { background: #2F4A34; color: white; }
+    .acc-toolbar button:focus-visible { outline: 3px solid #2F4A34; outline-offset: 2px; }
+    .acc-toolbar .acc-label {
+      font-size: 0.7rem; color: #999; margin-right: 4px; font-weight: 500;
+    }
+    .acc-toolbar .separator { width: 1px; height: 24px; background: #ddd; margin: 0 4px; }
+    .acc-toolbar .voice-btn.listening { background: #c0392b; color: white; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    .acc-toolbar .voice-btn .listening-indicator { display: none; }
+    .acc-toolbar .voice-btn.listening .listening-indicator { display: inline; }
+    .acc-toolbar .voice-btn.listening .mic-icon { display: none; }
+
+    /* High contrast mode */
+    body.high-contrast {
+      background: #000 !important;
+      color: #fff !important;
+    }
+    body.high-contrast .sidebar { background: #111 !important; }
+    body.high-contrast .main { background: #000; }
+    body.high-contrast .stat-card,
+    body.high-contrast .form-grid,
+    body.high-contrast table { background: #1a1a1a !important; color: #fff !important; }
+    body.high-contrast .stat-card .num { color: #4CAF50 !important; }
+    body.high-contrast th { background: #333 !important; color: #fff !important; }
+    body.high-contrast td { border-color: #333 !important; }
+    body.high-contrast input,
+    body.high-contrast select,
+    body.high-contrast textarea { background: #222 !important; color: #fff !important; border-color: #555 !important; }
+    body.high-contrast .badge-true { background: #1b5e20 !important; color: #a5d6a7 !important; }
+    body.high-contrast .badge-false,
+    body.high-contrast .badge-mejorable { background: #b71c1c !important; color: #ffcdd2 !important; }
+    body.high-contrast .badge-pendiente { background: #e65100 !important; color: #ffe0b2 !important; }
+    body.high-contrast .badge-confirmada { background: #1b5e20 !important; color: #a5d6a7 !important; }
+    body.high-contrast .badge-completada { background: #0d47a1 !important; color: #bbdefb !important; }
+    body.high-contrast .badge-cancelada { background: #b71c1c !important; color: #ffcdd2 !important; }
+    body.high-contrast .acc-toolbar { background: #1a1a1a !important; border: 1px solid #555; }
+    body.high-contrast .acc-toolbar button { background: #333; color: #fff; }
+    body.high-contrast a { color: #64B5F6 !important; }
+    body.high-contrast .toast { border: 2px solid white; }
+    body.high-contrast .modal { background: #1a1a1a !important; color: #fff; border: 1px solid #555; }
+    /* Catch any remaining inline white backgrounds (BSC cards, config cards) */
+    body.high-contrast [style*="background:white"],
+    body.high-contrast [style*="background: white"],
+    body.high-contrast [style*="background:#fff"],
+    body.high-contrast [style*="background: #fff"] {
+      background: #1a1a1a !important; color: #fff !important;
+    }
+    body.high-contrast code {
+      background: #333 !important; color: #a5d6a7 !important; padding: 3px 6px; border-radius: 4px;
+    }
+    /* Lighten dark-colored headings in high contrast */
+    body.high-contrast [style*="color:#2F4A34"] { color: #81C784 !important; }
+    body.high-contrast [style*="color: #2F4A34"] { color: #81C784 !important; }
   </style>
 </head>
 <body>
@@ -194,6 +261,19 @@
 <div id="modal-container" role="dialog" aria-modal="true" style="display:none"></div>
 
 <% if (user) { %>
+<div class="acc-toolbar" role="toolbar" aria-label="Barra de accesibilidad">
+  <span class="acc-label">Accesib.</span>
+  <button id="acc-contrast" onclick="toggleContrast()" aria-label="Activar o desactivar alto contraste" title="Alto contraste">◐</button>
+  <div class="separator"></div>
+  <button id="acc-font-minus" onclick="changeFont(-1)" aria-label="Reducir tamaño de letra" title="Reducir fuente">A−</button>
+  <button id="acc-font-reset" onclick="resetFont()" aria-label="Restablecer tamaño de letra" title="Restablecer fuente">A</button>
+  <button id="acc-font-plus" onclick="changeFont(1)" aria-label="Aumentar tamaño de letra" title="Aumentar fuente">A+</button>
+  <div class="separator"></div>
+  <button id="acc-voice" class="voice-btn" onclick="toggleVoice()" aria-label="Activar o desactivar comandos de voz" title="Comandos de voz">
+    <span class="mic-icon">🎤</span>
+    <span class="listening-indicator">🔴</span>
+  </button>
+</div>
 <aside class="sidebar" role="navigation" aria-label="Menú de navegación principal">
   <h2 aria-label="Lush Nails Spa">🌿 Lush Nails</h2>
   <nav aria-label="Secciones del panel">
@@ -258,5 +338,137 @@ document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
   const msg = urlParams.get('msg');
   if (msg) { toast(decodeURIComponent(msg), 'success'); }
+
+  // Load saved accessibility preferences
+  if (localStorage.getItem('acc-contrast') === 'true') document.body.classList.add('high-contrast');
+  var savedFont = localStorage.getItem('acc-font-size');
+  if (savedFont) {
+    savedFont = parseFloat(savedFont);
+    if (savedFont >= 80 && savedFont <= 150) {
+      document.body.style.fontSize = savedFont + '%';
+    }
+  }
 });
+
+// --- Accesibilidad: Alto Contraste ---
+function toggleContrast() {
+  var on = document.body.classList.toggle('high-contrast');
+  localStorage.setItem('acc-contrast', on);
+  toast(on ? 'Alto contraste activado' : 'Alto contraste desactivado', 'info');
+}
+
+// --- Accesibilidad: Tamaño de fuente ---
+function changeFont(dir) {
+  var current = parseFloat(localStorage.getItem('acc-font-size')) || 100;
+  var step = dir > 0 ? 10 : -10;
+  var newSize = Math.min(150, Math.max(80, current + step));
+  document.body.style.fontSize = newSize + '%';
+  localStorage.setItem('acc-font-size', newSize);
+}
+
+function resetFont() {
+  document.body.style.fontSize = '';
+  localStorage.removeItem('acc-font-size');
+  toast('Tamaño de fuente restablecido', 'info');
+}
+
+// --- Accesibilidad: Comandos de Voz ---
+var voiceRecognition = null;
+var voiceListening = false;
+
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    toast('Tu navegador no soporta comandos de voz', 'error');
+    return;
+  }
+  if (voiceListening) {
+    stopVoice();
+    return;
+  }
+  // Solicitar permiso de micrófono primero (evita error network)
+  var micPermission = navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+  if (micPermission) {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+      stream.getTracks().forEach(function(t) { t.stop(); });
+      startVoiceRecognition();
+    }).catch(function(err) {
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        toast('Permiso de micrófono denegado. Concede acceso en la configuración del navegador.', 'error');
+      } else {
+        toast('Error al acceder al micrófono: ' + err.message, 'error');
+      }
+    });
+  } else {
+    startVoiceRecognition();
+  }
+}
+
+function startVoiceRecognition() {
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    toast('API de voz no disponible en Brave incluso con escudo desactivado. Prueba en Chrome o Edge.', 'error');
+    return;
+  }
+  voiceRecognition = new SpeechRecognition();
+  voiceRecognition.lang = 'es-ES';
+  voiceRecognition.continuous = false;
+  voiceRecognition.interimResults = false;
+
+  voiceRecognition.onstart = function() {
+    voiceListening = true;
+    document.getElementById('acc-voice').classList.add('listening');
+    toast('🎤 Escuchando... di una página: dashboard, bsc, tablero, servicios, sucursales, citas, postulaciones, galería o configuración', 'info');
+  };
+
+  voiceRecognition.onresult = function(event) {
+    var transcript = event.results[0][0].transcript.toLowerCase().trim();
+    var pages = {
+      'dashboard': '/', 'inicio': '/', 'principal': '/',
+      'bsc': '/bsc', 'balanced scorecard': '/bsc',
+      'tablero': '/tablero', 'tablero de comando': '/tablero',
+      'servicios': '/servicios',
+      'sucursales': '/sucursales',
+      'citas': '/citas',
+      'postulaciones': '/postulaciones', 'postulación': '/postulaciones',
+      'galería': '/galeria', 'galeria': '/galeria',
+      'configuración': '/configuracion', 'configuracion': '/configuracion', 'ajustes': '/configuracion'
+    };
+    var matched = null;
+    for (var key in pages) {
+      if (transcript.includes(key)) { matched = pages[key]; break; }
+    }
+    if (matched && window.location.pathname !== matched) {
+      toast('🗣️ Navegando a ' + matched, 'success');
+      window.location.href = matched;
+    } else if (matched) {
+      toast('Ya estás en esa página', 'info');
+    } else {
+      toast('No entendí. Di: dashboard, bsc, tablero, servicios, sucursales, citas, postulaciones, galería o configuración', 'error');
+    }
+    stopVoice();
+  };
+
+  voiceRecognition.onerror = function(event) {
+    if (event.error === 'network') {
+      toast('Brave bloquea el servicio de voz de Google. Prueba en Chrome o Edge normal.', 'error');
+    } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
+      toast('Error de voz: ' + event.error, 'error');
+    }
+    stopVoice();
+  };
+
+  voiceRecognition.onend = function() { stopVoice(); };
+
+  try { voiceRecognition.start(); } catch (e) { toast('Error al iniciar voz', 'error'); stopVoice(); }
+}
+
+function stopVoice() {
+  voiceListening = false;
+  if (voiceRecognition) {
+    try { voiceRecognition.stop(); } catch(e) {}
+    voiceRecognition = null;
+  }
+  var btn = document.getElementById('acc-voice');
+  if (btn) btn.classList.remove('listening');
+}
 </script>
