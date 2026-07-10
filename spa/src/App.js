@@ -76,7 +76,7 @@ function App() {
     setFormData(prev => ({ ...prev, archivo: e.target.files[0] }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.nombre || !formData.correo || !formData.telefono) {
@@ -84,14 +84,24 @@ function App() {
       return;
     }
 
-    const mailtoLink = `mailto:${CORREO_TRABAJO}?subject=Postulación de Trabajo - ${encodeURIComponent(formData.nombre)}&body=${encodeURIComponent(
-      `Nombre: ${formData.nombre}\nCorreo: ${formData.correo}\nTeléfono: ${formData.telefono}`
-    )}`;
-    window.location.href = mailtoLink;
-    
-    setFormEnviado(true);
-    setFormData({ nombre: '', correo: '', telefono: '', archivo: null });
-    alert('¡Postulación enviada con éxito! Nos pondremos en contacto contigo.');
+    try {
+      const res = await fetch('http://localhost:4000/api/postular', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: formData.nombre,
+          correo: formData.correo,
+          telefono: formData.telefono
+        })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error('Error al enviar');
+      setFormEnviado(true);
+      setFormData({ nombre: '', correo: '', telefono: '', archivo: null });
+      alert('¡Postulación enviada con éxito! Nos pondremos en contacto contigo.');
+    } catch (err) {
+      alert('Error al enviar la postulación. Intenta de nuevo.');
+    }
   };
 
   const handleNavClick = (targetId) => {

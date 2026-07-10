@@ -13,6 +13,7 @@ const citasRoutes = require('./routes/citas');
 const postulacionesRoutes = require('./routes/postulaciones');
 const galeriaRoutes = require('./routes/galeria');
 const configRoutes = require('./routes/configuracion');
+const apiRoutes = require('./routes/api');
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 4000;
@@ -44,7 +45,16 @@ app.use('/sucursales', sucursalesRoutes);
 app.use('/citas', citasRoutes);
 app.use('/postulaciones', postulacionesRoutes);
 app.use('/galeria', galeriaRoutes);
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
 app.use('/configuracion', configRoutes);
+app.use('/api', apiRoutes);
 
 app.listen(PORT, () => {
   console.log(`Panel admin: http://localhost:${PORT}`);
