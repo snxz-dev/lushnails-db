@@ -14,6 +14,8 @@ const postulacionesRoutes = require('./routes/postulaciones');
 const galeriaRoutes = require('./routes/galeria');
 const configRoutes = require('./routes/configuracion');
 const apiRoutes = require('./routes/api');
+const bscRoutes = require('./routes/bsc');
+const tableroRoutes = require('./routes/tablero');
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 4000;
@@ -54,6 +56,8 @@ app.use((req, res, next) => {
 });
 
 app.use('/configuracion', configRoutes);
+app.use('/bsc', bscRoutes);
+app.use('/tablero', tableroRoutes);
 app.use('/api', apiRoutes);
 
 app.listen(PORT, () => {

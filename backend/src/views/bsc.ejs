@@ -1,0 +1,70 @@
+<%- include('partials/header') %>
+<div class="top-bar"><h1>🌿 Portal Empresarial - Lush Nails Spa</h1></div>
+
+<div style="background:#2F4A34;color:white;padding:30px;border-radius:8px;margin-bottom:30px;text-align:center">
+  <h2 style="color:white;font-size:2rem;margin-bottom:8px">LUSH NAILS SPA</h2>
+  <p style="color:#A7B8A0;font-style:italic">"Elegancia en cada detalle"</p>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:30px">
+  <div style="background:white;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <h3 style="color:#2F4A34;font-size:1rem;margin-bottom:8px">Misión</h3>
+    <p style="font-size:0.85rem;line-height:1.7"><%= config.mision %></p>
+  </div>
+  <div style="background:white;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <h3 style="color:#2F4A34;font-size:1rem;margin-bottom:8px">Visión</h3>
+    <p style="font-size:0.85rem;line-height:1.7"><%= config.vision %></p>
+  </div>
+  <div style="background:white;padding:24px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <h3 style="color:#2F4A34;font-size:1rem;margin-bottom:8px">Objetivo General</h3>
+    <p style="font-size:0.85rem;line-height:1.7"><%= config.objetivo_general %></p>
+  </div>
+</div>
+
+<h2 style="margin-bottom:20px">📊 Balanced Scorecard</h2>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:30px">
+  <div style="background:white;padding:20px;border-radius:8px;border-top:4px solid #2F4A34;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <h3 style="font-size:0.9rem;margin-bottom:12px">💰 Financiera</h3>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Servicios activos:</strong> <%= kpi.total_servicios %></p>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Sucursales operando:</strong> <%= kpi.sucursales_activas %></p>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Citas completadas:</strong> <%= kpi.citas_completadas %></p>
+  </div>
+  <div style="background:white;padding:20px;border-radius:8px;border-top:4px solid #5E7F5E;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <h3 style="font-size:0.9rem;margin-bottom:12px">👥 Clientes</h3>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Total clientes:</strong> <%= kpi.total_clientes %></p>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Citas últimos 30 días:</strong> <%= kpi.citas_30dias %></p>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Citas pendientes:</strong> <%= kpi.citas_pendientes %></p>
+  </div>
+  <div style="background:white;padding:20px;border-radius:8px;border-top:4px solid #A7B8A0;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <h3 style="font-size:0.9rem;margin-bottom:12px">⚙️ Procesos Internos</h3>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Categorías:</strong> <%= serviciosXcategoria.length %></p>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Galería activa:</strong> <%= kpi.total_galeria %> imágenes</p>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Citas canceladas:</strong> <%= kpi.citas_canceladas %></p>
+  </div>
+  <div style="background:white;padding:20px;border-radius:8px;border-top:4px solid #BFA78C;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+    <h3 style="font-size:0.9rem;margin-bottom:12px">📚 Aprendizaje y Crecimiento</h3>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Postulaciones recibidas:</strong> <%= kpi.total_postulaciones %></p>
+    <p style="font-size:0.85rem;margin:6px 0"><strong>Servicios por categoría:</strong></p>
+    <ul style="font-size:0.8rem;padding-left:16px">
+      <% serviciosXcategoria.forEach(c => { %>
+      <li><%= c.label || c.nombre.toUpperCase() %>: <%= c.total %> servicios</li>
+      <% }) %>
+    </ul>
+  </div>
+</div>
+
+<h2 style="margin-bottom:15px">📈 Indicadores por Perspectiva</h2>
+<table>
+  <thead><tr><th>Perspectiva</th><th>Indicador</th><th>Valor Actual</th><th>Estándar</th><th>Estado</th></tr></thead>
+  <tbody>
+    <tr><td>Financiera</td><td>Servicios activos</td><td><%= kpi.total_servicios %></td><td>≥ 30</td><td><span class="badge <%= kpi.total_servicios >= 30 ? 'badge-true' : 'badge-false' %>"><%= kpi.total_servicios >= 30 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Financiera</td><td>Sucursales operativas</td><td><%= kpi.sucursales_activas %></td><td>≥ 3</td><td><span class="badge <%= kpi.sucursales_activas >= 3 ? 'badge-true' : 'badge-false' %>"><%= kpi.sucursales_activas >= 3 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Clientes</td><td>Clientes registrados</td><td><%= kpi.total_clientes %></td><td>≥ 10</td><td><span class="badge <%= kpi.total_clientes >= 10 ? 'badge-true' : 'badge-false' %>"><%= kpi.total_clientes >= 10 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Clientes</td><td>Citas últimas 30 días</td><td><%= kpi.citas_30dias %></td><td>≥ 5</td><td><span class="badge <%= kpi.citas_30dias >= 5 ? 'badge-true' : 'badge-false' %>"><%= kpi.citas_30dias >= 5 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Procesos</td><td>Galería activa</td><td><%= kpi.total_galeria %></td><td>≥ 5</td><td><span class="badge <%= kpi.total_galeria >= 5 ? 'badge-true' : 'badge-false' %>"><%= kpi.total_galeria >= 5 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Procesos</td><td>Citas canceladas</td><td><%= kpi.citas_canceladas %></td><td>≤ 2</td><td><span class="badge <%= kpi.citas_canceladas <= 2 ? 'badge-true' : 'badge-false' %>"><%= kpi.citas_canceladas <= 2 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+    <tr><td>Aprendizaje</td><td>Postulaciones recibidas</td><td><%= kpi.total_postulaciones %></td><td>≥ 1</td><td><span class="badge <%= kpi.total_postulaciones >= 1 ? 'badge-true' : 'badge-false' %>"><%= kpi.total_postulaciones >= 1 ? 'Cumple' : 'Mejorable' %></span></td></tr>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

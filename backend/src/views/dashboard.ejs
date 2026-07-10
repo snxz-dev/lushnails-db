@@ -1,8 +1,14 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Dashboard</h1>
+  <h1>🏠 Portal Corporativo Lush Nails Spa</h1>
 </div>
-<div class="stats-grid">
+
+<div style="background:#2F4A34;color:white;padding:40px;border-radius:12px;margin-bottom:30px;text-align:center">
+  <h2 style="color:white;font-size:2.5rem;margin-bottom:4px;letter-spacing:4px">LUSH NAILS SPA</h2>
+  <p style="color:#A7B8A0;font-style:italic;font-size:1.1rem">"Elegancia en cada detalle"</p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;margin-bottom:30px">
   <div class="stat-card">
     <div class="num"><%= stats.servicios %></div>
     <div class="label">Servicios Activos</div>
@@ -20,4 +26,5 @@
     <div class="label">Postulaciones No Leídas</div>
   </div>
 </div>
+
 <%- include('partials/footer') %>

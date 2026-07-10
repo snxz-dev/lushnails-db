@@ -1,0 +1,60 @@
+<%- include('partials/header') %>
+<div class="top-bar"><h1>🎯 Tablero de Comando</h1></div>
+
+<h2 style="margin-bottom:15px">Indicadores Clave</h2>
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="num"><%= indicadores.nuevos_clientes %></div>
+    <div class="label">Nuevos Clientes (30d)</div>
+  </div>
+  <div class="stat-card">
+    <div class="num"><%= indicadores.atenciones_mes %></div>
+    <div class="label">Atenciones del Mes</div>
+  </div>
+  <div class="stat-card">
+    <div class="num"><%= indicadores.tiempo_promedio_min || '—' %> min</div>
+    <div class="label">Tiempo Promedio x Servicio</div>
+  </div>
+  <div class="stat-card">
+    <div class="num"><%= indicadores.postulaciones_pendientes %></div>
+    <div class="label">Postulaciones Pendientes</div>
+  </div>
+  <div class="stat-card">
+    <div class="num"><%= indicadores.tasa_exito || '—' %>%</div>
+    <div class="label">Tasa de Éxito (Citas)</div>
+  </div>
+  <div class="stat-card">
+    <div class="num"><%= indicadores.citas_hoy %></div>
+    <div class="label">Citas para Hoy</div>
+  </div>
+</div>
+
+<h2 style="margin:30px 0 15px">📋 Tabla de Comandos del Sistema</h2>
+<table>
+  <thead><tr><th>Comando</th><th>Descripción</th><th>Frecuencia</th><th>Responsable</th></tr></thead>
+  <tbody>
+    <% comandos.forEach(c => { %>
+    <tr>
+      <td><code style="background:#f0ebe3;padding:3px 6px;border-radius:4px"><%= c.comando %></code></td>
+      <td><%= c.descripcion %></td>
+      <td><%= c.frecuencia %></td>
+      <td><%= c.responsable %></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<h2 style="margin:30px 0 15px">📊 Estándares del Portal</h2>
+<table>
+  <thead><tr><th>Estándar</th><th>Descripción</th><th>Nivel Actual</th></tr></thead>
+  <tbody>
+    <tr><td>Accesibilidad WCAG 2.1</td><td>Texto alternativo en imágenes, etiquetas semánticas, ARIA labels</td><td><span class="badge badge-true">Aceptable</span></td></tr>
+    <tr><td>Seguridad</td><td>Autenticación por sesión, contraseñas hasheadas (bcrypt)</td><td><span class="badge badge-true">Implementado</span></td></tr>
+    <tr><td>Base de Datos</td><td>PostgreSQL 16, relaciones normalizadas, índices, RLS</td><td><span class="badge badge-true">Implementado</span></td></tr>
+    <tr><td>Comunicación</td><td>API REST entre frontend (React) y backend (Express)</td><td><span class="badge badge-true">Implementado</span></td></tr>
+    <tr><td>Usabilidad</td><td>Panel admin responsive, navegación lateral, feedback visual</td><td><span class="badge badge-true">Aceptable</span></td></tr>
+    <tr><td>Balanced Scorecard</td><td>4 perspectivas con KPIs y estado de cumplimiento</td><td><span class="badge badge-true">Implementado</span></td></tr>
+    <tr><td>Tablero de Comando</td><td>Indicadores en tiempo real + tabla de comandos operativos</td><td><span class="badge badge-true">Implementado</span></td></tr>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

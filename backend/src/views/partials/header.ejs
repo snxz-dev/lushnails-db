@@ -112,13 +112,15 @@
 <div class="sidebar">
   <h2>🌿 Lush Nails</h2>
   <nav>
-    <a href="/" class="<%= path === '/' ? 'active' : '' %>">Dashboard</a>
-    <a href="/servicios" class="<%= path.startsWith('/servicios') ? 'active' : '' %>">Servicios</a>
-    <a href="/sucursales" class="<%= path.startsWith('/sucursales') ? 'active' : '' %>">Sucursales</a>
-    <a href="/citas" class="<%= path.startsWith('/citas') ? 'active' : '' %>">Citas</a>
-    <a href="/postulaciones" class="<%= path.startsWith('/postulaciones') ? 'active' : '' %>">Postulaciones</a>
-    <a href="/galeria" class="<%= path.startsWith('/galeria') ? 'active' : '' %>">Galería</a>
-    <a href="/configuracion" class="<%= path.startsWith('/configuracion') ? 'active' : '' %>">Configuración</a>
+    <a href="/" class="<%= path === '/' ? 'active' : '' %>">🏠 Dashboard</a>
+    <a href="/bsc" class="<%= path.startsWith('/bsc') ? 'active' : '' %>">📊 BSC</a>
+    <a href="/tablero" class="<%= path.startsWith('/tablero') ? 'active' : '' %>">🎯 Tablero</a>
+    <a href="/servicios" class="<%= path.startsWith('/servicios') ? 'active' : '' %>">📋 Servicios</a>
+    <a href="/sucursales" class="<%= path.startsWith('/sucursales') ? 'active' : '' %>">📍 Sucursales</a>
+    <a href="/citas" class="<%= path.startsWith('/citas') ? 'active' : '' %>">📅 Citas</a>
+    <a href="/postulaciones" class="<%= path.startsWith('/postulaciones') ? 'active' : '' %>">👥 Postulaciones</a>
+    <a href="/galeria" class="<%= path.startsWith('/galeria') ? 'active' : '' %>">🖼️ Galería</a>
+    <a href="/configuracion" class="<%= path.startsWith('/configuracion') ? 'active' : '' %>">⚙️ Configuración</a>
   </nav>
   <div class="user-info">
     <%= user.nombre %> (<%= user.rol %>)<br>
