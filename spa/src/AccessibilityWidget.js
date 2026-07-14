@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import './styles/accessibility.css';
 
@@ -25,9 +26,16 @@ export default function AccessibilityWidget() {
   });
 
   const applyFeatures = useCallback((feats, level) => {
-    document.body.classList.toggle('acc-grayscale', !!feats.grayscale);
+    var root = document.getElementById('root');
+    if (!root) return;
+    root.classList.toggle('acc-grayscale', !!feats.grayscale);
+    root.classList.toggle('acc-negative', !!feats.negative);
+    root.classList.toggle('acc-high-contrast', !!feats.highContrast);
+    root.classList.toggle('acc-light-bg', !!feats.lightBg);
+    root.classList.toggle('acc-underline', !!feats.underline);
+    root.classList.toggle('acc-readable-font', !!feats.readableFont);
+
     document.body.classList.toggle('acc-high-contrast', !!feats.highContrast);
-    document.body.classList.toggle('acc-negative', !!feats.negative);
     document.body.classList.toggle('acc-light-bg', !!feats.lightBg);
     document.body.classList.toggle('acc-underline', !!feats.underline);
     document.body.classList.toggle('acc-readable-font', !!feats.readableFont);
@@ -86,7 +94,7 @@ export default function AccessibilityWidget() {
     { code: 'en', label: 'English', flag: 'lang-en' },
   ];
 
-  return (
+  const widget = (
     <>
       {open && (
         <div className="acc-menu" role="menu" aria-label={t('acc.aria')}>
@@ -127,4 +135,6 @@ export default function AccessibilityWidget() {
       </button>
     </>
   );
+
+  return createPortal(widget, document.body);
 }

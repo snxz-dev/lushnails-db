@@ -175,73 +175,73 @@
 
 /* ── Accessibility body classes ── */
 
-body.acc-grayscale {
+#root.acc-grayscale {
   filter: grayscale(100%) !important;
 }
 
-body.acc-high-contrast {
+#root.acc-high-contrast {
   background: #000 !important;
   color: #fff !important;
 }
 
-body.acc-high-contrast .navbar,
-body.acc-high-contrast .footer {
+#root.acc-high-contrast .navbar,
+#root.acc-high-contrast .footer {
   background: #111 !important;
   color: #fff !important;
 }
 
-body.acc-high-contrast .hero-content h1,
-body.acc-high-contrast .hero-content p,
-body.acc-high-contrast .section-title h2,
-body.acc-high-contrast .section-title span,
-body.acc-high-contrast .about-text h2,
-body.acc-high-contrast .contact-info h2 {
+#root.acc-high-contrast .hero-content h1,
+#root.acc-high-contrast .hero-content p,
+#root.acc-high-contrast .section-title h2,
+#root.acc-high-contrast .section-title span,
+#root.acc-high-contrast .about-text h2,
+#root.acc-high-contrast .contact-info h2 {
   color: #fff !important;
 }
 
-body.acc-high-contrast .glass-card,
-body.acc-high-contrast .branch-card,
-body.acc-high-contrast .contact-wrapper,
-body.acc-high-contrast .work-form {
+#root.acc-high-contrast .glass-card,
+#root.acc-high-contrast .branch-card,
+#root.acc-high-contrast .contact-wrapper,
+#root.acc-high-contrast .work-form {
   background: #1a1a1a !important;
   color: #fff !important;
   border: 1px solid #555 !important;
 }
 
-body.acc-high-contrast a {
+#root.acc-high-contrast a {
   color: #64B5F6 !important;
 }
 
-body.acc-high-contrast .whatsapp-btn,
+#root.acc-high-contrast .whatsapp-btn,
 body.acc-high-contrast .acc-fab {
   background: #333 !important;
   border: 2px solid white;
 }
 
-body.acc-negative {
+#root.acc-negative {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
-body.acc-negative img,
-body.acc-negative video,
-body.acc-negative iframe {
+#root.acc-negative img,
+#root.acc-negative video,
+#root.acc-negative iframe {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
-body.acc-light-bg {
+#root.acc-light-bg {
   background: #fff8f0 !important;
 }
 
-body.acc-light-bg .navbar {
+#root.acc-light-bg .navbar {
   background: #fff8f0 !important;
 }
 
-body.acc-underline a {
+#root.acc-underline a {
   text-decoration: underline !important;
 }
 
-body.acc-readable-font,
-body.acc-readable-font * {
+#root.acc-readable-font,
+#root.acc-readable-font * {
   font-family: 'Verdana', 'Arial', sans-serif !important;
   letter-spacing: 0.03em !important;
   word-spacing: 0.05em !important;
