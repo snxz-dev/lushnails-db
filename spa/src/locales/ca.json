@@ -1,0 +1,127 @@
+{
+  "brand": "LUSH NAILS SPA",
+  "nav": {
+    "about": "Nosaltres",
+    "services": "Serveis",
+    "gallery": "Galeria",
+    "branches": "Sucursals",
+    "contact": "Contacte",
+    "work": "Treballa",
+    "directorio": "Directori"
+  },
+  "hero": {
+    "title": "Elegància en cada detall",
+    "description": "A Lush Nails Spa transformem la teva bellesa amb serveis professionals d'ungles, pestanyes, cabell i més. Gaudeix d'un espai dissenyat per consentir-te i fer-te sentir única.",
+    "bookBtn": "Reservar Cita",
+    "viewServices": "Veure Serveis"
+  },
+  "about": {
+    "subtitle": "Qui Som?",
+    "title": "Dedicats al teu Benestar",
+    "p1": "A Lush Nails som un saló de bellesa dedicat a realçar la bellesa i l'estil de cada persona a través de serveis professionals i personalitzats.",
+    "p2": "El nostre compromís és crear un ambient còmode i relaxant on cada client pugui gaudir d'una experiència de bellesa completa. Creiem que cada visita ha de ser un moment per consentir-te i sortir sentint-te renovada i feliç amb la teva imatge.",
+    "feature1": "Qualitat Premium",
+    "feature2": "Atenció Detallada",
+    "feature3": "Ambient Relaxant"
+  },
+  "services": {
+    "title": "Els Nostres Serveis",
+    "unas": "UNGLES",
+    "pestanas": "PESTANYES I CELLES",
+    "cabello": "CABELL",
+    "otros": "ALTRES",
+    "items": {
+      "acrilicas": "ACRÍLIQUES",
+      "poligel": "POLIGEL",
+      "softgel": "SOFT GEL",
+      "banoacrilico": "BANY ACRÍLIC",
+      "barridoacrilico": "ESMALTAT ACRÍLIC",
+      "barridopoligel": "ESMALTAT POLIGEL",
+      "manicuresemi": "MANICURA SEMIPERMANENT",
+      "manicurerubber": "MANICURA NIVELACIÓ RUBBER",
+      "manicuretra": "MANICURA TRADICIONAL",
+      "pedicuresemi": "PEDICURA SEMIP. NETEGJA PROFUNDA",
+      "pedicuretra": "PEDICURA TRADICIONAL",
+      "extraccion": "EXTRACCIÓ DE REPEUS",
+      "limpieza": "NETEGJA DE MANS O PEUS",
+      "pelopelo": "PÈL A PÈL CLÀSSIQUES",
+      "efectorimel": "PÈL A PÈL EFECTE RÍMEL",
+      "hibridas": "PÈL A PÈL HÍBRIDES",
+      "tecnologica": "PÈL A PÈL TECNOLÒGICA",
+      "puntopunto": "PUNT X PUNT CLÀSSIQUES",
+      "lifting": "LIFTING",
+      "henna": "SEMIPERMANENT HENNA",
+      "laminado": "LAMINAT",
+      "borrarpig": "ESBORRAR PIGMENTACIÓ",
+      "aumentar": "AUGMENTAR CELLES",
+      "microblading": "MICROBLADING",
+      "microshading": "MICROSHADING",
+      "efectopolvo": "EFECTE POLS",
+      "cortes": "Talls",
+      "botox": "Bòtox capil·lar",
+      "repolarizacion": "Repolarització",
+      "tintes": "Tints",
+      "alisados": "Allisats",
+      "depicompletas": "Depilacions completes",
+      "depicera": "Depilacions amb cera o fil",
+      "limpiezafacial": "Neteja facial"
+    }
+  },
+  "gallery": {
+    "title": "Galeria"
+  },
+  "branches": {
+    "subtitle": "On trobar-nos",
+    "title": "Les Nostres Sucursals",
+    "sanantonio": "San Antonio de Pichincha",
+    "sanantonioDir": "Carrers: 13 de Junio i Santa Ana",
+    "pusuqui": "Pusuqui",
+    "pusuquiDir": "Carrer Rafael Cuervo",
+    "calderon": "Calderón",
+    "calderonDir": "Capitán Génovanny carrers i Derby",
+    "contactar": "Contactar"
+  },
+  "contact": {
+    "title": "Agenda la teva cita",
+    "whatsapp": "WhatsApp Directe",
+    "description": "Cada visita és un moment per consentir-te.",
+    "slogan": "\"Elegància en cada detall\""
+  },
+  "work": {
+    "subtitle": "Uneix-te al Nostre Equip",
+    "title": "Treballa amb Nosaltres",
+    "namePlaceholder": "Nom Complet *",
+    "emailPlaceholder": "Correu Electrònic *",
+    "phonePlaceholder": "Telèfon *",
+    "fileLabel": "Curriculum Vitae / Portafoli (Opcional)",
+    "fileHint": "Formats acceptats: PDF, DOC, JPG, PNG (màx. 5MB)",
+    "submit": "Enviar Postulació",
+    "successTitle": "Gràcies pel teu interès!",
+    "successMsg": "Hem rebut la teva informació. Et contactarem aviat.",
+    "alertRequired": "Si us plau, completa tots els camps",
+    "alertSuccess": "Postulació enviada amb èxit! Ens posarem en contacte."
+  },
+  "footer": {
+    "rights": "Tots els drets reservats."
+  },
+  "whatsapp": {
+    "aria": "Obrir menú d'ubicacions"
+  },
+  "acc": {
+    "aria": "Obrir menú d'accessibilitat",
+    "bigger": "Augmentar text",
+    "smaller": "Disminuir text",
+    "grayscale": "Escala de grisos",
+    "contrast": "Alt contrast",
+    "negative": "Contrast negatiu",
+    "lightbg": "Fons clar",
+    "underline": "Subratllar enllaços",
+    "readable": "Font llegible",
+    "reset": "Restablir"
+  },
+  "lang": {
+    "es": "ES",
+    "ca": "CAT",
+    "en": "EN"
+  }
+}

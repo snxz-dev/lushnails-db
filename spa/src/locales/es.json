@@ -1,0 +1,127 @@
+{
+  "brand": "LUSH NAILS SPA",
+  "nav": {
+    "about": "Nosotros",
+    "services": "Servicios",
+    "gallery": "Galería",
+    "branches": "Sucursales",
+    "contact": "Contacto",
+    "work": "Trabaja",
+    "directorio": "Directorio"
+  },
+  "hero": {
+    "title": "Elegancia en cada detalle",
+    "description": "En Lush Nails Spa transformamos tu belleza con servicios profesionales de uñas, pestañas, cabello y más. Disfruta de un espacio diseñado para consentirte y hacerte sentir única.",
+    "bookBtn": "Reservar Cita",
+    "viewServices": "Ver Servicios"
+  },
+  "about": {
+    "subtitle": "¿Quiénes Somos?",
+    "title": "Dedicados a tu Bienestar",
+    "p1": "En Lush Nails somos un salón de belleza dedicado a resaltar la belleza y el estilo de cada persona a través de servicios profesionales y personalizados.",
+    "p2": "Nuestro compromiso es crear un ambiente cómodo y relajante donde cada cliente pueda disfrutar de una experiencia de belleza completa. Creemos que cada visita debe ser un momento para consentirte y salir sintiéndote renovada y feliz con tu imagen.",
+    "feature1": "Calidad Premium",
+    "feature2": "Atención Detallada",
+    "feature3": "Ambiente Relajante"
+  },
+  "services": {
+    "title": "Nuestros Servicios",
+    "unas": "UÑAS",
+    "pestanas": "PESTAÑAS Y CEJAS",
+    "cabello": "CABELLO",
+    "otros": "OTROS",
+    "items": {
+      "acrilicas": "ACRILICAS",
+      "poligel": "POLIGEL",
+      "softgel": "SOFT GEL",
+      "banoacrilico": "BAÑO ACRILICO",
+      "barridoacrilico": "BARRIDO ACRILICO",
+      "barridopoligel": "BARRIDO POLIGEL",
+      "manicuresemi": "MANICURE SEMIPERMANENTE",
+      "manicurerubber": "MANICURE NIVELACION RUBBER",
+      "manicuretra": "MANICURE TRADICIONAL",
+      "pedicuresemi": "PEDICURE SEMIP. LIMPIEZA PROFUNDA",
+      "pedicuretra": "PEDICURE TRADICIONAL",
+      "extraccion": "EXTRACCION UÑEROS",
+      "limpieza": "LIMPIEZA MANOS O PIES",
+      "pelopelo": "PELO A PELO CLASICAS",
+      "efectorimel": "PELO A PELO EFECTO RIMEL",
+      "hibridas": "PELO A PELO HIBRIDAS",
+      "tecnologica": "PELO A PELO TECNOLOGICA",
+      "puntopunto": "PUNTO X PUNTO CLASICAS",
+      "lifting": "LIFTING",
+      "henna": "SEMIPERMANENTE HENNA",
+      "laminado": "LAMINADO",
+      "borrarpig": "BORRAR PIGMENTACION",
+      "aumentar": "AUMENTAR CEJAS",
+      "microblading": "MICROBLADING",
+      "microshading": "MICROSHADING",
+      "efectopolvo": "EFECTO POLVO",
+      "cortes": "Cortes",
+      "botox": "Botox capilar",
+      "repolarizacion": "Repolarización",
+      "tintes": "Tintes",
+      "alisados": "Alisados",
+      "depicompletas": "Depilaciones completas",
+      "depicera": "Depilaciones con cera o hilo",
+      "limpiezafacial": "Limpieza facial"
+    }
+  },
+  "gallery": {
+    "title": "Galería"
+  },
+  "branches": {
+    "subtitle": "Dónde encontrarnos",
+    "title": "Nuestras Sucursales",
+    "sanantonio": "San Antonio de Pichincha",
+    "sanantonioDir": "Calles: 13 de Junio y Santa Ana",
+    "pusuqui": "Pusuqui",
+    "pusuquiDir": "Calle Rafael Cuervo",
+    "calderon": "Calderon",
+    "calderonDir": "Capitán Génovanny calles y Derby",
+    "contactar": "Contactar"
+  },
+  "contact": {
+    "title": "Agenda tu cita",
+    "whatsapp": "WhatsApp Directo",
+    "description": "Cada visita es un momento para consentirte.",
+    "slogan": "\"Elegancia en cada detalle\""
+  },
+  "work": {
+    "subtitle": "Únete a Nuestro Equipo",
+    "title": "Trabaja con Nosotros",
+    "namePlaceholder": "Nombre Completo *",
+    "emailPlaceholder": "Correo Electrónico *",
+    "phonePlaceholder": "Teléfono *",
+    "fileLabel": "Hoja de Vida / Portafolio (Opcional)",
+    "fileHint": "Formatos aceptados: PDF, DOC, JPG, PNG (máx. 5MB)",
+    "submit": "Enviar Postulación",
+    "successTitle": "¡Gracias por tu interés!",
+    "successMsg": "Hemos recibido tu información. Te contactaremos pronto.",
+    "alertRequired": "Por favor completa todos los campos",
+    "alertSuccess": "¡Postulación enviada con éxito! Nos pondremos en contacto contigo."
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados."
+  },
+  "whatsapp": {
+    "aria": "Abrir menú de ubicaciones"
+  },
+  "acc": {
+    "aria": "Abrir menú de accesibilidad",
+    "bigger": "Aumentar texto",
+    "smaller": "Disminuir texto",
+    "grayscale": "Escala de grises",
+    "contrast": "Alto contraste",
+    "negative": "Contraste negativo",
+    "lightbg": "Fondo claro",
+    "underline": "Subrayar enlaces",
+    "readable": "Fuente legible",
+    "reset": "Restablecer"
+  },
+  "lang": {
+    "es": "ES",
+    "ca": "CAT",
+    "en": "EN"
+  }
+}

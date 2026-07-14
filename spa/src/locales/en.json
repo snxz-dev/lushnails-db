@@ -1,0 +1,127 @@
+{
+  "brand": "LUSH NAILS SPA",
+  "nav": {
+    "about": "About Us",
+    "services": "Services",
+    "gallery": "Gallery",
+    "branches": "Branches",
+    "contact": "Contact",
+    "work": "Work With Us",
+    "directorio": "Directory"
+  },
+  "hero": {
+    "title": "Elegance in Every Detail",
+    "description": "At Lush Nails Spa we transform your beauty with professional nail, eyelash, hair services and more. Enjoy a space designed to pamper you and make you feel unique.",
+    "bookBtn": "Book Appointment",
+    "viewServices": "View Services"
+  },
+  "about": {
+    "subtitle": "Who We Are",
+    "title": "Dedicated to Your Wellness",
+    "p1": "At Lush Nails we are a beauty salon dedicated to enhancing the beauty and style of each person through professional and personalized services.",
+    "p2": "Our commitment is to create a comfortable and relaxing environment where every client can enjoy a complete beauty experience. We believe each visit should be a moment to pamper yourself and leave feeling renewed and happy with your image.",
+    "feature1": "Premium Quality",
+    "feature2": "Detailed Attention",
+    "feature3": "Relaxing Environment"
+  },
+  "services": {
+    "title": "Our Services",
+    "unas": "NAILS",
+    "pestanas": "LASHES & BROWS",
+    "cabello": "HAIR",
+    "otros": "OTHERS",
+    "items": {
+      "acrilicas": "ACRYLICS",
+      "poligel": "POLYGEL",
+      "softgel": "SOFT GEL",
+      "banoacrilico": "ACRYLIC DIP",
+      "barridoacrilico": "ACRYLIC SWEEP",
+      "barridopoligel": "POLYGEL SWEEP",
+      "manicuresemi": "SEMI-PERMANENT MANICURE",
+      "manicurerubber": "RUBBER BASE MANICURE",
+      "manicuretra": "TRADITIONAL MANICURE",
+      "pedicuresemi": "SEMI-PERMANENT PEDICURE",
+      "pedicuretra": "TRADITIONAL PEDICURE",
+      "extraccion": "INGROWN NAIL EXTRACTION",
+      "limpieza": "HAND OR FOOT CLEANING",
+      "pelopelo": "CLASSIC LASH EXTENSIONS",
+      "efectorimel": "MASCARA EFFECT LASHES",
+      "hibridas": "HYBRID LASHES",
+      "tecnologica": "TECHNOLOGY LASHES",
+      "puntopunto": "POINT BY POINT CLASSIC",
+      "lifting": "LIFTING",
+      "henna": "SEMI-PERMANENT HENNA",
+      "laminado": "LAMINATION",
+      "borrarpig": "REMOVE PIGMENTATION",
+      "aumentar": "BROW ENHANCEMENT",
+      "microblading": "MICROBLADING",
+      "microshading": "MICROSHADING",
+      "efectopolvo": "POWDER EFFECT",
+      "cortes": "Haircuts",
+      "botox": "Hair Botox",
+      "repolarizacion": "Repolarization",
+      "tintes": "Hair Dye",
+      "alisados": "Hair Straightening",
+      "depicompletas": "Full Hair Removal",
+      "depicera": "Wax or Thread Hair Removal",
+      "limpiezafacial": "Facial Cleaning"
+    }
+  },
+  "gallery": {
+    "title": "Gallery"
+  },
+  "branches": {
+    "subtitle": "Where to Find Us",
+    "title": "Our Branches",
+    "sanantonio": "San Antonio de Pichincha",
+    "sanantonioDir": "Streets: 13 de Junio y Santa Ana",
+    "pusuqui": "Pusuqui",
+    "pusuquiDir": "Rafael Cuervo Street",
+    "calderon": "Calderon",
+    "calderonDir": "Capitán Génovanny streets & Derby",
+    "contactar": "Contact"
+  },
+  "contact": {
+    "title": "Book Your Appointment",
+    "whatsapp": "WhatsApp Direct",
+    "description": "Every visit is a moment to pamper yourself.",
+    "slogan": "\"Elegance in Every Detail\""
+  },
+  "work": {
+    "subtitle": "Join Our Team",
+    "title": "Work With Us",
+    "namePlaceholder": "Full Name *",
+    "emailPlaceholder": "Email *",
+    "phonePlaceholder": "Phone *",
+    "fileLabel": "Resume / Portfolio (Optional)",
+    "fileHint": "Accepted formats: PDF, DOC, JPG, PNG (max 5MB)",
+    "submit": "Submit Application",
+    "successTitle": "Thank you for your interest!",
+    "successMsg": "We have received your information. We will contact you soon.",
+    "alertRequired": "Please fill in all fields",
+    "alertSuccess": "Application submitted successfully! We will be in touch."
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  },
+  "whatsapp": {
+    "aria": "Open locations menu"
+  },
+  "acc": {
+    "aria": "Open accessibility menu",
+    "bigger": "Increase text",
+    "smaller": "Decrease text",
+    "grayscale": "Grayscale",
+    "contrast": "High contrast",
+    "negative": "Negative contrast",
+    "lightbg": "Light background",
+    "underline": "Underline links",
+    "readable": "Readable font",
+    "reset": "Reset"
+  },
+  "lang": {
+    "es": "ES",
+    "ca": "CAT",
+    "en": "EN"
+  }
+}

@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import './styles/App.css';
 import './styles/menu.css';
+import './styles/accessibility.css';
+import AccessibilityWidget from './AccessibilityWidget';
 import logoImage from './assets/logo.svg';
 import unas18 from './assets/uñas18.jpeg';
 import unas1000 from './assets/uñas1000.jpeg';
@@ -28,6 +31,8 @@ const fotosUñas = [
   unas1000, unas101, unas202, unas303, unas404, unas505, unas606, unas707
 ];
 
+const CORREO_TRABAJO = 'ibethcabrera1@gmail.com';
+
 const WHATSAPP_LINKS = {
   general: 'https://wa.me/message/C756ADRGK277F1',
   sanAntonio: 'https://wa.me/message/C756ADRGK277F1',
@@ -42,6 +47,7 @@ const REDES_SOCIALES = {
 };
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [whatsappMenuOpen, setWhatsappMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -59,10 +65,10 @@ function App() {
   };
 
   const services = {
-    uñas: { image: imgManicure, items: ["ACRILICAS", "POLIGEL", "SOFT GEL", "BAÑO ACRILICO", "BARRIDO ACRILICO", "BARRIDO POLIGEL", "MANICURE SEMIPERMANENTE", "MANICURE NIVELACION RUBBER", "MANICURE TRADICIONAL", "PEDICURE SEMIP. LIMPIEZA PROFUNDA", "PEDICURE TRADICIONAL", "EXTRACCION UÑEROS", "LIMPIEZA MANOS O PIES"] },
-    pestañas: { image: imgPestanas, items: ["PELO A PELO CLASICAS", "PELO A PELO EFECTO RIMEL", "PELO A PELO HIBRIDAS", "PELO A PELO TECNOLOGICA", "PUNTO X PUNTO CLASICAS", "LIFTING", "SEMIPERMANENTE HENNA", "LAMINADO", "BORRAR PIGMENTACION", "AUMENTAR CEJAS", "MICROBLADING", "MICROSHADING", "EFECTO POLVO"], label: "PESTAÑAS Y CEJAS" },
-    cabello: { image: imgCabello, items: ["Cortes", "Botox capilar", "Repolarización", "Tintes", "Alisados"] },
-    otros: { image: logoImage, items: ["Depilaciones completas", "Depilaciones con cera o hilo", "Limpieza facial"], label: "OTROS" }
+    uñas: { image: imgManicure, items: ["acrilicas", "poligel", "softgel", "banoacrilico", "barridoacrilico", "barridopoligel", "manicuresemi", "manicurerubber", "manicuretra", "pedicuresemi", "pedicuretra", "extraccion", "limpieza"] },
+    pestañas: { image: imgPestanas, items: ["pelopelo", "efectorimel", "hibridas", "tecnologica", "puntopunto", "lifting", "henna", "laminado", "borrarpig", "aumentar", "microblading", "microshading", "efectopolvo"], label: "pestanas" },
+    cabello: { image: imgCabello, items: ["cortes", "botox", "repolarizacion", "tintes", "alisados"] },
+    otros: { image: logoImage, items: ["depicompletas", "depicera", "limpiezafacial"], label: "otros" }
   };
 
   const handleInputChange = (e) => {
@@ -74,32 +80,22 @@ function App() {
     setFormData(prev => ({ ...prev, archivo: e.target.files[0] }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     
     if (!formData.nombre || !formData.correo || !formData.telefono) {
-      alert('Por favor completa todos los campos');
+      alert(t('work.alertRequired'));
       return;
     }
 
-    try {
-      const res = await fetch('http://localhost:4000/api/postular', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nombre: formData.nombre,
-          correo: formData.correo,
-          telefono: formData.telefono
-        })
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error('Error al enviar');
-      setFormEnviado(true);
-      setFormData({ nombre: '', correo: '', telefono: '', archivo: null });
-      alert('¡Postulación enviada con éxito! Nos pondremos en contacto contigo.');
-    } catch (err) {
-      alert('Error al enviar la postulación. Intenta de nuevo.');
-    }
+    const mailtoLink = `mailto:${CORREO_TRABAJO}?subject=Postulación de Trabajo - ${encodeURIComponent(formData.nombre)}&body=${encodeURIComponent(
+      `Nombre: ${formData.nombre}\nCorreo: ${formData.correo}\nTeléfono: ${formData.telefono}`
+    )}`;
+    window.location.href = mailtoLink;
+    
+    setFormEnviado(true);
+    setFormData({ nombre: '', correo: '', telefono: '', archivo: null });
+    alert(t('work.alertSuccess'));
   };
 
   const handleNavClick = (targetId) => {
@@ -108,6 +104,10 @@ function App() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
   };
 
   useEffect(() => {
@@ -119,27 +119,46 @@ function App() {
       <nav className="navbar">
         <div className="navbar-logo">
           <img src={logoImage} alt="Lush Nails Spa" />
-          <span>LUSH NAILS SPA</span>
+          <span>{t('brand')}</span>
         </div>
         <div className="navbar-links">
-          <button onClick={() => handleNavClick('about')}>Nosotros</button>
-          <button onClick={() => handleNavClick('services')}>Servicios</button>
-          <button onClick={() => handleNavClick('gallery')}>Galería</button>
-          <button onClick={() => handleNavClick('branches')}>Sucursales</button>
-          <button onClick={() => handleNavClick('contact')}>Contacto</button>
-          <button onClick={() => handleNavClick('work')}>Trabaja</button>
-          <button onClick={() => window.history.back()} className="directorio-btn">Directorio</button>
+          <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
+          <button onClick={() => handleNavClick('services')}>{t('nav.services')}</button>
+          <button onClick={() => handleNavClick('gallery')}>{t('nav.gallery')}</button>
+          <button onClick={() => handleNavClick('branches')}>{t('nav.branches')}</button>
+          <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
+          <button onClick={() => handleNavClick('work')}>{t('nav.work')}</button>
+          <button onClick={() => window.history.back()} className="directorio-btn">{t('nav.directorio')}</button>
+          <div className="lang-selector">
+            <button className={`lang-btn ${i18n.language === 'es' ? 'active' : ''}`} onClick={() => changeLanguage('es')} aria-label="Español">
+              <span className="lang-flag lang-es"></span>
+              <span>{t('lang.es')}</span>
+            </button>
+            <button className={`lang-btn ${i18n.language === 'ca' ? 'active' : ''}`} onClick={() => changeLanguage('ca')} aria-label="Català">
+              <span className="lang-flag lang-ca"></span>
+              <span>{t('lang.ca')}</span>
+            </button>
+            <button className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`} onClick={() => changeLanguage('en')} aria-label="English">
+              <span className="lang-flag lang-en"></span>
+              <span>{t('lang.en')}</span>
+            </button>
+          </div>
         </div>
       </nav>
 
       <div className={`fab-menu mobile-menu ${menuOpen ? 'active' : ''}`}>
-        <button onClick={() => { window.history.back(); setMenuOpen(false); }} className="directorio-btn">Directorio</button>
-        <button onClick={() => handleNavClick('about')}>Nosotros</button>
-        <button onClick={() => handleNavClick('services')}>Servicios</button>
-        <button onClick={() => handleNavClick('gallery')}>Galería</button>
-        <button onClick={() => handleNavClick('branches')}>Sucursales</button>
-        <button onClick={() => handleNavClick('contact')}>Contacto</button>
-        <button onClick={() => handleNavClick('work')}>Trabaja</button>
+        <button onClick={() => { window.history.back(); setMenuOpen(false); }} className="directorio-btn">{t('nav.directorio')}</button>
+        <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
+        <button onClick={() => handleNavClick('services')}>{t('nav.services')}</button>
+        <button onClick={() => handleNavClick('gallery')}>{t('nav.gallery')}</button>
+        <button onClick={() => handleNavClick('branches')}>{t('nav.branches')}</button>
+        <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
+        <button onClick={() => handleNavClick('work')}>{t('nav.work')}</button>
+        <div className="mobile-lang">
+          <button className={`lang-btn ${i18n.language === 'es' ? 'active' : ''}`} onClick={() => { changeLanguage('es'); setMenuOpen(false); }} aria-label="Español"><span className="lang-flag lang-es"></span>{t('lang.es')}</button>
+          <button className={`lang-btn ${i18n.language === 'ca' ? 'active' : ''}`} onClick={() => { changeLanguage('ca'); setMenuOpen(false); }} aria-label="Català"><span className="lang-flag lang-ca"></span>{t('lang.ca')}</button>
+          <button className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`} onClick={() => { changeLanguage('en'); setMenuOpen(false); }} aria-label="English"><span className="lang-flag lang-en"></span>{t('lang.en')}</button>
+        </div>
       </div>
       {menuOpen && <div className="menu-overlay" onClick={() => setMenuOpen(false)}></div>}
 
@@ -152,11 +171,11 @@ function App() {
           </button>
         </div>
         <div className="hero-content animate-fade" style={{ textAlign: 'center' }}>
-          <h1 style={{color: '#000000'}}>Elegancia en cada detalle</h1>
-          <p style={{color: '#000000'}}>En Lush Nails Spa transformamos tu belleza con servicios profesionales de uñas, pestañas, cabello y más. Disfruta de un espacio diseñado para consentirte y hacerte sentir única.</p>
+          <h1 style={{color: '#000000'}}>{t('hero.title')}</h1>
+          <p style={{color: '#000000'}}>{t('hero.description')}</p>
           <div className="hero-cta" style={{ justifyContent: 'center', display: 'flex', gap: '15px' }}>
-            <a href="https://wa.me/message/C756ADRGK277F1" target="_blank" rel="noopener noreferrer" className="premium-button">Reservar Cita</a>
-            <a href="#services" className="outline-button">Ver Servicios</a>
+            <a href="https://wa.me/message/C756ADRGK277F1" target="_blank" rel="noopener noreferrer" className="premium-button">{t('hero.bookBtn')}</a>
+            <a href="#services" className="outline-button">{t('hero.viewServices')}</a>
           </div>
         </div>
         <div className="hero-image-container">
@@ -174,18 +193,14 @@ function App() {
             <img src={unas18} alt="Spa Experience" />
           </div>
           <div className="about-text">
-            <span className="section-subtitle">¿Quiénes Somos?</span>
-            <h2 style={{color: '#000000'}}>Dedicados a tu Bienestar</h2>
-            <p>
-              En Lush Nails somos un salón de belleza dedicado a resaltar la belleza y el estilo de cada persona a través de servicios profesionales y personalizados.
-            </p>
-            <p>
-              Nuestro compromiso es crear un ambiente cómodo y relajante donde cada cliente pueda disfrutar de una experiencia de belleza completa. Creemos que cada visita debe ser un momento para consentirte y salir sintiéndote renovada y feliz con tu imagen.
-            </p>
+            <span className="section-subtitle">{t('about.subtitle')}</span>
+            <h2 style={{color: '#000000'}}>{t('about.title')}</h2>
+            <p>{t('about.p1')}</p>
+            <p>{t('about.p2')}</p>
             <div className="about-features">
-              <span>Calidad Premium</span>
-              <span>Atención Detallada</span>
-              <span>Ambiente Relajante</span>
+              <span>{t('about.feature1')}</span>
+              <span>{t('about.feature2')}</span>
+              <span>{t('about.feature3')}</span>
             </div>
           </div>
         </div>
@@ -193,7 +208,7 @@ function App() {
 
       <section id="services" className="services">
         <div className="section-title">
-          <span className="section-subtitle" style={{color: '#000000', fontSize: '2rem', fontWeight: '600'}}>Nuestros Servicios</span>
+          <span className="section-subtitle" style={{color: '#000000', fontSize: '2rem', fontWeight: '600'}}>{t('services.title')}</span>
           <div className="divider"></div>
         </div>
         
@@ -214,14 +229,14 @@ function App() {
                   margin: category === 'otros' ? '75px auto' : 'unset'
                 }} 
               />
-                <h3 className="category-title" style={category === 'otros' ? { marginTop: '125px' } : category === 'cabello' ? { marginTop: '25px' } : {}}>{data.label || category.toUpperCase()}</h3>
+                <h3 className="category-title" style={category === 'otros' ? { marginTop: '125px' } : category === 'cabello' ? { marginTop: '25px' } : {}}>{t('services.' + category)}</h3>
                 <span style={{ cursor: 'pointer', fontSize: '20px', display: 'flex', justifyContent: 'center', color: '#2F4A34' }} onClick={toggleServicios}>
                   {servicioActivo === 'all' ? '▲' : '▼'}
                 </span>
                 {(servicioActivo === 'all') && (
                 <ul className="service-list" style={{marginTop: '20px', paddingLeft: '20px'}}>
                   {data.items.map((item, index) => (
-                    <li key={index} style={{marginBottom: '10px', listStyle: 'none'}}>🌿 {item}</li>
+                    <li key={index} style={{marginBottom: '10px', listStyle: 'none'}}>🌿 {t('services.items.' + item)}</li>
                   ))}
                 </ul>
                 )}
@@ -233,7 +248,7 @@ function App() {
 
       <section id="gallery" className="gallery">
         <div className="section-title">
-          <h2 style={{color: '#000000', fontSize: '2rem', fontWeight: '600'}}>Galería</h2>
+          <h2 style={{color: '#000000', fontSize: '2rem', fontWeight: '600'}}>{t('gallery.title')}</h2>
           <div className="divider"></div>
         </div>
         <div className="gallery-grid">
@@ -257,14 +272,14 @@ function App() {
 
       <section id="branches" className="branches">
         <div className="section-title">
-          <span className="section-subtitle">Dónde encontrarnos</span>
-          <h2>Nuestras Sucursales</h2>
+          <span className="section-subtitle">{t('branches.subtitle')}</span>
+          <h2>{t('branches.title')}</h2>
           <div className="divider"></div>
         </div>
         <div className="branches-grid">
           <div className="branch-card glass-card">
-            <h3>San Antonio de Pichincha</h3>
-            <p>Calles: 13 de Junio y Santa Ana</p>
+            <h3>{t('branches.sanantonio')}</h3>
+            <p>{t('branches.sanantonioDir')}</p>
             <div className="map-container">
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0436544892345!2d-78.45093467129654!3d-0.011645414317095574!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d47efc3d3f0b7d%3A0x0!2sSan+Antonio+de+Pichincha!5e0!3m2!1ses!2sec!4v1700000000000" 
@@ -280,12 +295,12 @@ function App() {
             </div>
             <a href={WHATSAPP_LINKS.sanAntonio} target="_blank" rel="noopener noreferrer" className="whatsapp-branch-btn">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              Contactar
+              {t('branches.contactar')}
             </a>
           </div>
           <div className="branch-card glass-card">
-            <h3>Pusuqui</h3>
-            <p>Calle Rafael Cuervo</p>
+            <h3>{t('branches.pusuqui')}</h3>
+            <p>{t('branches.pusuquiDir')}</p>
             <div className="map-container">
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.4567890123456!2d-78.45678901234567!3d-0.008!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d47ef123456789%3A0x0!2sCalle+Rafael+Cuervo%2C+Pusuqui!5e0!3m2!1ses!2sec!4v1700000000000" 
@@ -301,12 +316,12 @@ function App() {
             </div>
             <a href={WHATSAPP_LINKS.pusuqui} target="_blank" rel="noopener noreferrer" className="whatsapp-branch-btn">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              Contactar
+              {t('branches.contactar')}
             </a>
           </div>
           <div className="branch-card glass-card">
-            <h3>Calderon</h3>
-            <p>Capitán Génovanny calles y Derby</p>
+            <h3>{t('branches.calderon')}</h3>
+            <p>{t('branches.calderonDir')}</p>
             <div className="map-container">
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.289376953546!2d-78.43545201888296!3d-0.09247969680315883!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d5ab7e9c559f49%3A0x0!2sCalder%C3%B3n%2C+Quito!5e0!3m2!1ses!2sec!4v1700000000000" 
@@ -322,7 +337,7 @@ function App() {
             </div>
             <a href={WHATSAPP_LINKS.calderon} target="_blank" rel="noopener noreferrer" className="whatsapp-branch-btn">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              Contactar
+              {t('branches.contactar')}
             </a>
           </div>
         </div>
@@ -331,30 +346,30 @@ function App() {
       <section id="contact" className="contact" style={{ backgroundColor: '#2F4A34' }}>
         <div className="contact-wrapper glass-card" style={{ backgroundColor: '#F5F5DC' }}>
           <div className="contact-info">
-            <h2 style={{ color: 'black' }}>Agenda tu cita</h2>
+            <h2 style={{ color: 'black' }}>{t('contact.title')}</h2>
             <a href="https://wa.me/message/C756ADRGK277F1" target="_blank" rel="noopener noreferrer" className="whatsapp-button">
-              WhatsApp Directo
+              {t('contact.whatsapp')}
             </a>
           </div>
           <div className="contact-footer-info">
-            <p style={{ color: 'black' }}>Cada visita es un momento para consentirte.</p>
-            <span className="slogan" style={{ color: 'black' }}>"Elegancia en cada detalle"</span>
+            <p style={{ color: 'black' }}>{t('contact.description')}</p>
+            <span className="slogan" style={{ color: 'black' }}>{t('contact.slogan')}</span>
           </div>
         </div>
       </section>
 
       <section id="work" className="work-with-us">
         <div className="section-title">
-          <span className="section-subtitle">Únete a Nuestro Equipo</span>
-          <h2>Trabaja con Nosotros</h2>
+          <span className="section-subtitle">{t('work.subtitle')}</span>
+          <h2>{t('work.title')}</h2>
           <div className="divider"></div>
         </div>
         
         <div className="work-form">
           {formEnviado ? (
             <div className="success-message">
-              <h3>¡Gracias por tu interés!</h3>
-              <p>Hemos recibido tu información. Te contactaremos pronto.</p>
+              <h3>{t('work.successTitle')}</h3>
+              <p>{t('work.successMsg')}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
@@ -366,7 +381,7 @@ function App() {
                   value={formData.nombre}
                   onChange={handleInputChange}
                   required
-                  placeholder="Nombre Completo *"
+                  placeholder={t('work.namePlaceholder')}
                 />
               </div>
               
@@ -378,7 +393,7 @@ function App() {
                   value={formData.correo}
                   onChange={handleInputChange}
                   required
-                  placeholder="Correo Electrónico *"
+                  placeholder={t('work.emailPlaceholder')}
                 />
               </div>
               
@@ -390,12 +405,12 @@ function App() {
                   value={formData.telefono}
                   onChange={handleInputChange}
                   required
-                  placeholder="Teléfono *"
+                  placeholder={t('work.phonePlaceholder')}
                 />
               </div>
               
               <div className="form-group">
-                <label htmlFor="archivo">Hoja de Vida / Portafolio (Opcional)</label>
+                <label htmlFor="archivo">{t('work.fileLabel')}</label>
                 <input
                   type="file"
                   id="archivo"
@@ -403,11 +418,11 @@ function App() {
                   onChange={handleFileChange}
                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                 />
-                <p className="file-hint">Formatos aceptados: PDF, DOC, JPG, PNG (máx. 5MB)</p>
+                <p className="file-hint">{t('work.fileHint')}</p>
               </div>
               
               <button type="submit" className="submit-btn">
-                Enviar Postulación
+                {t('work.submit')}
               </button>
             </form>
           )}
@@ -415,7 +430,7 @@ function App() {
       </section>
 
       <footer className="footer">
-        <p>© {new Date().getFullYear()} LUSH NAILS SPA. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} LUSH NAILS SPA. {t('footer.rights')}</p>
       </footer>
 
       <div className="social-float">
@@ -440,7 +455,7 @@ function App() {
         <button 
           className="whatsapp-btn"
           onClick={() => setWhatsappMenuOpen(!whatsappMenuOpen)}
-          aria-label="Abrir menú de ubicaciones"
+          aria-label={t('whatsapp.aria')}
         >
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
@@ -463,6 +478,7 @@ function App() {
           </div>
         )}
       </div>
+      <AccessibilityWidget />
     </div>
   );
 }

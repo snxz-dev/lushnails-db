@@ -1,0 +1,228 @@
+/* ── Accessibility Widget ── */
+.acc-widget-container {
+  position: fixed;
+  left: 30px;
+  bottom: 30px;
+  z-index: 9996;
+}
+
+.acc-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #2F4A34;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.acc-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.acc-fab:focus-visible {
+  outline: 3px solid #2F4A34;
+  outline-offset: 3px;
+}
+
+.acc-menu {
+  position: absolute;
+  bottom: 70px;
+  left: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  padding: 8px;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  animation: accFadeIn 0.2s ease;
+}
+
+@keyframes accFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.acc-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: #333;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+
+.acc-option:hover {
+  background: #f0ebe3;
+}
+
+.acc-option:focus-visible {
+  outline: 2px solid #2F4A34;
+  outline-offset: 2px;
+}
+
+.acc-option.active {
+  background: #2F4A34;
+  color: white;
+}
+
+.acc-option.active:hover {
+  background: #5E7F5E;
+}
+
+.acc-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f0ebe3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  color: #2F4A34;
+}
+
+.acc-option.active .acc-icon {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.acc-standalone .acc-icon {
+  background: #A7B8A0;
+  color: white;
+  font-weight: 700;
+}
+
+.acc-divider {
+  height: 1px;
+  background: #e0d8cc;
+  margin: 4px 0;
+}
+
+.acc-reset .acc-icon {
+  background: #c0392b;
+  color: white;
+}
+
+.acc-label {
+  font-size: 0.82rem;
+}
+
+/* ── Accessibility body classes ── */
+
+/* Font size is applied via inline style on body */
+
+/* Grayscale */
+body.acc-grayscale {
+  filter: grayscale(100%) !important;
+}
+
+/* High contrast */
+body.acc-high-contrast {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+body.acc-high-contrast .navbar,
+body.acc-high-contrast .footer {
+  background: #111 !important;
+  color: #fff !important;
+}
+
+body.acc-high-contrast .hero-content h1,
+body.acc-high-contrast .hero-content p,
+body.acc-high-contrast .section-title h2,
+body.acc-high-contrast .section-title span,
+body.acc-high-contrast .about-text h2,
+body.acc-high-contrast .contact-info h2 {
+  color: #fff !important;
+}
+
+body.acc-high-contrast .glass-card,
+body.acc-high-contrast .branch-card,
+body.acc-high-contrast .contact-wrapper,
+body.acc-high-contrast .work-form {
+  background: #1a1a1a !important;
+  color: #fff !important;
+  border: 1px solid #555 !important;
+}
+
+body.acc-high-contrast a {
+  color: #64B5F6 !important;
+}
+
+body.acc-high-contrast .whatsapp-btn,
+body.acc-high-contrast .acc-fab {
+  background: #333 !important;
+  border: 2px solid white;
+}
+
+/* Negative contrast (invert) */
+body.acc-negative {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+body.acc-negative img,
+body.acc-negative video,
+body.acc-negative iframe {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* Light background */
+body.acc-light-bg {
+  background: #fff8f0 !important;
+}
+
+body.acc-light-bg .navbar {
+  background: #fff8f0 !important;
+}
+
+/* Underline links */
+body.acc-underline a {
+  text-decoration: underline !important;
+}
+
+/* Readable font */
+body.acc-readable-font,
+body.acc-readable-font * {
+  font-family: 'Verdana', 'Arial', sans-serif !important;
+  letter-spacing: 0.03em !important;
+  word-spacing: 0.05em !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .acc-widget-container {
+    left: 15px;
+    bottom: 15px;
+  }
+
+  .acc-fab {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+  }
+
+  .acc-menu {
+    bottom: 60px;
+    min-width: 190px;
+  }
+}
