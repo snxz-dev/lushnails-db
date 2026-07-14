@@ -70,14 +70,14 @@ export default function AccessibilityWidget() {
   };
 
   const featuresList = [
-    { key: 'bigger', icon: '🔼', label: t('acc.bigger'), fn: () => changeFont(1), standalone: true },
-    { key: 'smaller', icon: '🔽', label: t('acc.smaller'), fn: () => changeFont(-1), standalone: true },
-    { key: 'grayscale', icon: '🎨', label: t('acc.grayscale') },
-    { key: 'highContrast', icon: '🌓', label: t('acc.contrast') },
-    { key: 'negative', icon: '👁️', label: t('acc.negative') },
-    { key: 'lightBg', icon: '☀️', label: t('acc.lightbg') },
-    { key: 'underline', icon: '🔗', label: t('acc.underline') },
-    { key: 'readableFont', icon: '✏️', label: t('acc.readable') },
+    { key: 'bigger', icon: 'A+', label: t('acc.bigger'), fn: () => changeFont(1), standalone: true },
+    { key: 'smaller', icon: 'A−', label: t('acc.smaller'), fn: () => changeFont(-1), standalone: true },
+    { key: 'grayscale', icon: '◐', label: t('acc.grayscale') },
+    { key: 'highContrast', icon: '☯', label: t('acc.contrast') },
+    { key: 'negative', icon: '👁', label: t('acc.negative') },
+    { key: 'lightBg', icon: '☀', label: t('acc.lightbg') },
+    { key: 'underline', icon: 'U', label: t('acc.underline') },
+    { key: 'readableFont', icon: 'Aa', label: t('acc.readable') },
   ];
 
   const languages = [
