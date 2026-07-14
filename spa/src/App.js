@@ -47,7 +47,7 @@ const REDES_SOCIALES = {
 };
 
 function App() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [whatsappMenuOpen, setWhatsappMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -106,10 +106,6 @@ function App() {
     }
   };
 
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
-  };
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -129,20 +125,6 @@ function App() {
           <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
           <button onClick={() => handleNavClick('work')}>{t('nav.work')}</button>
           <button onClick={() => window.history.back()} className="directorio-btn">{t('nav.directorio')}</button>
-          <div className="lang-selector">
-            <button className={`lang-btn ${i18n.language === 'es' ? 'active' : ''}`} onClick={() => changeLanguage('es')} aria-label="Español">
-              <span className="lang-flag lang-es"></span>
-              <span>{t('lang.es')}</span>
-            </button>
-            <button className={`lang-btn ${i18n.language === 'ca' ? 'active' : ''}`} onClick={() => changeLanguage('ca')} aria-label="Català">
-              <span className="lang-flag lang-ca"></span>
-              <span>{t('lang.ca')}</span>
-            </button>
-            <button className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`} onClick={() => changeLanguage('en')} aria-label="English">
-              <span className="lang-flag lang-en"></span>
-              <span>{t('lang.en')}</span>
-            </button>
-          </div>
         </div>
       </nav>
 
@@ -154,11 +136,6 @@ function App() {
         <button onClick={() => handleNavClick('branches')}>{t('nav.branches')}</button>
         <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
         <button onClick={() => handleNavClick('work')}>{t('nav.work')}</button>
-        <div className="mobile-lang">
-          <button className={`lang-btn ${i18n.language === 'es' ? 'active' : ''}`} onClick={() => { changeLanguage('es'); setMenuOpen(false); }} aria-label="Español"><span className="lang-flag lang-es"></span>{t('lang.es')}</button>
-          <button className={`lang-btn ${i18n.language === 'ca' ? 'active' : ''}`} onClick={() => { changeLanguage('ca'); setMenuOpen(false); }} aria-label="Català"><span className="lang-flag lang-ca"></span>{t('lang.ca')}</button>
-          <button className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`} onClick={() => { changeLanguage('en'); setMenuOpen(false); }} aria-label="English"><span className="lang-flag lang-en"></span>{t('lang.en')}</button>
-        </div>
       </div>
       {menuOpen && <div className="menu-overlay" onClick={() => setMenuOpen(false)}></div>}
 

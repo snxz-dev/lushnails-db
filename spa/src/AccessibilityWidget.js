@@ -16,7 +16,7 @@ function saveFeatures(features) {
 }
 
 export default function AccessibilityWidget() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [features, setFeatures] = useState(loadFeatures);
   const [fontLevel, setFontLevel] = useState(() => {
@@ -58,6 +58,11 @@ export default function AccessibilityWidget() {
     });
   };
 
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    setOpen(false);
+  };
+
   const resetAll = () => {
     setFeatures({});
     setFontLevel(0);
@@ -66,7 +71,7 @@ export default function AccessibilityWidget() {
 
   const featuresList = [
     { key: 'bigger', icon: 'A+', label: t('acc.bigger'), fn: () => changeFont(1), standalone: true },
-    { key: 'smaller', icon: 'A-', label: t('acc.smaller'), fn: () => changeFont(-1), standalone: true },
+    { key: 'smaller', icon: 'A−', label: t('acc.smaller'), fn: () => changeFont(-1), standalone: true },
     { key: 'grayscale', icon: '◐', label: t('acc.grayscale') },
     { key: 'highContrast', icon: '☯', label: t('acc.contrast') },
     { key: 'negative', icon: '👁', label: t('acc.negative') },
@@ -75,35 +80,41 @@ export default function AccessibilityWidget() {
     { key: 'readableFont', icon: 'Aa', label: t('acc.readable') },
   ];
 
+  const languages = [
+    { code: 'es', label: 'Español', flag: 'lang-es' },
+    { code: 'ca', label: 'Català', flag: 'lang-ca' },
+    { code: 'en', label: 'English', flag: 'lang-en' },
+  ];
+
   return (
     <div className="acc-widget-container">
       {open && (
         <div className="acc-menu" role="menu" aria-label={t('acc.aria')}>
-          {featuresList.map(f => (
-            f.standalone ? (
-              <button
-                key={f.icon + f.label}
-                className="acc-option acc-standalone"
-                onClick={f.fn}
-                role="menuitem"
-                aria-label={f.label}
-              >
-                <span className="acc-icon">{f.icon}</span>
-                <span className="acc-label">{f.label}</span>
+          <div className="acc-menu-section">
+            {featuresList.map(f => (
+              f.standalone ? (
+                <button key={f.icon + f.label} className="acc-option acc-standalone" onClick={f.fn} role="menuitem" aria-label={f.label}>
+                  <span className="acc-icon">{f.icon}</span>
+                  <span className="acc-label">{f.label}</span>
+                </button>
+              ) : (
+                <button key={f.key} className={`acc-option ${features[f.key] ? 'active' : ''}`} onClick={() => toggle(f.key)} role="menuitem" aria-label={f.label + (features[f.key] ? ' (activado)' : ' (desactivado)')}>
+                  <span className="acc-icon">{f.icon}</span>
+                  <span className="acc-label">{f.label}</span>
+                </button>
+              )
+            ))}
+          </div>
+          <div className="acc-divider"></div>
+          <div className="acc-menu-section acc-lang-section">
+            <span className="acc-section-title">Idioma</span>
+            {languages.map(l => (
+              <button key={l.code} className={`acc-option ${i18n.language === l.code ? 'active' : ''}`} onClick={() => changeLanguage(l.code)} role="menuitem" aria-label={l.label}>
+                <span className={`acc-icon acc-flag-icon ${l.flag}`}></span>
+                <span className="acc-label">{l.label}</span>
               </button>
-            ) : (
-              <button
-                key={f.key}
-                className={`acc-option ${features[f.key] ? 'active' : ''}`}
-                onClick={() => toggle(f.key)}
-                role="menuitem"
-                aria-label={f.label + (features[f.key] ? ' (activado)' : ' (desactivado)')}
-              >
-                <span className="acc-icon">{f.icon}</span>
-                <span className="acc-label">{f.label}</span>
-              </button>
-            )
-          ))}
+            ))}
+          </div>
           <div className="acc-divider"></div>
           <button className="acc-option acc-reset" onClick={resetAll} role="menuitem" aria-label={t('acc.reset')}>
             <span className="acc-icon">↺</span>
@@ -111,12 +122,7 @@ export default function AccessibilityWidget() {
           </button>
         </div>
       )}
-      <button
-        className="acc-fab"
-        onClick={() => setOpen(!open)}
-        aria-label={t('acc.aria')}
-        aria-expanded={open}
-      >
+      <button className="acc-fab" onClick={() => setOpen(!open)} aria-label={t('acc.aria')} aria-expanded={open}>
         ♿
       </button>
     </div>
