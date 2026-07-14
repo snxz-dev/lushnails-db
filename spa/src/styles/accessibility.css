@@ -1,12 +1,9 @@
 /* ── Accessibility Widget ── */
-.acc-widget-container {
+.acc-fab {
   position: fixed;
   left: 30px;
   bottom: 30px;
-  z-index: 9996;
-}
-
-.acc-fab {
+  z-index: 9997;
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -20,8 +17,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 1;
 }
 
 .acc-fab:hover {
@@ -34,10 +29,15 @@
   outline-offset: 3px;
 }
 
+.acc-fab[aria-expanded="true"] {
+  background: #5E7F5E;
+}
+
 .acc-menu {
-  position: absolute;
-  bottom: 0;
-  left: 70px;
+  position: fixed;
+  left: 100px;
+  bottom: 30px;
+  z-index: 9998;
   background: white;
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.15);
@@ -47,7 +47,6 @@
   flex-direction: column;
   gap: 2px;
   animation: accFadeIn 0.2s ease;
-  z-index: 2;
   max-height: 80vh;
   overflow-y: auto;
 }
@@ -174,19 +173,12 @@
   font-size: 0.9rem;
 }
 
-/* Close menu when clicking the fab button again */
-.acc-fab[aria-expanded="true"] {
-  background: #5E7F5E;
-}
-
 /* ── Accessibility body classes ── */
 
-/* Grayscale */
 body.acc-grayscale {
   filter: grayscale(100%) !important;
 }
 
-/* High contrast */
 body.acc-high-contrast {
   background: #000 !important;
   color: #fff !important;
@@ -226,7 +218,6 @@ body.acc-high-contrast .acc-fab {
   border: 2px solid white;
 }
 
-/* Negative contrast */
 body.acc-negative {
   filter: invert(1) hue-rotate(180deg) !important;
 }
@@ -237,7 +228,6 @@ body.acc-negative iframe {
   filter: invert(1) hue-rotate(180deg) !important;
 }
 
-/* Light background */
 body.acc-light-bg {
   background: #fff8f0 !important;
 }
@@ -246,12 +236,10 @@ body.acc-light-bg .navbar {
   background: #fff8f0 !important;
 }
 
-/* Underline links */
 body.acc-underline a {
   text-decoration: underline !important;
 }
 
-/* Readable font */
 body.acc-readable-font,
 body.acc-readable-font * {
   font-family: 'Verdana', 'Arial', sans-serif !important;
@@ -259,21 +247,18 @@ body.acc-readable-font * {
   word-spacing: 0.05em !important;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
-  .acc-widget-container {
+  .acc-fab {
     left: 15px;
     bottom: 15px;
-  }
-
-  .acc-fab {
     width: 48px;
     height: 48px;
     font-size: 1.2rem;
   }
 
   .acc-menu {
-    left: 60px;
+    left: 75px;
+    bottom: 15px;
     min-width: 200px;
   }
 }
