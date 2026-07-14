@@ -253,6 +253,28 @@
     /* Lighten dark-colored headings in high contrast */
     body.high-contrast [style*="color:#2F4A34"] { color: #81C784 !important; }
     body.high-contrast [style*="color: #2F4A34"] { color: #81C784 !important; }
+
+    /* Extra accessibility toggles */
+    body.acc-grayscale { filter: grayscale(100%) !important; }
+    body.acc-negative { filter: invert(1) hue-rotate(180deg) !important; }
+    body.acc-negative img, body.acc-negative video, body.acc-negative iframe { filter: invert(1) hue-rotate(180deg) !important; }
+    body.acc-light-bg { background: #fff8f0 !important; }
+    body.acc-light-bg .sidebar { background: #3a5a3e !important; }
+    body.acc-underline a { text-decoration: underline !important; }
+    body.acc-readable-font, body.acc-readable-font * { font-family: 'Verdana', 'Arial', sans-serif !important; letter-spacing: 0.03em !important; word-spacing: 0.05em !important; }
+    body.acc-light-bg .stat-card, body.acc-light-bg .form-grid, body.acc-light-bg table { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+    .acc-toolbar .acc-extras { display: none; position: absolute; bottom: 60px; left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); padding: 6px; min-width: 200px; flex-direction: column; gap: 2px; }
+    .acc-toolbar .acc-extras.open { display: flex; }
+    .acc-toolbar .acc-more-btn { width: auto; height: auto; border-radius: 12px; padding: 4px 10px; background: #5E7F5E; color: white; font-size: 0.75rem; }
+    .acc-toolbar .acc-more-btn:hover { background: #2F4A34; }
+    .acc-extra-option { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-family: inherit; color: #333; transition: all 0.15s; text-align: left; width: 100%; }
+    .acc-extra-option:hover { background: #f0ebe3; }
+    .acc-extra-option.active { background: #2F4A34; color: white; }
+    .acc-extra-option .acc-dot { width: 22px; height: 22px; border-radius: 50%; background: #f0ebe3; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; color: #2F4A34; }
+    .acc-extra-option.active .acc-dot { background: rgba(255,255,255,0.2); color: white; }
+    .acc-extra-option.reset .acc-dot { background: #c0392b; color: white; }
+    .acc-toolbar .acc-separator-full { height: 1px; background: #e0d8cc; margin: 4px 0; }
   </style>
 </head>
 <body>
@@ -273,9 +295,35 @@
     <span class="mic-icon">🎤</span>
     <span class="listening-indicator">🔴</span>
   </button>
+  <div class="separator"></div>
+  <button class="acc-more-btn" onclick="toggleAccExtras()" aria-label="Más opciones de accesibilidad" title="Más opciones">+</button>
+  <div class="acc-extras" id="acc-extras">
+    <button class="acc-extra-option" onclick="toggleAccClass('acc-grayscale','Escala de grises')" aria-label="Escala de grises">
+      <span class="acc-dot">◐</span> Escala de grises
+    </button>
+    <button class="acc-extra-option" onclick="toggleAccClass('acc-negative','Contraste negativo')" aria-label="Contraste negativo">
+      <span class="acc-dot">👁</span> Contraste negativo
+    </button>
+    <button class="acc-extra-option" onclick="toggleAccClass('acc-light-bg','Fondo claro')" aria-label="Fondo claro">
+      <span class="acc-dot">☀</span> Fondo claro
+    </button>
+    <button class="acc-extra-option" onclick="toggleAccClass('acc-underline','Subrayar enlaces')" aria-label="Subrayar enlaces">
+      <span class="acc-dot">U</span> Subrayar enlaces
+    </button>
+    <button class="acc-extra-option" onclick="toggleAccClass('acc-readable-font','Fuente legible')" aria-label="Fuente legible">
+      <span class="acc-dot">Aa</span> Fuente legible
+    </button>
+    <div class="acc-separator-full"></div>
+    <button class="acc-extra-option reset" onclick="resetAllAcc()" aria-label="Restablecer todo">
+      <span class="acc-dot">↺</span> Restablecer todo
+    </button>
+  </div>
 </div>
 <aside class="sidebar" role="navigation" aria-label="Menú de navegación principal">
-  <h2 aria-label="Lush Nails Spa">🌿 Lush Nails</h2>
+  <h2 aria-label="Lush Nails Spa" style="display:flex;align-items:center;gap:10px">
+    <img src="/logo.svg" alt="Logo Lush Nails" style="width:32px;height:32px">
+    Lush Nails
+  </h2>
   <nav aria-label="Secciones del panel">
     <a href="/" <%= path === '/' ? 'aria-current="page" class="active"' : '' %> role="menuitem">🏠 Dashboard</a>
     <a href="/bsc" <%= path.startsWith('/bsc') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📊 BSC</a>
@@ -348,6 +396,23 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.style.fontSize = savedFont + '%';
     }
   }
+  // Sync extra button states
+  var savedExtras = localStorage.getItem('acc-extras');
+  if (savedExtras) {
+    try {
+      var list = JSON.parse(savedExtras);
+      if (Array.isArray(list)) {
+        document.querySelectorAll('.acc-extra-option').forEach(function(b) {
+          var onclick = b.getAttribute('onclick');
+          if (onclick) {
+            list.forEach(function(cls) {
+              if (onclick.indexOf(cls) !== -1) b.classList.add('active');
+            });
+          }
+        });
+      }
+    } catch(e) {}
+  }
 });
 
 // --- Accesibilidad: Alto Contraste ---
@@ -371,6 +436,71 @@ function resetFont() {
   localStorage.removeItem('acc-font-size');
   toast('Tamaño de fuente restablecido', 'info');
 }
+
+// --- Accesibilidad: Opciones extra ---
+var accExtraKeys = ['acc-grayscale', 'acc-negative', 'acc-light-bg', 'acc-underline', 'acc-readable-font'];
+
+function loadAccExtras() {
+  var saved = localStorage.getItem('acc-extras');
+  if (!saved) return;
+  try {
+    var list = JSON.parse(saved);
+    if (!Array.isArray(list)) return;
+    list.forEach(function(cls) {
+      if (accExtraKeys.indexOf(cls) !== -1) document.body.classList.add(cls);
+    });
+  } catch(e) {}
+}
+loadAccExtras();
+
+function toggleAccExtras() {
+  var menu = document.getElementById('acc-extras');
+  menu.classList.toggle('open');
+}
+
+function toggleAccClass(cls, label) {
+  var on = document.body.classList.toggle(cls);
+  var saved = localStorage.getItem('acc-extras');
+  var list = saved ? JSON.parse(saved) : [];
+  if (!Array.isArray(list)) list = [];
+  if (on) {
+    if (list.indexOf(cls) === -1) list.push(cls);
+  } else {
+    list = list.filter(function(c) { return c !== cls; });
+  }
+  localStorage.setItem('acc-extras', JSON.stringify(list));
+  // Update active state on button
+  var btns = document.querySelectorAll('.acc-extra-option');
+  btns.forEach(function(b) {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf(cls) !== -1) {
+      b.classList.toggle('active', on);
+    }
+  });
+  // If high contrast already active, warn about conflicts
+  if (document.body.classList.contains('high-contrast') && (cls === 'acc-light-bg' || cls === 'acc-negative')) {
+    toast('Puede haber conflicto con el modo alto contraste activo. Desactívalo si es necesario.', 'info');
+  }
+  toast((on ? 'Activado: ' : 'Desactivado: ') + label, 'info');
+}
+
+function resetAllAcc() {
+  accExtraKeys.forEach(function(cls) {
+    document.body.classList.remove(cls);
+  });
+  localStorage.removeItem('acc-extras');
+  // Reset active states on buttons
+  document.querySelectorAll('.acc-extra-option').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('acc-extras').classList.remove('open');
+  toast('Opciones de accesibilidad restablecidas', 'info');
+}
+
+// Close extras menu when clicking outside
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('acc-extras');
+  if (menu && menu.classList.contains('open') && !e.target.closest('.acc-toolbar')) {
+    menu.classList.remove('open');
+  }
+});
 
 // --- Accesibilidad: Comandos de Voz ---
 var voiceRecognition = null;
