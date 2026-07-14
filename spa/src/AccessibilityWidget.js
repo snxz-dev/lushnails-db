@@ -97,8 +97,7 @@ export default function AccessibilityWidget() {
                 className={`acc-option ${features[f.key] ? 'active' : ''}`}
                 onClick={() => toggle(f.key)}
                 role="menuitem"
-                aria-label={f.label}
-                aria-pressed={!!features[f.key]}
+                aria-label={f.label + (features[f.key] ? ' (activado)' : ' (desactivado)')}
               >
                 <span className="acc-icon">{f.icon}</span>
                 <span className="acc-label">{f.label}</span>
