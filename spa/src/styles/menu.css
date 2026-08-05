@@ -85,13 +85,13 @@
   display: inline-block;
 }
 
-.fab-menu.mobile-menu .directorio-btn {
+.fab-menu.mobile-menu .cuenta-btn {
   background: #5E7F5E;
   font-weight: 700;
   border: 2px solid white;
 }
 
-.fab-menu.mobile-menu .directorio-btn:hover {
+.fab-menu.mobile-menu .cuenta-btn:hover {
   background: #2F4A34;
 }
 

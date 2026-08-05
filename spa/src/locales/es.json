@@ -7,6 +7,9 @@
     "branches": "Sucursales",
     "contact": "Contacto",
     "work": "Trabaja",
+    "cita": "Reservar",
+    "ingresar": "Ingresar",
+    "miCuenta": "Mi Cuenta",
     "directorio": "Directorio"
   },
   "hero": {
@@ -27,7 +30,7 @@
   "services": {
     "title": "Nuestros Servicios",
     "unas": "UÑAS",
-    "pestanas": "PESTAÑAS Y CEJAS",
+    "pestanas": "PESTAÑAS",
     "cabello": "CABELLO",
     "otros": "OTROS",
     "items": {
@@ -100,6 +103,49 @@
     "successMsg": "Hemos recibido tu información. Te contactaremos pronto.",
     "alertRequired": "Por favor completa todos los campos",
     "alertSuccess": "¡Postulación enviada con éxito! Nos pondremos en contacto contigo."
+  },
+  "cita": {
+    "subtitle": "Elige tu servicio y reserva",
+    "title": "Reserva tu Cita",
+    "namePlaceholder": "Nombre Completo *",
+    "phonePlaceholder": "Teléfono *",
+    "emailPlaceholder": "Correo (opcional)",
+    "sucursalPlaceholder": "Selecciona la sucursal *",
+    "servicioPlaceholder": "Selecciona el servicio *",
+    "notasPlaceholder": "Notas adicionales (opcional)",
+    "submit": "Reservar Cita",
+    "successTitle": "¡Cita solicitada!",
+    "successMsg": "Hemos recibido tu solicitud. Te contactaremos para confirmarla.",
+    "newCita": "Nueva reserva",
+    "alertRequired": "Por favor completa todos los campos",
+    "error": "No se pudo enviar la solicitud. Intenta de nuevo."
+  },
+  "cuenta": {
+    "subtitle": "Acceso para clientes",
+    "title": "Mi Cuenta",
+    "loginTab": "Iniciar Sesión",
+    "registerTab": "Registrarse",
+    "namePlaceholder": "Nombre Completo *",
+    "phonePlaceholder": "Teléfono *",
+    "emailPlaceholder": "Correo Electrónico *",
+    "passwordPlaceholder": "Contraseña *",
+    "loginBtn": "Ingresar",
+    "registerBtn": "Crear Cuenta",
+    "welcome": "¡Hola",
+    "logout": "Cerrar sesión",
+    "panelDesc": "Desde aquí puedes ver tu historial de citas, explorar el catálogo de servicios y reservar una nueva cita.",
+    "misCitas": "Mis Citas",
+    "noCitas": "Aún no tienes citas reservadas.",
+    "verServicios": "Explora nuestros servicios",
+    "verServiciosDesc": "Mira el catálogo completo o reserva directamente tu próxima cita.",
+    "alertRequired": "Por favor completa todos los campos",
+    "confirmCancel": "¿Seguro que quieres cancelar esta cita?",
+    "cancelCita": "Cancelar cita",
+    "cancelError": "No se pudo cancelar la cita. Intenta de nuevo.",
+    "volver": "Volver a la página",
+    "deleteCita": "Eliminar",
+    "confirmDelete": "¿Seguro que quieres eliminar esta cita?",
+    "deleteError": "No se pudo eliminar la cita. Intenta de nuevo."
   },
   "footer": {
     "rights": "Todos los derechos reservados."

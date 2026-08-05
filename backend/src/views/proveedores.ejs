@@ -1,0 +1,44 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Proveedores</h1>
+</div>
+
+<form method="POST" action="/proveedores" class="form-grid">
+  <div class="field"><label>Nombre *</label><input name="nombre" required></div>
+  <div class="field"><label>Contacto</label><input name="contacto" placeholder="Persona de contacto"></div>
+  <div class="field"><label>Teléfono</label><input name="telefono"></div>
+  <div class="field"><label>Correo</label><input name="correo" type="email"></div>
+  <div class="field"><label>Tipo de Insumo</label><input name="tipo_insumo" placeholder="Ej: Uñas, Cabello, Estética"></div>
+  <div class="field"><label>Dirección</label><input name="direccion"></div>
+  <div class="field" style="grid-column:1/-1"><label>Notas</label><textarea name="notas" rows="2"></textarea></div>
+  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
+</form>
+
+<table>
+  <thead><tr><th>Nombre</th><th>Contacto</th><th>Teléfono</th><th>Tipo Insumo</th><th>Activo</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (proveedores.length === 0) { %>
+    <tr><td colspan="6" class="empty">Sin proveedores registrados</td></tr>
+    <% } %>
+    <% proveedores.forEach(p => { %>
+    <tr>
+      <td><%= p.nombre %></td>
+      <td><%= p.contacto || '—' %></td>
+      <td><%= p.telefono || '—' %></td>
+      <td><%= p.tipo_insumo || '—' %></td>
+      <td><span class="badge badge-<%= p.activo %>"><%= p.activo ? 'Sí' : 'No' %></span></td>
+      <td>
+        <form method="POST" action="/proveedores/<%= p.id %>/toggle" style="display:inline">
+          <button type="submit" class="btn btn-sm <%= p.activo ? 'btn-warning' : 'btn-success' %>">
+            <%= p.activo ? 'Desactivar' : 'Activar' %>
+          </button>
+        </form>
+        <form method="POST" action="/proveedores/<%= p.id %>/delete" style="display:inline" data-confirm="¿Eliminar este proveedor?">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

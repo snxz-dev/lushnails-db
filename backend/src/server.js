@@ -5,6 +5,7 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const pool = require('./config/db');
+const { requireRole } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const serviciosRoutes = require('./routes/servicios');
@@ -16,6 +17,10 @@ const configRoutes = require('./routes/configuracion');
 const apiRoutes = require('./routes/api');
 const bscRoutes = require('./routes/bsc');
 const tableroRoutes = require('./routes/tablero');
+const proveedoresRoutes = require('./routes/proveedores');
+const aliadosRoutes = require('./routes/aliados');
+const rolesRoutes = require('./routes/roles');
+const clientesRoutes = require('./routes/clientes');
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 4000;
@@ -40,6 +45,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/', requireRole);
+
 app.use('/', authRoutes);
 app.use('/', dashboardRoutes);
 app.use('/servicios', serviciosRoutes);
@@ -59,6 +66,10 @@ app.use('/configuracion', configRoutes);
 app.use('/bsc', bscRoutes);
 app.use('/tablero', tableroRoutes);
 app.use('/api', apiRoutes);
+app.use('/proveedores', proveedoresRoutes);
+app.use('/roles', rolesRoutes);
+app.use('/clientes', clientesRoutes);
+app.use('/aliados', aliadosRoutes);
 
 app.listen(PORT, () => {
   console.log(`Panel admin: http://localhost:${PORT}`);

@@ -7,7 +7,10 @@
     "branches": "Sucursals",
     "contact": "Contacte",
     "work": "Treballa",
-    "directorio": "Directori"
+    "directorio": "Directori",
+    "cita": "Reserva",
+    "ingresar": "Entrar",
+    "miCuenta": "El Meu Compte"
   },
   "hero": {
     "title": "Elegància en cada detall",
@@ -27,7 +30,7 @@
   "services": {
     "title": "Els Nostres Serveis",
     "unas": "UNGLES",
-    "pestanas": "PESTANYES I CELLES",
+    "pestanas": "PESTANYES",
     "cabello": "CABELL",
     "otros": "ALTRES",
     "items": {
@@ -123,5 +126,48 @@
     "es": "ES",
     "ca": "CAT",
     "en": "EN"
+  },
+  "cita": {
+    "subtitle": "Tria el teu servei i reserva",
+    "title": "Reserva la teva Cita",
+    "namePlaceholder": "Nom Complet *",
+    "phonePlaceholder": "Telèfon *",
+    "emailPlaceholder": "Correu (opcional)",
+    "sucursalPlaceholder": "Selecciona la sucursal *",
+    "servicioPlaceholder": "Selecciona el servei *",
+    "notasPlaceholder": "Notes addicionals (opcional)",
+    "submit": "Reservar Cita",
+    "successTitle": "Cita sol·licitada!",
+    "successMsg": "Hem rebut la teva sol·licitud. Et contactarem per confirmar-la.",
+    "newCita": "Nova reserva",
+    "alertRequired": "Si us plau completa tots els camps",
+    "error": "No s'ha pogut enviar la sol·licitud. Torna a provar."
+  },
+  "cuenta": {
+    "subtitle": "Accés per a clients",
+    "title": "El Meu Compte",
+    "loginTab": "Inicia Sessió",
+    "registerTab": "Registrar-se",
+    "namePlaceholder": "Nom Complet *",
+    "phonePlaceholder": "Telèfon *",
+    "emailPlaceholder": "Correu Electrònic *",
+    "passwordPlaceholder": "Contrasenya *",
+    "loginBtn": "Entrar",
+    "registerBtn": "Crear Compte",
+    "welcome": "Hola",
+    "logout": "Tanca sessió",
+    "panelDesc": "Des d'aquí pots veure el teu historial de cites, explorar el catàleg de serveis i reservar una nova cita.",
+    "misCitas": "Les Meves Cites",
+    "noCitas": "Encara no tens cites reservades.",
+    "verServicios": "Explora els nostres serveis",
+    "verServiciosDesc": "Mira el catàleg complet o reserva directament la teva propera cita.",
+    "alertRequired": "Si us plau completa tots els camps",
+    "confirmCancel": "Segur que vols cancel·lar aquesta cita?",
+    "cancelCita": "Cancel·lar cita",
+    "cancelError": "No s'ha pogut cancel·lar la cita. Torna a provar.",
+    "volver": "Tornar a la pàgina",
+    "deleteCita": "Eliminar",
+    "confirmDelete": "Segur que vols eliminar aquesta cita?",
+    "deleteError": "No s'ha pogut eliminar la cita. Torna a provar."
   }
 }

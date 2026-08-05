@@ -282,14 +282,24 @@
   </h2>
   <nav aria-label="Secciones del panel">
     <a href="/" <%= path === '/' ? 'aria-current="page" class="active"' : '' %> role="menuitem">🏠 Dashboard</a>
+    <% if (user.rol === 'superadmin' || user.rol === 'reportes') { %>
     <a href="/bsc" <%= path.startsWith('/bsc') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📊 BSC</a>
     <a href="/tablero" <%= path.startsWith('/tablero') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🎯 Tablero</a>
+    <% } %>
+    <% if (user.rol === 'superadmin' || user.rol === 'ventas') { %>
     <a href="/servicios" <%= path.startsWith('/servicios') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📋 Servicios</a>
     <a href="/sucursales" <%= path.startsWith('/sucursales') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📍 Sucursales</a>
     <a href="/citas" <%= path.startsWith('/citas') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📅 Citas</a>
-    <a href="/postulaciones" <%= path.startsWith('/postulaciones') ? 'aria-current="page" class="active"' : '' %> role="menuitem">👥 Postulaciones</a>
+    <a href="/clientes" <%= path.startsWith('/clientes') ? 'aria-current="page" class="active"' : '' %> role="menuitem">👤 Clientes</a>
     <a href="/galeria" <%= path.startsWith('/galeria') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🖼️ Galería</a>
+    <a href="/proveedores" <%= path.startsWith('/proveedores') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📦 Proveedores</a>
+    <a href="/aliados" <%= path.startsWith('/aliados') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🤝 Aliados</a>
+    <% } %>
+    <% if (user.rol === 'superadmin') { %>
+    <a href="/postulaciones" <%= path.startsWith('/postulaciones') ? 'aria-current="page" class="active"' : '' %> role="menuitem">👥 Postulaciones</a>
+    <a href="/roles" <%= path.startsWith('/roles') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🔐 Roles</a>
     <a href="/configuracion" <%= path.startsWith('/configuracion') ? 'aria-current="page" class="active"' : '' %> role="menuitem">⚙️ Configuración</a>
+    <% } %>
   </nav>
   <div class="user-info" aria-label="Información de usuario">
     <%= user.nombre %> (<%= user.rol %>)<br>
@@ -421,7 +431,7 @@ function startVoiceRecognition() {
   voiceRecognition.onstart = function() {
     voiceListening = true;
     document.getElementById('acc-voice').classList.add('listening');
-    toast('🎤 Escuchando... di una página: dashboard, bsc, tablero, servicios, sucursales, citas, postulaciones, galería o configuración', 'info');
+      toast('🎤 Escuchando... di una página: dashboard, bsc, tablero, servicios, sucursales, citas, postulaciones, galería, proveedores, aliados o configuración', 'info');
   };
 
   voiceRecognition.onresult = function(event) {
@@ -435,6 +445,8 @@ function startVoiceRecognition() {
       'citas': '/citas',
       'postulaciones': '/postulaciones', 'postulación': '/postulaciones',
       'galería': '/galeria', 'galeria': '/galeria',
+      'proveedores': '/proveedores', 'proveedor': '/proveedores',
+      'aliados': '/aliados', 'aliado': '/aliados',
       'configuración': '/configuracion', 'configuracion': '/configuracion', 'ajustes': '/configuracion'
     };
     var matched = null;
@@ -447,7 +459,7 @@ function startVoiceRecognition() {
     } else if (matched) {
       toast('Ya estás en esa página', 'info');
     } else {
-      toast('No entendí. Di: dashboard, bsc, tablero, servicios, sucursales, citas, postulaciones, galería o configuración', 'error');
+      toast('No entendí. Di: dashboard, bsc, tablero, servicios, sucursales, citas, postulaciones, galería, proveedores, aliados o configuración', 'error');
     }
     stopVoice();
   };

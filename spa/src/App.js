@@ -32,6 +32,7 @@ const fotosUñas = [
 ];
 
 const CORREO_TRABAJO = 'ibethcabrera1@gmail.com';
+const API_URL = 'http://localhost:4000/api';
 
 const WHATSAPP_LINKS = {
   general: 'https://wa.me/message/C756ADRGK277F1',
@@ -59,14 +60,163 @@ function App() {
   const [formEnviado, setFormEnviado] = useState(false);
   const [imagenAmpliada, setImagenAmpliada] = useState(null);
   const [servicioActivo, setServicioActivo] = useState(null);
+  const [vista, setVista] = useState('home');
+  const [serviciosDb, setServiciosDb] = useState([]);
+  const [sucursalesDb, setSucursalesDb] = useState([]);
+  const [citaForm, setCitaForm] = useState({
+    nombre: '', telefono: '', correo: '', id_sucursal: '', fecha: '', hora: '', notas: ''
+  });
+  const [serviciosSel, setServiciosSel] = useState([]);
+  const [citaEnviada, setCitaEnviada] = useState(false);
+  const [citaError, setCitaError] = useState('');
+  const [cliente, setCliente] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('lushnails_cliente')) || null;
+    } catch {
+      return null;
+    }
+  });
+  const [misCitas, setMisCitas] = useState([]);
+  const [authMode, setAuthMode] = useState('login');
+  const [authForm, setAuthForm] = useState({ nombre: '', telefono: '', correo: '', password: '' });
+  const [authError, setAuthError] = useState('');
+
+  useEffect(() => {
+    if (cliente && cliente.id) {
+      fetch(`${API_URL}/clientes/${cliente.id}/citas`)
+        .then(r => r.json())
+        .then(setMisCitas)
+        .catch(() => {});
+    }
+  }, [cliente]);
+
+  const handleAuthChange = (e) => {
+    const { name, value } = e.target;
+    setAuthForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    const url = authMode === 'login' ? `${API_URL}/clientes/login` : `${API_URL}/clientes/registro`;
+    const body = authMode === 'login'
+      ? { correo: authForm.correo, password: authForm.password }
+      : { nombre: authForm.nombre, telefono: authForm.telefono, correo: authForm.correo, password: authForm.password };
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('lushnails_cliente', JSON.stringify(data.cliente));
+        setCliente(data.cliente);
+        setCitaForm(prev => ({ ...prev, nombre: data.cliente.nombre, telefono: data.cliente.telefono, correo: data.cliente.correo }));
+        setAuthForm({ nombre: '', telefono: '', correo: '', password: '' });
+      } else {
+        setAuthError(data.error || t('cita.error'));
+      }
+    } catch (err) {
+      setAuthError(t('cita.error'));
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('lushnails_cliente');
+    setCliente(null);
+    setMisCitas([]);
+  };
+
+  const handleCancelarCita = async (citaId) => {
+    if (!window.confirm(t('cuenta.confirmCancel'))) return;
+    try {
+      const res = await fetch(`${API_URL}/clientes/${cliente.id}/citas/${citaId}/cancelar`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMisCitas(prev => prev.map(c => c.id === citaId ? { ...c, estado: 'cancelada' } : c));
+      } else {
+        alert(data.error || t('cuenta.cancelError'));
+      }
+    } catch (err) {
+      alert(t('cuenta.cancelError'));
+    }
+  };
+
+  const handleEliminarCita = async (citaId) => {
+    if (!window.confirm(t('cuenta.confirmDelete'))) return;
+    try {
+      const res = await fetch(`${API_URL}/clientes/${cliente.id}/citas/${citaId}/eliminar`, {
+        method: 'POST'
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMisCitas(prev => prev.filter(c => c.id !== citaId));
+      } else {
+        alert(data.error || t('cuenta.deleteError'));
+      }
+    } catch (err) {
+      alert(t('cuenta.deleteError'));
+    }
+  };
+
+  useEffect(() => {
+    fetch(`${API_URL}/servicios`)
+      .then(r => r.json())
+      .then(setServiciosDb)
+      .catch(() => {});
+    fetch(`${API_URL}/sucursales`)
+      .then(r => r.json())
+      .then(setSucursalesDb)
+      .catch(() => {});
+  }, []);
+
+  const handleCitaChange = (e) => {
+    const { name, value } = e.target;
+    setCitaForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const toggleServicio = (nombre) => {
+    setServiciosSel(prev =>
+      prev.includes(nombre) ? prev.filter(s => s !== nombre) : [...prev, nombre]
+    );
+  };
+
+  const handleCitaSubmit = async (e) => {
+    e.preventDefault();
+    if (!citaForm.nombre || !citaForm.telefono || !citaForm.id_sucursal || serviciosSel.length === 0 || !citaForm.fecha || !citaForm.hora) {
+      setCitaError(t('cita.alertRequired'));
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/citas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...citaForm, servicio: serviciosSel.join(', ') })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCitaEnviada(true);
+        setCitaError('');
+        setCitaForm({ nombre: '', telefono: '', correo: '', id_sucursal: '', fecha: '', hora: '', notas: '' });
+        setServiciosSel([]);
+      } else {
+        setCitaError(data.error || t('cita.error'));
+      }
+    } catch (err) {
+      setCitaError(t('cita.error'));
+    }
+  };
 
   const toggleServicios = () => {
     setServicioActivo(servicioActivo === 'all' ? null : 'all');
   };
 
   const services = {
-    uñas: { image: imgManicure, items: ["acrilicas", "poligel", "softgel", "banoacrilico", "barridoacrilico", "barridopoligel", "manicuresemi", "manicurerubber", "manicuretra", "pedicuresemi", "pedicuretra", "extraccion", "limpieza"] },
-    pestañas: { image: imgPestanas, items: ["pelopelo", "efectorimel", "hibridas", "tecnologica", "puntopunto", "lifting", "henna", "laminado", "borrarpig", "aumentar", "microblading", "microshading", "efectopolvo"], label: "pestanas" },
+    unas: { image: imgManicure, items: ["acrilicas", "poligel", "softgel", "banoacrilico", "barridoacrilico", "barridopoligel", "manicuresemi", "manicurerubber", "manicuretra", "pedicuresemi", "pedicuretra", "extraccion", "limpieza"] },
+    pestanas: { image: imgPestanas, items: ["pelopelo", "efectorimel", "hibridas", "tecnologica", "puntopunto", "lifting", "henna", "laminado", "borrarpig", "aumentar", "microblading", "microshading", "efectopolvo"], label: "pestanas" },
     cabello: { image: imgCabello, items: ["cortes", "botox", "repolarizacion", "tintes", "alisados"] },
     otros: { image: logoImage, items: ["depicompletas", "depicera", "limpiezafacial"], label: "otros" }
   };
@@ -100,6 +250,12 @@ function App() {
 
   const handleNavClick = (targetId) => {
     setMenuOpen(false);
+    if (targetId === 'cuenta' || targetId === 'cita') {
+      setVista('cuenta');
+      window.scrollTo(0, 0);
+      return;
+    }
+    setVista('home');
     const element = document.getElementById(targetId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -113,23 +269,24 @@ function App() {
   return (
     <div className="spa-container">
       <nav className="navbar">
-        <div className="navbar-logo">
+        <button className="navbar-logo" onClick={() => { setVista('home'); window.scrollTo(0, 0); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }} aria-label="Ir al inicio">
           <img src={logoImage} alt="Lush Nails Spa" />
           <span>{t('brand')}</span>
-        </div>
+        </button>
         <div className="navbar-links">
           <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
           <button onClick={() => handleNavClick('services')}>{t('nav.services')}</button>
+          <button onClick={() => handleNavClick('cita')}>{t('nav.cita')}</button>
           <button onClick={() => handleNavClick('gallery')}>{t('nav.gallery')}</button>
           <button onClick={() => handleNavClick('branches')}>{t('nav.branches')}</button>
           <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
           <button onClick={() => handleNavClick('work')}>{t('nav.work')}</button>
-          <button onClick={() => window.history.back()} className="directorio-btn">{t('nav.directorio')}</button>
+          <button onClick={() => handleNavClick('cuenta')} className="cuenta-btn">{cliente ? t('nav.miCuenta') : t('nav.ingresar')}</button>
         </div>
       </nav>
 
       <div className={`fab-menu mobile-menu ${menuOpen ? 'active' : ''}`}>
-        <button onClick={() => { window.history.back(); setMenuOpen(false); }} className="directorio-btn">{t('nav.directorio')}</button>
+        <button onClick={() => { handleNavClick('cuenta'); setMenuOpen(false); }} className="cuenta-btn">{cliente ? t('nav.miCuenta') : t('nav.ingresar')}</button>
         <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
         <button onClick={() => handleNavClick('services')}>{t('nav.services')}</button>
         <button onClick={() => handleNavClick('gallery')}>{t('nav.gallery')}</button>
@@ -139,6 +296,7 @@ function App() {
       </div>
       {menuOpen && <div className="menu-overlay" onClick={() => setMenuOpen(false)}></div>}
 
+      {vista === 'home' && (<>
       <section className="hero">
         <div className="hero-logo mobile-only">
           <img src={logoImage} alt="Lush Nails Spa" />
@@ -192,21 +350,20 @@ function App() {
         <div className="services-container">
           {Object.entries(services).map(([category, data]) => {
             return (
-              <div key={category} className={`service-category-block ${servicioActivo === 'all' || servicioActivo === category ? 'expanded' : ''}`}>
+              <div key={category} className={`service-category-block ${category === 'otros' ? 'service-category-otros' : ''} ${servicioActivo === 'all' || servicioActivo === category ? 'expanded' : ''}`}>
               <img 
                 src={data.image} 
                 alt={category}
                 onClick={() => setServicioActivo(servicioActivo === 'all' ? null : 'all')}
                 style={{
-                  width: category === 'otros' ? '50%' : '100%',
+                  width: '100%',
                   height: 'auto',
                   borderRadius: '8px',
                   cursor: 'pointer',
-                  display: 'block',
-                  margin: category === 'otros' ? '75px auto' : 'unset'
+                  display: 'block'
                 }} 
               />
-                <h3 className="category-title" style={category === 'otros' ? { marginTop: '125px' } : category === 'cabello' ? { marginTop: '25px' } : {}}>{t('services.' + category)}</h3>
+                <h3 className="category-title" style={category === 'cabello' ? { marginTop: '25px' } : {}}>{t('services.' + category)}</h3>
                 <span style={{ cursor: 'pointer', fontSize: '20px', display: 'flex', justifyContent: 'center', color: '#2F4A34' }} onClick={toggleServicios}>
                   {servicioActivo === 'all' ? '▲' : '▼'}
                 </span>
@@ -405,6 +562,164 @@ function App() {
           )}
         </div>
       </section>
+      </>)}
+
+      {vista === 'cuenta' && (<>
+      <div className="cuenta-nav">
+        <button className="btn-volver" onClick={() => setVista('home')}>← {t('cuenta.volver')}</button>
+      </div>
+      <section id="cuenta" className="cuenta">
+        <div className="section-title">
+          <span className="section-subtitle">{t('cuenta.subtitle')}</span>
+          <h2>{t('cuenta.title')}</h2>
+          <div className="divider"></div>
+        </div>
+
+        <div className="cuenta-wrapper">
+          {!cliente ? (
+            <div className="auth-box">
+              <div className="auth-tabs">
+                <button className={authMode === 'login' ? 'active' : ''} onClick={() => { setAuthMode('login'); setAuthError(''); }}>{t('cuenta.loginTab')}</button>
+                <button className={authMode === 'register' ? 'active' : ''} onClick={() => { setAuthMode('register'); setAuthError(''); }}>{t('cuenta.registerTab')}</button>
+              </div>
+              <form onSubmit={handleAuthSubmit} className="auth-form">
+                {authMode === 'register' && (
+                  <>
+                    <div className="form-group">
+                      <input type="text" name="nombre" value={authForm.nombre} onChange={handleAuthChange} required placeholder={t('cuenta.namePlaceholder')} />
+                    </div>
+                    <div className="form-group">
+                      <input type="tel" name="telefono" value={authForm.telefono} onChange={handleAuthChange} required placeholder={t('cuenta.phonePlaceholder')} />
+                    </div>
+                  </>
+                )}
+                <div className="form-group">
+                  <input type="email" name="correo" value={authForm.correo} onChange={handleAuthChange} required placeholder={t('cuenta.emailPlaceholder')} />
+                </div>
+                <div className="form-group">
+                  <input type="password" name="password" value={authForm.password} onChange={handleAuthChange} required placeholder={t('cuenta.passwordPlaceholder')} />
+                </div>
+                {authError && <p className="error-msg">{authError}</p>}
+                <button type="submit" className="submit-btn">{authMode === 'login' ? t('cuenta.loginBtn') : t('cuenta.registerBtn')}</button>
+              </form>
+            </div>
+          ) : (
+            <div className="panel-cliente">
+              <div className="panel-cliente-header">
+                <h3>{t('cuenta.welcome')}, {cliente.nombre}!</h3>
+                <button className="btn-logout" onClick={handleLogout}>{t('cuenta.logout')}</button>
+              </div>
+              <p className="panel-cliente-desc">{t('cuenta.panelDesc')}</p>
+
+              <h4>{t('cuenta.misCitas')}</h4>
+              {misCitas.length === 0 ? (
+                <p className="empty-citas">{t('cuenta.noCitas')}</p>
+              ) : (
+                <div className="mis-citas-list">
+                  {misCitas.map(c => (
+                    <div key={c.id} className="cita-card">
+                      <span className={`cita-estado badge-${c.estado}`}>{c.estado}</span>
+                      <strong>{c.servicio}</strong>
+                      <span>{new Date(c.fecha).toLocaleDateString()} · {c.hora} · {c.sucursal}</span>
+                      {c.notas && <em>{c.notas}</em>}
+                      <div className="cita-acciones">
+                        {c.estado === 'pendiente' && (
+                          <button className="btn-cancelar-cita" onClick={() => handleCancelarCita(c.id)}>{t('cuenta.cancelCita')}</button>
+                        )}
+                        {(c.estado === 'cancelada' || c.estado === 'completada') && (
+                          <button className="btn-eliminar-cita" onClick={() => handleEliminarCita(c.id)}>{t('cuenta.deleteCita')}</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="panel-cliente-books">
+                <h4>{t('cuenta.verServicios')}</h4>
+                <p>{t('cuenta.verServiciosDesc')}</p>
+                <button className="submit-btn" onClick={() => handleNavClick('services')}>{t('nav.services')}</button>
+                <button className="submit-btn" onClick={() => handleNavClick('cita')}>{t('nav.cita')}</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {cliente && (
+      <section id="cita" className="cita">
+        <div className="section-title">
+          <span className="section-subtitle">{t('cita.subtitle')}</span>
+          <h2>{t('cita.title')}</h2>
+          <div className="divider"></div>
+        </div>
+
+        <div className="cita-wrapper">
+          {citaEnviada ? (
+            <div className="success-message">
+              <h3>{t('cita.successTitle')}</h3>
+              <p>{t('cita.successMsg')}</p>
+              <button className="submit-btn" onClick={() => setCitaEnviada(false)}>{t('cita.newCita')}</button>
+            </div>
+          ) : (
+            <form onSubmit={handleCitaSubmit} className="cita-form">
+              <div className="form-group">
+                <input type="text" name="nombre" value={citaForm.nombre} onChange={handleCitaChange} required placeholder={t('cita.namePlaceholder')} />
+              </div>
+              <div className="form-group">
+                <input type="tel" name="telefono" value={citaForm.telefono} onChange={handleCitaChange} required placeholder={t('cita.phonePlaceholder')} />
+              </div>
+              <div className="form-group">
+                <input type="email" name="correo" value={citaForm.correo} onChange={handleCitaChange} placeholder={t('cita.emailPlaceholder')} />
+              </div>
+              <div className="form-group">
+                <select name="id_sucursal" value={citaForm.id_sucursal} onChange={handleCitaChange} required>
+                  <option value="">{t('cita.sucursalPlaceholder')}</option>
+                  {sucursalesDb.map(s => (
+                    <option key={s.id} value={s.id}>{s.nombre}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">{t('cita.servicioPlaceholder')}</label>
+                <div className="chips-list">
+                  {serviciosDb.map(s => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={`chip ${serviciosSel.includes(s.nombre) ? 'chip-selected' : ''}`}
+                      onClick={() => toggleServicio(s.nombre)}
+                    >
+                      {s.nombre}{serviciosSel.includes(s.nombre) ? ' ✓' : ''}
+                    </button>
+                  ))}
+                </div>
+                {serviciosSel.length > 0 && (
+                  <div className="chips-selected">
+                    {serviciosSel.map(nombre => (
+                      <span key={nombre} className="chip-tag">
+                        {nombre}
+                        <button type="button" className="chip-remove" aria-label={`Quitar ${nombre}`} onClick={() => toggleServicio(nombre)}>×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="form-group form-row">
+                <input type="date" name="fecha" value={citaForm.fecha} onChange={handleCitaChange} required />
+                <input type="time" name="hora" value={citaForm.hora} onChange={handleCitaChange} required />
+              </div>
+              <div className="form-group">
+                <textarea name="notas" value={citaForm.notas} onChange={handleCitaChange} placeholder={t('cita.notasPlaceholder')} rows="2" />
+              </div>
+              {citaError && <p className="error-msg">{citaError}</p>}
+              <button type="submit" className="submit-btn">{t('cita.submit')}</button>
+            </form>
+          )}
+        </div>
+      </section>
+      )}
+      </>)}
 
       <footer className="footer">
         <p>© {new Date().getFullYear()} LUSH NAILS SPA. {t('footer.rights')}</p>

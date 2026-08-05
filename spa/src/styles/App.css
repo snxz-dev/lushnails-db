@@ -56,7 +56,7 @@
   text-decoration: none;
 }
 
-.navbar-links .directorio-btn {
+.navbar-links .cuenta-btn {
   margin-left: auto;
   background: #2F4A34;
   color: white;
@@ -66,12 +66,12 @@
   box-shadow: 0 4px 12px rgba(47, 74, 52, 0.3);
 }
 
-.navbar-links .directorio-btn:hover {
+.navbar-links .cuenta-btn:hover {
   background: #5E7F5E;
   color: white;
 }
 
-.navbar-links .directorio-btn::after {
+.navbar-links .cuenta-btn::after {
   display: none;
 }
 
@@ -674,6 +674,10 @@
   margin-right: auto;
 }
 
+.services-container .service-category-otros {
+  grid-column: 2;
+}
+
 .service-img-container {
   position: relative;
 }
@@ -1176,6 +1180,355 @@
   padding: 50px;
   border-radius: 12px;
   box-shadow: var(--shadow);
+}
+
+.cita {
+  background: var(--bg-primary);
+  padding: 100px 5%;
+}
+
+.cita-wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  padding: 50px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.cita-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.cita-form .form-row input {
+  width: 100%;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--verde-salvia);
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  transition: var(--transition);
+  background: var(--bg-primary);
+  color: #7A5A3A;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: #2F4A34;
+  box-shadow: 0 0 0 3px rgba(47, 74, 52, 0.1);
+}
+
+.error-msg {
+  color: #c0392b;
+  background: rgba(192, 57, 43, 0.1);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2F4A34;
+  font-size: 0.95rem;
+}
+
+.chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 8px 14px;
+  background: var(--bg-primary);
+  color: #2F4A34;
+  border: 2px solid var(--verde-salvia);
+  border-radius: 20px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.chip:hover {
+  border-color: #2F4A34;
+}
+
+.chip-selected {
+  background: #2F4A34;
+  color: white;
+  border-color: #2F4A34;
+}
+
+.chips-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chip-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 14px;
+  background: #2F4A34;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.chip-remove {
+  background: transparent;
+  color: white;
+  border: none;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.chip-remove:hover {
+  color: #f5c6cb;
+}
+
+.cuenta-nav {
+  padding: 24px 5%;
+  background: var(--bg-primary);
+}
+
+.btn-volver {
+  padding: 10px 20px;
+  background: transparent;
+  color: #2F4A34;
+  border: 2px solid #2F4A34;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-volver:hover {
+  background: #2F4A34;
+  color: white;
+}
+
+.cuenta {
+  background: var(--bg-primary);
+  padding: 100px 5%;
+}
+
+.cuenta-wrapper {
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  padding: 50px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 14px;
+  background: var(--bg-primary);
+  color: #2F4A34;
+  border: 2px solid var(--verde-salvia);
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.auth-tabs button.active {
+  background: #2F4A34;
+  color: white;
+}
+
+.auth-tabs button:focus-visible {
+  outline: 3px solid #2F4A34;
+  outline-offset: 2px;
+}
+
+.panel-cliente-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.panel-cliente-header h3 {
+  color: #2F4A34;
+  margin: 0;
+}
+
+.btn-logout {
+  padding: 8px 16px;
+  background: transparent;
+  color: #c0392b;
+  border: 2px solid #c0392b;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-logout:hover {
+  background: #c0392b;
+  color: white;
+}
+
+.panel-cliente-desc {
+  color: #7A5A3A;
+  margin-bottom: 25px;
+}
+
+.panel-cliente h4 {
+  color: #2F4A34;
+  margin: 25px 0 12px;
+}
+
+.empty-citas {
+  color: #7A5A3A;
+  font-style: italic;
+}
+
+.mis-citas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cita-card {
+  background: var(--bg-primary);
+  border: 2px solid var(--verde-salvia);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cita-card strong {
+  color: #2F4A34;
+}
+
+.cita-card span:not(.cita-estado) {
+  color: #7A5A3A;
+  font-size: 0.9rem;
+}
+
+.cita-card em {
+  color: #7A5A3A;
+  font-size: 0.85rem;
+}
+
+.cita-estado {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.cita-estado.badge-pendiente {
+  background: #f39c12;
+  color: white;
+}
+
+.cita-estado.badge-confirmada {
+  background: #2ecc71;
+  color: white;
+}
+
+.cita-estado.badge-completada {
+  background: #2F4A34;
+  color: white;
+}
+
+.cita-estado.badge-cancelada {
+  background: #c0392b;
+  color: white;
+}
+
+.btn-cancelar-cita {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 6px 14px;
+  background: transparent;
+  color: #c0392b;
+  border: 1.5px solid #c0392b;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-cancelar-cita:hover {
+  background: #c0392b;
+  color: white;
+}
+
+.cita-acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.btn-eliminar-cita {
+  align-self: flex-start;
+  padding: 6px 14px;
+  background: transparent;
+  color: #7A5A3A;
+  border: 1.5px solid #7A5A3A;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-eliminar-cita:hover {
+  background: #7A5A3A;
+  color: white;
+}
+
+.panel-cliente-books {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.panel-cliente-books .submit-btn {
+  width: auto;
 }
 
 .form-group {

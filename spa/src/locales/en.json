@@ -7,7 +7,10 @@
     "branches": "Branches",
     "contact": "Contact",
     "work": "Work With Us",
-    "directorio": "Directory"
+    "directorio": "Directory",
+    "cita": "Book",
+    "ingresar": "Login",
+    "miCuenta": "My Account"
   },
   "hero": {
     "title": "Elegance in Every Detail",
@@ -27,7 +30,7 @@
   "services": {
     "title": "Our Services",
     "unas": "NAILS",
-    "pestanas": "LASHES & BROWS",
+    "pestanas": "LASHES",
     "cabello": "HAIR",
     "otros": "OTHERS",
     "items": {
@@ -123,5 +126,48 @@
     "es": "ES",
     "ca": "CAT",
     "en": "EN"
+  },
+  "cita": {
+    "subtitle": "Choose your service and book",
+    "title": "Book your Appointment",
+    "namePlaceholder": "Full Name *",
+    "phonePlaceholder": "Phone *",
+    "emailPlaceholder": "Email (optional)",
+    "sucursalPlaceholder": "Select branch *",
+    "servicioPlaceholder": "Select service *",
+    "notasPlaceholder": "Additional notes (optional)",
+    "submit": "Book Appointment",
+    "successTitle": "Appointment requested!",
+    "successMsg": "We received your request. We will contact you to confirm it.",
+    "newCita": "New booking",
+    "alertRequired": "Please complete all fields",
+    "error": "Could not send request. Try again."
+  },
+  "cuenta": {
+    "subtitle": "Client access",
+    "title": "My Account",
+    "loginTab": "Sign In",
+    "registerTab": "Register",
+    "namePlaceholder": "Full Name *",
+    "phonePlaceholder": "Phone *",
+    "emailPlaceholder": "Email *",
+    "passwordPlaceholder": "Password *",
+    "loginBtn": "Sign In",
+    "registerBtn": "Create Account",
+    "welcome": "Hello",
+    "logout": "Log out",
+    "panelDesc": "From here you can view your appointment history, explore the service catalog and book a new appointment.",
+    "misCitas": "My Appointments",
+    "noCitas": "You have no appointments yet.",
+    "verServicios": "Explore our services",
+    "verServiciosDesc": "Browse the full catalog or book your next appointment.",
+    "alertRequired": "Please complete all fields",
+    "confirmCancel": "Are you sure you want to cancel this appointment?",
+    "cancelCita": "Cancel appointment",
+    "cancelError": "Could not cancel the appointment. Try again.",
+    "volver": "Back to page",
+    "deleteCita": "Delete",
+    "confirmDelete": "Are you sure you want to delete this appointment?",
+    "deleteError": "Could not delete the appointment. Try again."
   }
 }

@@ -181,6 +181,38 @@ CREATE TABLE IF NOT EXISTS usuario_admin (
     updated_at      TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
+-- 2.7. Proveedores
+-- Empresas o personas que proveen insumos al spa
+CREATE TABLE IF NOT EXISTS proveedor (
+    id              SERIAL PRIMARY KEY,
+    nombre          VARCHAR(150) NOT NULL,
+    contacto        VARCHAR(150),
+    telefono        VARCHAR(20),
+    correo          VARCHAR(255),
+    tipo_insumo     VARCHAR(100),
+    direccion       VARCHAR(255),
+    notas           TEXT,
+    activo          BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP    NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+-- 2.8. Aliados
+-- Negocios aliados o partners del spa
+CREATE TABLE IF NOT EXISTS aliado (
+    id              SERIAL PRIMARY KEY,
+    nombre          VARCHAR(150) NOT NULL,
+    descripcion     TEXT,
+    telefono        VARCHAR(20),
+    correo          VARCHAR(255),
+    link_whatsapp   VARCHAR(255),
+    direccion       VARCHAR(255),
+    sitio_web       VARCHAR(255),
+    activo          BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP    NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
 -- ============================================================================
 -- 4. ÍNDICES
 -- ============================================================================
@@ -200,6 +232,8 @@ CREATE INDEX IF NOT EXISTS idx_postulacion_fecha ON postulacion(fecha);
 CREATE INDEX IF NOT EXISTS idx_galeria_categoria ON galeria(categoria);
 CREATE INDEX IF NOT EXISTS idx_galeria_activo ON galeria(activo);
 CREATE INDEX IF NOT EXISTS idx_usuario_admin_email ON usuario_admin(email);
+CREATE INDEX IF NOT EXISTS idx_proveedor_activo ON proveedor(activo);
+CREATE INDEX IF NOT EXISTS idx_aliado_activo ON aliado(activo);
 
 -- ============================================================================
 -- 5. FUNCIONES Y TRIGGERS
@@ -245,6 +279,14 @@ CREATE TRIGGER trg_configuracion_updated
 
 CREATE TRIGGER trg_usuario_admin_updated
     BEFORE UPDATE ON usuario_admin
+    FOR EACH ROW EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trg_proveedor_updated
+    BEFORE UPDATE ON proveedor
+    FOR EACH ROW EXECUTE FUNCTION actualizar_timestamp();
+
+CREATE TRIGGER trg_aliado_updated
+    BEFORE UPDATE ON aliado
     FOR EACH ROW EXECUTE FUNCTION actualizar_timestamp();
 
 -- ============================================================================
@@ -468,6 +510,8 @@ ALTER TABLE cliente ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cita ENABLE ROW LEVEL SECURITY;
 ALTER TABLE postulacion ENABLE ROW LEVEL SECURITY;
 ALTER TABLE usuario_admin ENABLE ROW LEVEL SECURITY;
+ALTER TABLE proveedor ENABLE ROW LEVEL SECURITY;
+ALTER TABLE aliado ENABLE ROW LEVEL SECURITY;
 
 -- Nota: Las políticas específicas de RLS se definirán según el middleware
 -- de autenticación que se implemente en el backend (Node.js, Python, etc.)

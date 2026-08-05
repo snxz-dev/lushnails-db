@@ -1,0 +1,64 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Clientes</h1>
+</div>
+
+<h3 style="margin-bottom:12px">Registrar Cliente y Cita</h3>
+<form method="POST" action="/clientes" class="form-grid">
+  <div class="field"><label>Nombre</label><input name="nombre" required></div>
+  <div class="field"><label>Teléfono</label><input name="telefono" required></div>
+  <div class="field"><label>Correo</label><input name="correo" type="email"></div>
+  <div class="field"><label>Dirección</label><input name="direccion"></div>
+  <div class="field"><label>Alergias</label><input name="alergias"></div>
+  <div class="field"><label>Notas</label><input name="notas"></div>
+  <div class="field"><label>Sucursal</label>
+    <select name="id_sucursal">
+      <option value="">— Sin cita —</option>
+      <% sucursales.forEach(s => { %>
+      <option value="<%= s.id %>"><%= s.nombre %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field"><label>Servicio</label>
+    <select name="servicio">
+      <option value="">—</option>
+      <% servicios.forEach(s => { %>
+      <option value="<%= s.nombre %>"><%= s.nombre %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field"><label>Fecha</label><input name="fecha" type="date"></div>
+  <div class="field"><label>Hora</label><input name="hora" type="time"></div>
+  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Registrar</button></div>
+</form>
+
+<h3 style="margin:24px 0 12px">Clientes Existentes</h3>
+<table>
+  <thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Citas</th><th>Última visita</th><th>Activo</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (clientes.length === 0) { %>
+    <tr><td colspan="7" class="empty">Sin clientes registrados</td></tr>
+    <% } %>
+    <% clientes.forEach(c => { %>
+    <tr>
+      <td><%= c.nombre %></td>
+      <td><%= c.telefono %></td>
+      <td><%= c.correo || '-' %></td>
+      <td><%= c.total_citas %></td>
+      <td><%= c.ultima_visita || '-' %></td>
+      <td><span class="badge badge-<%= c.activo %>"><%= c.activo ? 'Sí' : 'No' %></span></td>
+      <td>
+        <form method="POST" action="/clientes/<%= c.id %>/toggle" style="display:inline">
+          <button type="submit" class="btn btn-sm <%= c.activo ? 'btn-warning' : 'btn-success' %>">
+            <%= c.activo ? 'Desactivar' : 'Activar' %>
+          </button>
+        </form>
+        <form method="POST" action="/clientes/<%= c.id %>/delete" style="display:inline" data-confirm="¿Eliminar este cliente y sus citas?">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>
