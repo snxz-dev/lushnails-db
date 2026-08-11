@@ -36,7 +36,9 @@ lushnails-db/
 ## 1. Base de Datos (PostgreSQL)
 
 ### Requisitos
-- Docker + Docker Compose
+- Docker + Docker Compose (funciona en **Linux** y **Windows** con Docker Desktop)
+
+> **Windows**: usa [Docker Desktop](https://www.docker.com/products/docker-desktop/) e instala Docker (revisa que esté corriendo antes de los comandos). Los comandos `docker compose` son idénticos en ambos sistemas.
 
 ### Inicio rápido
 
@@ -89,7 +91,9 @@ empleado ──1:N──> cita
 ## 2. Panel de Administración (Backend)
 
 ### Requisitos
-- Node.js 18+ y pnpm
+- Node.js 18+ y pnpm (funciona en Linux y Windows)
+
+> **Windows**: abre una terminal (PowerShell), sigue los mismos comandos. La BD corre en Docker, que ya compartes con el sistema, así que la conexión a `localhost:5432` es la misma.
 
 ### Inicio rápido
 
