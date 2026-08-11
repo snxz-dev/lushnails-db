@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+
+# Builds
+build/
+dist/
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sist. operativo / editores
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# BD
+*.dump
+backup.sql
