@@ -178,9 +178,9 @@ function App() {
     setCitaForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const toggleServicio = (nombre) => {
+  const toggleServicio = (id) => {
     setServiciosSel(prev =>
-      prev.includes(nombre) ? prev.filter(s => s !== nombre) : [...prev, nombre]
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
     );
   };
 
@@ -194,7 +194,7 @@ function App() {
       const res = await fetch(`${API_URL}/citas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...citaForm, servicio: serviciosSel.join(', ') })
+        body: JSON.stringify({ ...citaForm, servicios: serviciosSel })
       });
       const data = await res.json();
       if (data.success) {
@@ -619,7 +619,7 @@ function App() {
                   {misCitas.map(c => (
                     <div key={c.id} className="cita-card">
                       <span className={`cita-estado badge-${c.estado}`}>{c.estado}</span>
-                      <strong>{c.servicio}</strong>
+                      <strong>{c.servicios || c.servicio || '—'}</strong>
                       <span>{new Date(c.fecha).toLocaleDateString()} · {c.hora} · {c.sucursal}</span>
                       {c.notas && <em>{c.notas}</em>}
                       <div className="cita-acciones">
@@ -687,21 +687,24 @@ function App() {
                     <button
                       key={s.id}
                       type="button"
-                      className={`chip ${serviciosSel.includes(s.nombre) ? 'chip-selected' : ''}`}
-                      onClick={() => toggleServicio(s.nombre)}
+                      className={`chip ${serviciosSel.includes(s.id) ? 'chip-selected' : ''}`}
+                      onClick={() => toggleServicio(s.id)}
                     >
-                      {s.nombre}{serviciosSel.includes(s.nombre) ? ' ✓' : ''}
+                      {s.nombre}{serviciosSel.includes(s.id) ? ' ✓' : ''}
                     </button>
                   ))}
                 </div>
                 {serviciosSel.length > 0 && (
                   <div className="chips-selected">
-                    {serviciosSel.map(nombre => (
-                      <span key={nombre} className="chip-tag">
-                        {nombre}
-                        <button type="button" className="chip-remove" aria-label={`Quitar ${nombre}`} onClick={() => toggleServicio(nombre)}>×</button>
-                      </span>
-                    ))}
+                    {serviciosSel.map(id => {
+                      const svc = serviciosDb.find(s => s.id === id);
+                      return (
+                        <span key={id} className="chip-tag">
+                          {svc ? svc.nombre : id}
+                          <button type="button" className="chip-remove" aria-label={`Quitar ${svc ? svc.nombre : id}`} onClick={() => toggleServicio(id)}>×</button>
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
               </div>

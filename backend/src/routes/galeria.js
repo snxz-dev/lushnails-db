@@ -6,8 +6,14 @@ const router = Router();
 
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM galeria ORDER BY orden, created_at DESC');
-    res.render('galeria', { imagenes: result.rows });
+    const result = await pool.query(
+      `SELECT g.*, cs.nombre AS categoria_nombre
+       FROM galeria g
+       LEFT JOIN categoria_servicio cs ON cs.id = g.id_categoria
+       ORDER BY g.orden, g.created_at DESC`
+    );
+    const categorias = await pool.query('SELECT id, nombre FROM categoria_servicio ORDER BY orden');
+    res.render('galeria', { imagenes: result.rows, categorias: categorias.rows });
   } catch (err) {
     console.error(err);
     res.send('Error');
@@ -15,11 +21,11 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 router.post('/', requireAuth, async (req, res) => {
-  const { titulo, url_imagen, categoria, orden } = req.body;
+  const { titulo, url_imagen, id_categoria, orden } = req.body;
   try {
     await pool.query(
-      'INSERT INTO galeria (titulo, url_imagen, categoria, orden) VALUES ($1, $2, $3, $4)',
-      [titulo || null, url_imagen, categoria || null, parseInt(orden) || 0]
+      'INSERT INTO galeria (titulo, url_imagen, id_categoria, orden) VALUES ($1, $2, $3, $4)',
+      [titulo || null, url_imagen, id_categoria || null, parseInt(orden) || 0]
     );
     res.redirect('/galeria');
   } catch (err) {

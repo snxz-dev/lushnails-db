@@ -50,8 +50,8 @@ router.get('/sucursales', async (req, res) => {
 });
 
 router.post('/citas', async (req, res) => {
-  const { nombre, telefono, correo, id_sucursal, servicio, fecha, hora, notas } = req.body;
-  if (!nombre || !telefono || !id_sucursal || !servicio || !fecha || !hora) {
+  const { nombre, telefono, correo, id_sucursal, servicios, fecha, hora, notas } = req.body;
+  if (!nombre || !telefono || !id_sucursal || !servicios || !servicios.length || !fecha || !hora) {
     return res.status(400).json({ error: 'Faltan campos requeridos' });
   }
   const client = await pool.connect();
@@ -75,11 +75,18 @@ router.post('/citas', async (req, res) => {
       );
       idCliente = nuevoCliente.rows[0].id;
     }
-    await client.query(
-      `INSERT INTO cita (id_cliente, id_sucursal, fecha, hora, servicio, estado, notas)
-       VALUES ($1, $2, $3, $4, $5, 'pendiente', $6)`,
-      [idCliente, id_sucursal, fecha, hora, servicio, notas || null]
+    const nuevaCita = await client.query(
+      `INSERT INTO cita (id_cliente, id_sucursal, fecha, hora, estado, notas)
+       VALUES ($1, $2, $3, $4, 'pendiente', $5) RETURNING id`,
+      [idCliente, id_sucursal, fecha, hora, notas || null]
     );
+    const idCita = nuevaCita.rows[0].id;
+    for (const idServicio of servicios) {
+      await client.query(
+        'INSERT INTO cita_servicio (id_cita, id_servicio) VALUES ($1, $2)',
+        [idCita, idServicio]
+      );
+    }
     await client.query('COMMIT');
     res.json({ success: true });
   } catch (err) {
@@ -147,10 +154,14 @@ router.post('/clientes/login', async (req, res) => {
 router.get('/clientes/:id/citas', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT ci.id, ci.fecha, ci.hora, ci.servicio, ci.estado, ci.notas, s.nombre sucursal
+      `SELECT ci.id, ci.fecha, ci.hora, ci.estado, ci.notas, s.nombre sucursal,
+              COALESCE(string_agg(se.nombre, ', ' ORDER BY se.nombre), '') AS servicios
        FROM cita ci
        JOIN sucursal s ON s.id = ci.id_sucursal
+       LEFT JOIN cita_servicio cs ON cs.id_cita = ci.id
+       LEFT JOIN servicio se ON se.id = cs.id_servicio
        WHERE ci.id_cliente = $1
+       GROUP BY ci.id, s.nombre
        ORDER BY ci.fecha DESC, ci.hora DESC`,
       [req.params.id]
     );

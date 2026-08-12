@@ -55,12 +55,16 @@ router.post('/', requireAuth, async (req, res) => {
       );
       idCliente = insert.rows[0].id;
     }
-    const { id_sucursal, servicio, fecha, hora } = req.body;
-    if (id_sucursal && servicio && fecha && hora) {
+    const { id_sucursal, id_servicio, fecha, hora } = req.body;
+    if (id_sucursal && id_servicio && fecha && hora) {
+      const cita = await client.query(
+        `INSERT INTO cita (id_cliente, id_sucursal, fecha, hora, estado)
+         VALUES ($1, $2, $3, $4, 'pendiente') RETURNING id`,
+        [idCliente, id_sucursal, fecha, hora]
+      );
       await client.query(
-        `INSERT INTO cita (id_cliente, id_sucursal, fecha, hora, servicio, estado)
-         VALUES ($1, $2, $3, $4, $5, 'pendiente')`,
-        [idCliente, id_sucursal, fecha, hora, servicio]
+        'INSERT INTO cita_servicio (id_cita, id_servicio) VALUES ($1, $2)',
+        [cita.rows[0].id, id_servicio]
       );
     }
     await client.query('COMMIT');

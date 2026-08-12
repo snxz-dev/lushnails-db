@@ -20,10 +20,10 @@
     </select>
   </div>
   <div class="field"><label>Servicio</label>
-    <select name="servicio">
+    <select name="id_servicio">
       <option value="">—</option>
       <% servicios.forEach(s => { %>
-      <option value="<%= s.nombre %>"><%= s.nombre %></option>
+      <option value="<%= s.id %>"><%= s.nombre %></option>
       <% }) %>
     </select>
   </div>

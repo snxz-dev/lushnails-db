@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS "session" (
     sid         VARCHAR NOT NULL COLLATE "default",
     sess        JSON NOT NULL,
     expire      TIMESTAMP(6) NOT NULL,
+    id_usuario  INTEGER,
     PRIMARY KEY (sid)
 ) WITH (OIDS=FALSE);
 
@@ -60,6 +61,8 @@ CREATE TABLE IF NOT EXISTS sucursal (
 -- Configuración de enlaces a redes sociales
 CREATE TABLE IF NOT EXISTS configuracion (
     id              SERIAL PRIMARY KEY,
+    id_sucursal     INTEGER      REFERENCES sucursal(id)
+                                  ON DELETE CASCADE ON UPDATE CASCADE,
     clave           VARCHAR(100) NOT NULL UNIQUE,
     valor           TEXT         NOT NULL,
     descripcion     VARCHAR(255),
@@ -129,7 +132,6 @@ CREATE TABLE IF NOT EXISTS cita (
                                   ON DELETE SET NULL ON UPDATE CASCADE,
     fecha           DATE         NOT NULL,
     hora            TIME         NOT NULL,
-    servicio        VARCHAR(255) NOT NULL,
     estado          VARCHAR(20)  NOT NULL DEFAULT 'pendiente'
                                   CHECK (estado IN ('pendiente', 'confirmada', 'completada', 'cancelada')),
     notas           TEXT,
@@ -137,10 +139,22 @@ CREATE TABLE IF NOT EXISTS cita (
     updated_at      TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
--- 2.5. Postulaciones Laborales
+-- 2.5. Cita-Servicio (tabla puente N:M)
+-- Una cita puede incluir varios servicios y un servicio puede estar en varias citas
+CREATE TABLE IF NOT EXISTS cita_servicio (
+    id_cita         INTEGER      NOT NULL REFERENCES cita(id)
+                                  ON DELETE CASCADE ON UPDATE CASCADE,
+    id_servicio     INTEGER      NOT NULL REFERENCES servicio(id)
+                                  ON DELETE RESTRICT ON UPDATE CASCADE,
+    PRIMARY KEY (id_cita, id_servicio)
+);
+
+-- 2.6. Postulaciones Laborales
 -- Formulario "Trabaja con Nosotros"
 CREATE TABLE IF NOT EXISTS postulacion (
     id              SERIAL PRIMARY KEY,
+    id_sucursal     INTEGER      REFERENCES sucursal(id)
+                                  ON DELETE SET NULL ON UPDATE CASCADE,
     nombre          VARCHAR(150) NOT NULL,
     correo          VARCHAR(255) NOT NULL,
     telefono        VARCHAR(20)  NOT NULL,
@@ -150,10 +164,14 @@ CREATE TABLE IF NOT EXISTS postulacion (
     fecha           TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
--- 2.6. Galería
+-- 2.7. Galería
 -- Imágenes de trabajos realizados (uñas, peinados, etc.)
 CREATE TABLE IF NOT EXISTS galeria (
     id              SERIAL PRIMARY KEY,
+    id_categoria    INTEGER      REFERENCES categoria_servicio(id)
+                                  ON DELETE SET NULL ON UPDATE CASCADE,
+    id_sucursal     INTEGER      REFERENCES sucursal(id)
+                                  ON DELETE SET NULL ON UPDATE CASCADE,
     titulo          VARCHAR(200),
     url_imagen      VARCHAR(255) NOT NULL,
     categoria       VARCHAR(50),
@@ -170,6 +188,8 @@ CREATE TABLE IF NOT EXISTS galeria (
 -- Acceso al panel de administración del portal
 CREATE TABLE IF NOT EXISTS usuario_admin (
     id              SERIAL PRIMARY KEY,
+    id_sucursal     INTEGER      REFERENCES sucursal(id)
+                                  ON DELETE SET NULL ON UPDATE CASCADE,
     nombre          VARCHAR(150) NOT NULL,
     email           VARCHAR(255) NOT NULL UNIQUE,
     password_hash   VARCHAR(255) NOT NULL,
@@ -181,10 +201,12 @@ CREATE TABLE IF NOT EXISTS usuario_admin (
     updated_at      TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
--- 2.7. Proveedores
+-- 2.8. Proveedores
 -- Empresas o personas que proveen insumos al spa
 CREATE TABLE IF NOT EXISTS proveedor (
     id              SERIAL PRIMARY KEY,
+    id_sucursal     INTEGER      REFERENCES sucursal(id)
+                                  ON DELETE SET NULL ON UPDATE CASCADE,
     nombre          VARCHAR(150) NOT NULL,
     contacto        VARCHAR(150),
     telefono        VARCHAR(20),
@@ -197,10 +219,12 @@ CREATE TABLE IF NOT EXISTS proveedor (
     updated_at      TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
--- 2.8. Aliados
+-- 2.9. Aliados
 -- Negocios aliados o partners del spa
 CREATE TABLE IF NOT EXISTS aliado (
     id              SERIAL PRIMARY KEY,
+    id_sucursal     INTEGER      REFERENCES sucursal(id)
+                                  ON DELETE SET NULL ON UPDATE CASCADE,
     nombre          VARCHAR(150) NOT NULL,
     descripcion     TEXT,
     telefono        VARCHAR(20),
@@ -216,6 +240,12 @@ CREATE TABLE IF NOT EXISTS aliado (
 -- ============================================================================
 -- 4. ÍNDICES
 -- ============================================================================
+
+-- FK de sesiones hacia el usuario administrador (tabla definida después)
+ALTER TABLE "session"
+    ADD CONSTRAINT fk_session_usuario
+    FOREIGN KEY (id_usuario) REFERENCES usuario_admin(id)
+    ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- Índices para búsquedas frecuentes
 CREATE INDEX IF NOT EXISTS idx_servicio_categoria ON servicio(id_categoria);
@@ -420,7 +450,7 @@ JOIN categoria_servicio cs ON s.id_categoria = cs.id
 WHERE s.activo = TRUE AND cs.activo = TRUE
 ORDER BY cs.orden, s.orden;
 
--- Vista: Citas con información del cliente y sucursal
+-- Vista: Citas con información del cliente, sucursal y servicios
 CREATE OR REPLACE VIEW v_citas_completas AS
 SELECT
     c.id AS cita_id,
@@ -430,13 +460,16 @@ SELECT
     e.nombre AS empleado,
     c.fecha,
     c.hora,
-    c.servicio,
+    string_agg(se.nombre, ', ' ORDER BY se.nombre) AS servicios,
     c.estado,
     c.notas
 FROM cita c
 JOIN cliente cl ON c.id_cliente = cl.id
 JOIN sucursal s ON c.id_sucursal = s.id
 LEFT JOIN empleado e ON c.id_empleado = e.id
+LEFT JOIN cita_servicio cs ON cs.id_cita = c.id
+LEFT JOIN servicio se ON se.id = cs.id_servicio
+GROUP BY c.id, cl.nombre, cl.telefono, s.nombre, e.nombre, c.fecha, c.hora, c.estado, c.notas
 ORDER BY c.fecha DESC, c.hora DESC;
 
 -- Vista: Próximas citas (pendientes y confirmadas)
@@ -457,12 +490,13 @@ CREATE OR REPLACE FUNCTION registrar_cita(
     p_id_sucursal INTEGER,
     p_fecha DATE,
     p_hora TIME,
-    p_servicio VARCHAR,
+    p_servicios INTEGER[],
     p_notas TEXT DEFAULT NULL
 ) RETURNS INTEGER AS $$
 DECLARE
     v_id_cliente INTEGER;
     v_id_cita INTEGER;
+    v_servicio INTEGER;
 BEGIN
     -- Buscar o crear el cliente
     SELECT id INTO v_id_cliente
@@ -490,9 +524,15 @@ BEGIN
     END IF;
 
     -- Crear la cita
-    INSERT INTO cita (id_cliente, id_sucursal, fecha, hora, servicio, notas)
-    VALUES (v_id_cliente, p_id_sucursal, p_fecha, p_hora, p_servicio, p_notas)
+    INSERT INTO cita (id_cliente, id_sucursal, fecha, hora, notas)
+    VALUES (v_id_cliente, p_id_sucursal, p_fecha, p_hora, p_notas)
     RETURNING id INTO v_id_cita;
+
+    -- Vincular los servicios mediante la tabla puente
+    FOREACH v_servicio IN ARRAY p_servicios LOOP
+        INSERT INTO cita_servicio (id_cita, id_servicio)
+        VALUES (v_id_cita, v_servicio);
+    END LOOP;
 
     -- Actualizar última visita del cliente
     UPDATE cliente SET ultima_visita = p_fecha WHERE id = v_id_cliente;
