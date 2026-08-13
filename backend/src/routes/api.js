@@ -116,6 +116,40 @@ router.post('/citas', async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+
+    // Calcular duración total de los servicios solicitados
+    const ids = Array.isArray(servicios) ? servicios.map(Number) : String(servicios).split(',').map(Number).filter(Boolean);
+    const durResult = await client.query(
+      'SELECT COALESCE(SUM(COALESCE(duracion_minutos, 60)), 60) AS total FROM servicio WHERE id = ANY($1)',
+      [ids]
+    );
+    const duracion = Number(durResult.rows[0].total);
+
+    // Verificar solapamiento con citas existentes (pendiente/confirmada)
+    const aMin = (h) => { const [hh, mm] = h.split(':').map(Number); return hh * 60 + mm; };
+    const inicioReq = aMin(hora);
+    const finReq = inicioReq + duracion;
+
+    const citasExist = await client.query(
+      `SELECT c.hora, COALESCE(SUM(COALESCE(s.duracion_minutos, 60)), 60) AS duracion
+       FROM cita c
+       LEFT JOIN cita_servicio cs ON cs.id_cita = c.id
+       LEFT JOIN servicio s ON s.id = cs.id_servicio
+       WHERE c.id_sucursal = $1 AND c.fecha = $2 AND c.estado IN ('pendiente', 'confirmada')
+       GROUP BY c.id, c.hora`,
+      [id_sucursal, fecha]
+    );
+
+    for (const c of citasExist.rows) {
+      const cIni = aMin(c.hora);
+      const cFin = cIni + Number(c.duracion);
+      if (inicioReq < cFin && finReq > cIni) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({ error: 'Horario no disponible' });
+      }
+    }
+
+    // Crear/actualizar cliente
     let cliente = await client.query(
       'SELECT id FROM cliente WHERE telefono = $1 LIMIT 1',
       [telefono]
@@ -134,13 +168,14 @@ router.post('/citas', async (req, res) => {
       );
       idCliente = nuevoCliente.rows[0].id;
     }
+
     const nuevaCita = await client.query(
       `INSERT INTO cita (id_cliente, id_sucursal, fecha, hora, estado, notas)
        VALUES ($1, $2, $3, $4, 'pendiente', $5) RETURNING id`,
       [idCliente, id_sucursal, fecha, hora, notas || null]
     );
     const idCita = nuevaCita.rows[0].id;
-    for (const idServicio of servicios) {
+    for (const idServicio of ids) {
       await client.query(
         'INSERT INTO cita_servicio (id_cita, id_servicio) VALUES ($1, $2)',
         [idCita, idServicio]

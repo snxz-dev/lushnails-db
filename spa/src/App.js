@@ -775,15 +775,20 @@ function App() {
                 <label className="form-label">{t('cita.horaPlaceholder')}</label>
                 {slotsCargando ? (
                   <div className="slots-grid"><span className="slots-msg">Cargando horarios…</span></div>
-                ) : slotsDb.length === 0 ? (
-                  <div className="slots-grid"><span className="slots-msg">Elija fecha, sucursal y al menos un servicio para ver horas.</span></div>
                 ) : (
-                  <SlotsTable
-                    slots={slotsDb}
-                    selected={citaForm.hora}
-                    onSelect={(hora) => setCitaForm(prev => ({ ...prev, hora }))}
-                    readOnly={false}
-                  />
+                  <div className="time-input-row">
+                    <input
+                      type="time"
+                      name="hora_input"
+                      value={citaForm.hora}
+                      onChange={e => setCitaForm(prev => ({ ...prev, hora: e.target.value }))}
+                      min="09:00"
+                      max="19:00"
+                      step="900"
+                      required
+                    />
+                    <div className="slots-msg">Elige una hora entre 09:00 y 19:00. El sistema validará disponibilidad al enviar.</div>
+                  </div>
                 )}
                 <input type="hidden" name="hora" value={citaForm.hora} />
               </div>
