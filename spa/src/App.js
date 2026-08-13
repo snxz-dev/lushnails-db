@@ -69,6 +69,8 @@ function App() {
   const [serviciosSel, setServiciosSel] = useState([]);
   const [citaEnviada, setCitaEnviada] = useState(false);
   const [citaError, setCitaError] = useState('');
+  const [slotsDb, setSlotsDb] = useState([]);
+  const [slotsCargando, setSlotsCargando] = useState(false);
   const [cliente, setCliente] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('lushnails_cliente')) || null;
@@ -172,6 +174,36 @@ function App() {
       .then(setSucursalesDb)
       .catch(() => {});
   }, []);
+
+  // Cargar franjas disponibles según fecha, sucursal y servicios elegidos
+  const citaFecha = citaForm.fecha;
+  const citaSucursal = citaForm.id_sucursal;
+  const citaHora = citaForm.hora;
+  useEffect(() => {
+    if (!citaFecha || !citaSucursal || serviciosSel.length === 0) {
+      setSlotsDb([]);
+      setSlotsCargando(false);
+      return;
+    }
+    setSlotsCargando(true);
+    fetch(`${API_URL}/disponibilidad?fecha=${citaFecha}&id_sucursal=${citaSucursal}&servicios=${serviciosSel.join(',')}`)
+      .then(r => r.json())
+      .then(data => {
+        setSlotsDb(data.slots || []);
+        setSlotsCargando(false);
+      })
+      .catch(() => {
+        setSlotsDb([]);
+        setSlotsCargando(false);
+      });
+  }, [citaFecha, citaSucursal, serviciosSel]);
+
+  // Al cambiar fecha/sucursal/servicios se descarta la hora previamente elegida
+  useEffect(() => {
+    if (citaHora) {
+      setCitaForm(prev => ({ ...prev, hora: '' }));
+    }
+  }, [citaFecha, citaSucursal, serviciosSel, citaHora]);
 
   const handleCitaChange = (e) => {
     const { name, value } = e.target;
@@ -710,7 +742,29 @@ function App() {
               </div>
               <div className="form-group form-row">
                 <input type="date" name="fecha" value={citaForm.fecha} onChange={handleCitaChange} required />
-                <input type="time" name="hora" value={citaForm.hora} onChange={handleCitaChange} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">{t('cita.horaPlaceholder')}</label>
+                {slotsCargando ? (
+                  <div className="slots-grid"><span className="slots-msg">Cargando horarios…</span></div>
+                ) : slotsDb.length === 0 ? (
+                  <div className="slots-grid"><span className="slots-msg">Elija fecha, sucursal y al menos un servicio para ver horas.</span></div>
+                ) : (
+                  <div className="slots-grid">
+                    {slotsDb.map(s => (
+                      <button
+                        key={s.hora}
+                        type="button"
+                        disabled={s.ocupado}
+                        className={`slot ${citaForm.hora === s.hora ? 'slot-selected' : ''} ${s.ocupado ? 'slot-ocupado' : ''}`}
+                        onClick={() => setCitaForm(prev => ({ ...prev, hora: s.hora }))}
+                      >
+                        {s.hora}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <input type="hidden" name="hora" value={citaForm.hora} />
               </div>
               <div className="form-group">
                 <textarea name="notas" value={citaForm.notas} onChange={handleCitaChange} placeholder={t('cita.notasPlaceholder')} rows="2" />

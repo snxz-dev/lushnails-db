@@ -104,7 +104,21 @@ CREATE TABLE IF NOT EXISTS empleado (
     updated_at      TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
--- 2.3. Clientes
+-- 2.3. Horario de Empleados (disponibilidad semanal)
+-- Permite conocer la disponibilidad de cada empleado por día de la semana
+CREATE TABLE IF NOT EXISTS horario_empleado (
+    id           SERIAL PRIMARY KEY,
+    id_empleado  INTEGER NOT NULL REFERENCES empleado(id)
+                            ON DELETE CASCADE ON UPDATE CASCADE,
+    dia_semana   INTEGER NOT NULL CHECK (dia_semana BETWEEN 1 AND 7), -- 1=Lunes ... 7=Domingo
+    hora_inicio  TIME    NOT NULL,
+    hora_fin     TIME    NOT NULL,
+    activo       BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at   TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE (id_empleado, dia_semana)
+);
+
+-- 2.4. Clientes
 -- Información de los clientes del spa
 CREATE TABLE IF NOT EXISTS cliente (
     id              SERIAL PRIMARY KEY,
@@ -149,6 +163,26 @@ CREATE TABLE IF NOT EXISTS cita_servicio (
     PRIMARY KEY (id_cita, id_servicio)
 );
 
+-- 2.6. Servicio Realizado (historial de atención)
+-- Detalle de cada servicio ejecutado en una cita completada; alimenta el BSC
+-- y los indicadores financieros (ingresos mensuales, ticket promedio, etc.)
+CREATE TABLE IF NOT EXISTS servicio_realizado (
+    id           SERIAL PRIMARY KEY,
+    id_cita      INTEGER NOT NULL REFERENCES cita(id)
+                            ON DELETE CASCADE ON UPDATE CASCADE,
+    id_servicio  INTEGER NOT NULL REFERENCES servicio(id)
+                            ON DELETE RESTRICT ON UPDATE CASCADE,
+    id_empleado  INTEGER REFERENCES empleado(id)
+                            ON DELETE SET NULL ON UPDATE CASCADE,
+    id_sucursal  INTEGER NOT NULL REFERENCES sucursal(id)
+                            ON DELETE RESTRICT ON UPDATE CASCADE,
+    monto        NUMERIC(10,2) NOT NULL DEFAULT 0,
+    fecha        DATE    NOT NULL,
+    notas        TEXT,
+    created_at   TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE (id_cita, id_servicio)
+);
+
 -- 2.6. Postulaciones Laborales
 -- Formulario "Trabaja con Nosotros"
 CREATE TABLE IF NOT EXISTS postulacion (
@@ -184,17 +218,44 @@ CREATE TABLE IF NOT EXISTS galeria (
 -- 3. TABLAS DE SEGURIDAD
 -- ============================================================================
 
--- 3.1. Usuarios Administradores
+-- 3.1. Roles del sistema
+CREATE TABLE IF NOT EXISTS rol (
+    id          SERIAL PRIMARY KEY,
+    codigo      VARCHAR(30)  NOT NULL UNIQUE,
+    nombre      VARCHAR(60)  NOT NULL,
+    descripcion TEXT,
+    created_at  TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+-- 3.2. Permisos por módulo
+CREATE TABLE IF NOT EXISTS permiso (
+    id          SERIAL PRIMARY KEY,
+    codigo      VARCHAR(50)  NOT NULL UNIQUE,
+    nombre      VARCHAR(100) NOT NULL,
+    modulo      VARCHAR(50)  NOT NULL,
+    created_at  TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+-- 3.3. Rol-Permiso (tabla intermedia N:M)
+CREATE TABLE IF NOT EXISTS rol_permiso (
+    id_rol     INTEGER NOT NULL REFERENCES rol(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    id_permiso INTEGER NOT NULL REFERENCES permiso(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (id_rol, id_permiso)
+);
+
+-- 3.4. Usuarios Administradores
 -- Acceso al panel de administración del portal
 CREATE TABLE IF NOT EXISTS usuario_admin (
     id              SERIAL PRIMARY KEY,
+    id_rol          INTEGER      REFERENCES rol(id)
+                                  ON DELETE SET NULL ON UPDATE CASCADE,
     id_sucursal     INTEGER      REFERENCES sucursal(id)
                                   ON DELETE SET NULL ON UPDATE CASCADE,
     nombre          VARCHAR(150) NOT NULL,
     email           VARCHAR(255) NOT NULL UNIQUE,
     password_hash   VARCHAR(255) NOT NULL,
     rol             VARCHAR(20)  NOT NULL DEFAULT 'admin'
-                                  CHECK (rol IN ('admin', 'superadmin')),
+                                  CHECK (rol IN ('superadmin', 'admin', 'recepcionista', 'rrhh', 'gerencia', 'contabilidad')),
     activo          BOOLEAN      NOT NULL DEFAULT TRUE,
     ultimo_acceso   TIMESTAMP,
     created_at      TIMESTAMP    NOT NULL DEFAULT NOW(),
@@ -262,6 +323,13 @@ CREATE INDEX IF NOT EXISTS idx_postulacion_fecha ON postulacion(fecha);
 CREATE INDEX IF NOT EXISTS idx_galeria_categoria ON galeria(categoria);
 CREATE INDEX IF NOT EXISTS idx_galeria_activo ON galeria(activo);
 CREATE INDEX IF NOT EXISTS idx_usuario_admin_email ON usuario_admin(email);
+CREATE INDEX IF NOT EXISTS idx_usuario_admin_rol ON usuario_admin(id_rol);
+CREATE INDEX IF NOT EXISTS idx_rol_permiso_rol     ON rol_permiso(id_rol);
+CREATE INDEX IF NOT EXISTS idx_rol_permiso_permiso ON rol_permiso(id_permiso);
+CREATE INDEX IF NOT EXISTS idx_horario_empleado    ON horario_empleado(id_empleado);
+CREATE INDEX IF NOT EXISTS idx_srv_realizado_fecha ON servicio_realizado(fecha);
+CREATE INDEX IF NOT EXISTS idx_srv_realizado_cita  ON servicio_realizado(id_cita);
+CREATE INDEX IF NOT EXISTS idx_srv_realizado_serv  ON servicio_realizado(id_servicio);
 CREATE INDEX IF NOT EXISTS idx_proveedor_activo ON proveedor(activo);
 CREATE INDEX IF NOT EXISTS idx_aliado_activo ON aliado(activo);
 
@@ -332,51 +400,51 @@ INSERT INTO categoria_servicio (nombre, label, imagen_url, descripcion, orden) V
 ON CONFLICT (nombre) DO NOTHING;
 
 -- 6.2. Servicios por Categoría
--- Categoría: Uñas (id=1)
-INSERT INTO servicio (id_categoria, nombre, orden) VALUES
-    (1, 'ACRILICAS', 1),
-    (1, 'POLIGEL', 2),
-    (1, 'SOFT GEL', 3),
-    (1, 'BAÑO ACRILICO', 4),
-    (1, 'BARRIDO ACRILICO', 5),
-    (1, 'BARRIDO POLIGEL', 6),
-    (1, 'MANICURE SEMIPERMANENTE', 7),
-    (1, 'MANICURE NIVELACION RUBBER', 8),
-    (1, 'MANICURE TRADICIONAL', 9),
-    (1, 'PEDICURE SEMIP. LIMPIEZA PROFUNDA', 10),
-    (1, 'PEDICURE TRADICIONAL', 11),
-    (1, 'EXTRACCION UÑEROS', 12),
-    (1, 'LIMPIEZA MANOS O PIES', 13);
+-- Categoría: Uñas (id=1) — duración estándar 60 min
+INSERT INTO servicio (id_categoria, nombre, orden, duracion_minutos) VALUES
+    (1, 'ACRILICAS', 1, 60),
+    (1, 'POLIGEL', 2, 60),
+    (1, 'SOFT GEL', 3, 60),
+    (1, 'BAÑO ACRILICO', 4, 60),
+    (1, 'BARRIDO ACRILICO', 5, 60),
+    (1, 'BARRIDO POLIGEL', 6, 60),
+    (1, 'MANICURE SEMIPERMANENTE', 7, 60),
+    (1, 'MANICURE NIVELACION RUBBER', 8, 60),
+    (1, 'MANICURE TRADICIONAL', 9, 60),
+    (1, 'PEDICURE SEMIP. LIMPIEZA PROFUNDA', 10, 60),
+    (1, 'PEDICURE TRADICIONAL', 11, 60),
+    (1, 'EXTRACCION UÑEROS', 12, 60),
+    (1, 'LIMPIEZA MANOS O PIES', 13, 60);
 
--- Categoría: Pestañas y Cejas (id=2)
-INSERT INTO servicio (id_categoria, nombre, orden) VALUES
-    (2, 'PELO A PELO CLASICAS', 1),
-    (2, 'PELO A PELO EFECTO RIMEL', 2),
-    (2, 'PELO A PELO HIBRIDAS', 3),
-    (2, 'PELO A PELO TECNOLOGICA', 4),
-    (2, 'PUNTO X PUNTO CLASICAS', 5),
-    (2, 'LIFTING', 6),
-    (2, 'SEMIPERMANENTE HENNA', 7),
-    (2, 'LAMINADO', 8),
-    (2, 'BORRAR PIGMENTACION', 9),
-    (2, 'AUMENTAR CEJAS', 10),
-    (2, 'MICROBLADING', 11),
-    (2, 'MICROSHADING', 12),
-    (2, 'EFECTO POLVO', 13);
+-- Categoría: Pestañas y Cejas (id=2) — duración estándar 60 min
+INSERT INTO servicio (id_categoria, nombre, orden, duracion_minutos) VALUES
+    (2, 'PELO A PELO CLASICAS', 1, 60),
+    (2, 'PELO A PELO EFECTO RIMEL', 2, 60),
+    (2, 'PELO A PELO HIBRIDAS', 3, 60),
+    (2, 'PELO A PELO TECNOLOGICA', 4, 60),
+    (2, 'PUNTO X PUNTO CLASICAS', 5, 60),
+    (2, 'LIFTING', 6, 60),
+    (2, 'SEMIPERMANENTE HENNA', 7, 60),
+    (2, 'LAMINADO', 8, 60),
+    (2, 'BORRAR PIGMENTACION', 9, 60),
+    (2, 'AUMENTAR CEJAS', 10, 60),
+    (2, 'MICROBLADING', 11, 60),
+    (2, 'MICROSHADING', 12, 60),
+    (2, 'EFECTO POLVO', 13, 60);
 
--- Categoría: Cabello (id=3)
-INSERT INTO servicio (id_categoria, nombre, orden) VALUES
-    (3, 'Cortes', 1),
-    (3, 'Botox capilar', 2),
-    (3, 'Repolarización', 3),
-    (3, 'Tintes', 4),
-    (3, 'Alisados', 5);
+-- Categoría: Cabello (id=3) — duración estándar 90 min
+INSERT INTO servicio (id_categoria, nombre, orden, duracion_minutos) VALUES
+    (3, 'Cortes', 1, 90),
+    (3, 'Botox capilar', 2, 90),
+    (3, 'Repolarización', 3, 90),
+    (3, 'Tintes', 4, 90),
+    (3, 'Alisados', 5, 90);
 
--- Categoría: Otros (id=4)
-INSERT INTO servicio (id_categoria, nombre, orden) VALUES
-    (4, 'Depilaciones completas', 1),
-    (4, 'Depilaciones con cera o hilo', 2),
-    (4, 'Limpieza facial', 3);
+-- Categoría: Otros (id=4) — duración estándar 30 min
+INSERT INTO servicio (id_categoria, nombre, orden, duracion_minutos) VALUES
+    (4, 'Depilaciones completas', 1, 30),
+    (4, 'Depilaciones con cera o hilo', 2, 30),
+    (4, 'Limpieza facial', 3, 30);
 
 -- 6.3. Sucursales
 INSERT INTO sucursal (nombre, direccion, link_whatsapp, embed_maps, latitud, longitud, orden) VALUES
@@ -420,14 +488,87 @@ INSERT INTO configuracion (clave, valor, descripcion) VALUES
     ('horario_general', 'Lunes a Sábado 9:00 - 19:00', 'Horario general de atención')
 ON CONFLICT (clave) DO NOTHING;
 
--- 6.5. Usuario Administrador por DefectO
+-- 6.5. Roles del sistema
+INSERT INTO rol (codigo, nombre, descripcion) VALUES
+    ('superadmin',    'Super Administrador', 'Acceso total a todos los módulos y permisos'),
+    ('admin',         'Administrador',       'Gestión operativa completa del portal'),
+    ('recepcionista', 'Recepcionista',       'Gestión de citas y clientes'),
+    ('rrhh',          'Recursos Humanos',    'Postulaciones, empleados y horarios'),
+    ('gerencia',      'Gerencia',            'Tablero de comando y Balanced Scorecard'),
+    ('contabilidad',  'Contabilidad',        'Reportes financieros y BSC')
+ON CONFLICT (codigo) DO NOTHING;
+
+-- 6.6. Permisos del sistema
+INSERT INTO permiso (codigo, nombre, modulo) VALUES
+    ('dashboard.ver',            'Ver Dashboard administrativo',        'dashboard'),
+    ('servicios.gestionar',      'Gestionar servicios y categorías',   'servicios'),
+    ('sucursales.gestionar',     'Gestionar sucursales',               'sucursales'),
+    ('citas.gestionar',          'Gestionar citas',                    'citas'),
+    ('clientes.gestionar',       'Gestionar clientes',                 'clientes'),
+    ('empleados.gestionar',      'Gestionar empleados y horarios',     'empleados'),
+    ('galeria.gestionar',        'Gestionar galería',                  'galeria'),
+    ('postulaciones.gestionar',  'Gestionar postulaciones',            'postulaciones'),
+    ('proveedores.gestionar',    'Gestionar proveedores',              'proveedores'),
+    ('aliados.gestionar',        'Gestionar aliados estratégicos',     'aliados'),
+    ('configuracion.gestionar',  'Gestionar configuración general',    'configuracion'),
+    ('roles.gestionar',          'Gestionar usuarios, roles y permisos','roles'),
+    ('bsc.ver',                  'Ver Balanced Scorecard',             'bsc'),
+    ('tablero.ver',              'Ver Tablero de Comando',             'tablero'),
+    ('historial.ver',            'Ver historial de atenciones',        'historial'),
+    ('historial.gestionar',      'Registrar servicios realizados',     'historial')
+ON CONFLICT (codigo) DO NOTHING;
+
+-- 6.7. Asignación de permisos por rol
+-- Superadmin: todos los permisos
+INSERT INTO rol_permiso (id_rol, id_permiso)
+SELECT r.id, p.id FROM rol r CROSS JOIN permiso p
+WHERE r.codigo = 'superadmin'
+ON CONFLICT (id_rol, id_permiso) DO NOTHING;
+
+-- Administrador: operativo completo (excepto gestión de roles/permisos)
+INSERT INTO rol_permiso (id_rol, id_permiso)
+SELECT r.id, p.id FROM rol r CROSS JOIN permiso p
+WHERE r.codigo = 'admin'
+  AND p.codigo NOT IN ('roles.gestionar')
+ON CONFLICT (id_rol, id_permiso) DO NOTHING;
+
+-- Recepcionista: dashboard, citas, clientes, historial
+INSERT INTO rol_permiso (id_rol, id_permiso)
+SELECT r.id, p.id FROM rol r JOIN permiso p ON p.codigo IN
+    ('dashboard.ver','citas.gestionar','clientes.gestionar','historial.ver','historial.gestionar')
+WHERE r.codigo = 'recepcionista'
+ON CONFLICT (id_rol, id_permiso) DO NOTHING;
+
+-- RRHH: postulaciones, empleados, dashboard
+INSERT INTO rol_permiso (id_rol, id_permiso)
+SELECT r.id, p.id FROM rol r JOIN permiso p ON p.codigo IN
+    ('dashboard.ver','empleados.gestionar','postulaciones.gestionar')
+WHERE r.codigo = 'rrhh'
+ON CONFLICT (id_rol, id_permiso) DO NOTHING;
+
+-- Gerencia: dashboard, tablero, bsc, historial
+INSERT INTO rol_permiso (id_rol, id_permiso)
+SELECT r.id, p.id FROM rol r JOIN permiso p ON p.codigo IN
+    ('dashboard.ver','tablero.ver','bsc.ver','historial.ver')
+WHERE r.codigo = 'gerencia'
+ON CONFLICT (id_rol, id_permiso) DO NOTHING;
+
+-- Contabilidad: tablero, bsc, historial
+INSERT INTO rol_permiso (id_rol, id_permiso)
+SELECT r.id, p.id FROM rol r JOIN permiso p ON p.codigo IN
+    ('tablero.ver','bsc.ver','historial.ver')
+WHERE r.codigo = 'contabilidad'
+ON CONFLICT (id_rol, id_permiso) DO NOTHING;
+
+-- 6.8. Usuario Administrador por Defecto
 -- Password por defecto: LushNails2024 (cambiarlo en producción)
-INSERT INTO usuario_admin (nombre, email, password_hash, rol) VALUES
+INSERT INTO usuario_admin (nombre, email, password_hash, rol, id_rol) VALUES
     (
         'Administrador',
         'admin@lushnails.com',
         crypt('LushNails2024', gen_salt('bf')),
-        'superadmin'
+        'superadmin',
+        (SELECT id FROM rol WHERE codigo = 'superadmin')
     )
 ON CONFLICT (email) DO NOTHING;
 
@@ -552,6 +693,25 @@ ALTER TABLE postulacion ENABLE ROW LEVEL SECURITY;
 ALTER TABLE usuario_admin ENABLE ROW LEVEL SECURITY;
 ALTER TABLE proveedor ENABLE ROW LEVEL SECURITY;
 ALTER TABLE aliado ENABLE ROW LEVEL SECURITY;
+ALTER TABLE servicio_realizado ENABLE ROW LEVEL SECURITY;
+ALTER TABLE horario_empleado ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rol ENABLE ROW LEVEL SECURITY;
+ALTER TABLE permiso ENABLE ROW LEVEL SECURITY;
+
+-- Vista financiera: ingresos por servicio realizado (alimenta indicadores BSC)
+CREATE OR REPLACE VIEW v_financiero AS
+SELECT
+    sr.fecha,
+    sr.monto,
+    s.nombre AS servicio,
+    ss.nombre AS sucursal,
+    e.nombre AS empleado,
+    s.precio AS precio_lista,
+    ROUND((sr.monto - s.precio)::numeric, 2) AS diferencia
+FROM servicio_realizado sr
+JOIN servicio s ON s.id = sr.id_servicio
+JOIN sucursal ss ON ss.id = sr.id_sucursal
+LEFT JOIN empleado e ON e.id = sr.id_empleado;
 
 -- Nota: Las políticas específicas de RLS se definirán según el middleware
 -- de autenticación que se implemente en el backend (Node.js, Python, etc.)

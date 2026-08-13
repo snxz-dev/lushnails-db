@@ -141,7 +141,8 @@
     "successMsg": "Hem rebut la teva sol·licitud. Et contactarem per confirmar-la.",
     "newCita": "Nova reserva",
     "alertRequired": "Si us plau completa tots els camps",
-    "error": "No s'ha pogut enviar la sol·licitud. Torna a provar."
+    "error": "No s'ha pogut enviar la sol·licitud. Torna a provar.",
+    "horaPlaceholder": "Hora disponible"
   },
   "cuenta": {
     "subtitle": "Accés per a clients",

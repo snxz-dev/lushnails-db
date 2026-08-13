@@ -27,10 +27,60 @@
       <% }) %>
     </select>
   </div>
-  <div class="field"><label>Fecha</label><input name="fecha" type="date"></div>
-  <div class="field"><label>Hora</label><input name="hora" type="time"></div>
+  <div class="field"><label>Fecha</label><input name="fecha" id="cita-fecha" type="date"></div>
+  <div class="field" id="cita-grid-field" style="display:none">
+    <label>Hora disponible (solo horas libres)</label>
+    <div id="cita-slots" class="slots-grid-admin"></div>
+    <input type="hidden" name="hora" id="cita-hora">
+  </div>
   <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Registrar</button></div>
 </form>
+
+<script>
+(function () {
+  var fecha = document.getElementById('cita-fecha');
+  var suc = document.querySelector('select[name="id_sucursal"]');
+  var serv = document.querySelector('select[name="id_servicio"]');
+  var field = document.getElementById('cita-grid-field');
+  var slots = document.getElementById('cita-slots');
+  var horaHidden = document.getElementById('cita-hora');
+
+  function cargar() {
+    horaHidden.value = '';
+    if (!fecha.value || !suc.value || !serv.value) { field.style.display = 'none'; return; }
+    field.style.display = 'block';
+    slots.innerHTML = '<span class="slots-msg-admin">Cargando horarios…</span>';
+    fetch('/api/disponibilidad?fecha=' + fecha.value + '&id_sucursal=' + suc.value + '&servicios=' + serv.value)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        slots.innerHTML = '';
+        data.slots.forEach(function (s) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = s.hora;
+          b.className = s.ocupado ? 'slot-admin slot-ocupado' : 'slot-admin';
+          b.disabled = s.ocupado;
+          b.title = s.ocupado ? 'Ocupado' : 'Disponible';
+          if (!s.ocupado) {
+            b.onclick = function () {
+              slots.querySelectorAll('.slot-admin').forEach(function (x) { x.classList.remove('slot-selected'); });
+              b.classList.add('slot-selected');
+              horaHidden.value = s.hora;
+            };
+          }
+          slots.appendChild(b);
+        });
+      })
+      .catch(function () {
+        slots.innerHTML = '<span class="slots-msg-admin">Error al consultar disponibilidad</span>';
+      });
+  }
+
+  fecha.addEventListener('change', cargar);
+  suc.addEventListener('change', cargar);
+  serv.addEventListener('change', cargar);
+})();
+</script>
 
 <h3 style="margin:24px 0 12px">Clientes Existentes</h3>
 <table>

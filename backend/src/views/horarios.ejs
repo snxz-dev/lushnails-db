@@ -1,0 +1,56 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Horarios de Disponibilidad</h1>
+</div>
+
+<h3 style="margin-bottom:12px">Registrar Disponibilidad</h3>
+<form method="POST" action="/empleados/horarios" class="form-grid">
+  <div class="field"><label>Empleado *</label>
+    <select name="id_empleado" required>
+      <option value="">—</option>
+      <% empleados.forEach(e => { %>
+      <option value="<%= e.id %>"><%= e.nombre %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field"><label>Día *</label>
+    <select name="dia_semana" required>
+      <% dias.forEach((d, i) => { %>
+      <option value="<%= i + 1 %>"><%= d %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field"><label>Hora inicio *</label><input name="hora_inicio" type="time" required></div>
+  <div class="field"><label>Hora fin *</label><input name="hora_fin" type="time" required></div>
+  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Guardar</button></div>
+</form>
+
+<table>
+  <thead><tr><th>Empleado</th><th>Especialidad</th><th>Día</th><th>Inicio</th><th>Fin</th><th>Activo</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (horarios.length === 0) { %>
+    <tr><td colspan="7" class="empty">Sin horarios registrados</td></tr>
+    <% } %>
+    <% horarios.forEach(h => { %>
+    <tr>
+      <td><%= h.empleado %></td>
+      <td><%= h.especialidad || '—' %></td>
+      <td><%= dias[h.dia_semana - 1] %></td>
+      <td><%= h.hora_inicio %></td>
+      <td><%= h.hora_fin %></td>
+      <td><span class="badge badge-<%= h.activo %>"><%= h.activo ? 'Sí' : 'No' %></span></td>
+      <td>
+        <form method="POST" action="/empleados/horarios/<%= h.id %>/toggle" style="display:inline">
+          <button type="submit" class="btn btn-sm <%= h.activo ? 'btn-warning' : 'btn-success' %>">
+            <%= h.activo ? 'Desactivar' : 'Activar' %>
+          </button>
+        </form>
+        <form method="POST" action="/empleados/horarios/<%= h.id %>/delete" style="display:inline" data-confirm="¿Eliminar este horario?">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

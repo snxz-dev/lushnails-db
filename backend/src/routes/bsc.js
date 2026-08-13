@@ -16,7 +16,26 @@ router.get('/', requireAuth, async (req, res) => {
         (SELECT COUNT(*) FROM cita WHERE fecha >= CURRENT_DATE - INTERVAL '30 days') citas_30dias,
         (SELECT COUNT(*) FROM postulacion) total_postulaciones,
         (SELECT COUNT(*) FROM sucursal WHERE activo = true) sucursales_activas,
-        (SELECT COUNT(*) FROM galeria WHERE activo = true) total_galeria
+        (SELECT COUNT(*) FROM galeria WHERE activo = true) total_galeria,
+        (SELECT COALESCE(SUM(monto),0) FROM servicio_realizado
+           WHERE fecha >= DATE_TRUNC('month', CURRENT_DATE)) ingresos_mensuales,
+        (SELECT COALESCE(SUM(monto),0) FROM servicio_realizado) ingresos_totales,
+        (SELECT ROUND(COALESCE(AVG(monto),0)::numeric,2) FROM servicio_realizado) ticket_promedio
+    `);
+    // Rentabilidad por servicio: ingresos vs. número de atenciones por servicio
+    const rentabilidadXservicio = await pool.query(`
+      SELECT s.nombre AS servicio,
+             COUNT(sr.id) AS atenciones,
+             COALESCE(SUM(sr.monto),0) AS ingresos,
+             COALESCE(s.precio,0) AS precio_lista,
+             ROUND((COALESCE(SUM(sr.monto),0) - COALESCE(s.precio,0) * COUNT(sr.id))::numeric, 2) AS margen
+      FROM servicio_realizado sr
+      JOIN servicio s ON s.id = sr.id_servicio
+      JOIN categoria_servicio cs ON cs.id = s.id_categoria
+      WHERE cs.activo = true
+      GROUP BY s.id, s.nombre, s.precio
+      ORDER BY ingresos DESC
+      LIMIT 10
     `);
     const serviciosXcategoria = await pool.query(`
       SELECT cs.nombre, cs.label, COUNT(s.id) total
@@ -42,6 +61,7 @@ router.get('/', requireAuth, async (req, res) => {
       serviciosXcategoria: serviciosXcategoria.rows,
       citasXestado: citasXestado.rows,
       citasXmes: citasXmes.rows,
+      rentabilidadXservicio: rentabilidadXservicio.rows,
       config: Object.fromEntries(misvision.rows.map(r => [r.clave, r.valor]))
     });
   } catch (err) {

@@ -49,6 +49,65 @@ router.get('/sucursales', async (req, res) => {
   }
 });
 
+// Horarios disponibles: genera franjas de 09:00-19:00 (lun-sáb) según duración
+// de los servicios seleccionados y marca ocupadas las que se solapan con citas
+// pendientes/confirmadas de esa fecha+sucursal.
+const HORA_INICIO = 9 * 60;    // 09:00
+const HORA_FIN = 19 * 60;      // 19:00
+
+router.get('/disponibilidad', async (req, res) => {
+  try {
+    const { fecha, id_sucursal, servicios } = req.query;
+    if (!fecha || !id_sucursal || !servicios) {
+      return res.status(400).json({ error: 'Faltan fecha, id_sucursal o servicios' });
+    }
+    const ids = String(servicios).split(',').map(Number).filter(Boolean);
+    if (ids.length === 0) {
+      return res.status(400).json({ error: 'servicios inválidos' });
+    }
+
+    // Duración total = suma de las duraciones de los servicios seleccionados
+    const durResult = await pool.query(
+      'SELECT COALESCE(SUM(COALESCE(duracion_minutos, 60)), 60) AS total FROM servicio WHERE id = ANY($1)',
+      [ids]
+    );
+    const duracion = Number(durResult.rows[0].total);
+
+    // Citas existentes de esa fecha+sucursal (no canceladas) con su duración
+    const citas = await pool.query(
+      `SELECT c.hora,
+              COALESCE(SUM(COALESCE(s.duracion_minutos, 60)), 60) AS duracion
+       FROM cita c
+       LEFT JOIN cita_servicio cs ON cs.id_cita = c.id
+       LEFT JOIN servicio s ON s.id = cs.id_servicio
+       WHERE c.id_sucursal = $1 AND c.fecha = $2 AND c.estado IN ('pendiente', 'confirmada')
+       GROUP BY c.id, c.hora`,
+      [id_sucursal, fecha]
+    );
+
+    const aMin = (h) => { const [hh, mm] = h.split(':').map(Number); return hh * 60 + mm; };
+    const fHora = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+
+    const slots = [];
+    for (let t = HORA_INICIO; t + duracion <= HORA_FIN; t += duracion) {
+      const inicio = t;
+      const fin = t + duracion;
+      let ocupado = false;
+      for (const c of citas.rows) {
+        const cIni = aMin(c.hora);
+        const cFin = cIni + Number(c.duracion);
+        if (inicio < cFin && fin > cIni) { ocupado = true; break; }
+      }
+      slots.push({ hora: fHora(inicio), ocupado });
+    }
+
+    res.json({ duracion, slots });
+  } catch (err) {
+    console.error('Error al calcular disponibilidad:', err);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+});
+
 router.post('/citas', async (req, res) => {
   const { nombre, telefono, correo, id_sucursal, servicios, fecha, hora, notas } = req.body;
   if (!nombre || !telefono || !id_sucursal || !servicios || !servicios.length || !fecha || !hora) {

@@ -141,7 +141,8 @@
     "successMsg": "We received your request. We will contact you to confirm it.",
     "newCita": "New booking",
     "alertRequired": "Please complete all fields",
-    "error": "Could not send request. Try again."
+    "error": "Could not send request. Try again.",
+    "horaPlaceholder": "Available time"
   },
   "cuenta": {
     "subtitle": "Client access",

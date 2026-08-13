@@ -1,0 +1,51 @@
+<%- include('partials/header') %>
+<div class="top-bar">
+  <h1>Empleados</h1>
+</div>
+
+<h3 style="margin-bottom:12px">Nuevo Empleado</h3>
+<form method="POST" action="/empleados" class="form-grid">
+  <div class="field"><label>Nombre *</label><input name="nombre" required></div>
+  <div class="field"><label>Sucursal</label>
+    <select name="id_sucursal">
+      <option value="">—</option>
+      <% sucursales.forEach(s => { %>
+      <option value="<%= s.id %>"><%= s.nombre %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="field"><label>Especialidad</label><input name="especialidad" placeholder="Ej: Manicurista, Estilista"></div>
+  <div class="field"><label>Teléfono</label><input name="telefono"></div>
+  <div class="field" style="grid-column:1/-1"><label>Horario general</label><input name="horario" placeholder="Ej: L-V 9:00-18:00"></div>
+  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
+</form>
+
+<table>
+  <thead><tr><th>Nombre</th><th>Sucursal</th><th>Especialidad</th><th>Teléfono</th><th>Horario</th><th>Activo</th><th>Acciones</th></tr></thead>
+  <tbody>
+    <% if (empleados.length === 0) { %>
+    <tr><td colspan="7" class="empty">Sin empleados registrados</td></tr>
+    <% } %>
+    <% empleados.forEach(e => { %>
+    <tr>
+      <td><%= e.nombre %></td>
+      <td><%= e.sucursal || '—' %></td>
+      <td><%= e.especialidad || '—' %></td>
+      <td><%= e.telefono || '—' %></td>
+      <td><%= e.horario || '—' %></td>
+      <td><span class="badge badge-<%= e.activo %>"><%= e.activo ? 'Sí' : 'No' %></span></td>
+      <td>
+        <form method="POST" action="/empleados/<%= e.id %>/toggle" style="display:inline">
+          <button type="submit" class="btn btn-sm <%= e.activo ? 'btn-warning' : 'btn-success' %>">
+            <%= e.activo ? 'Desactivar' : 'Activar' %>
+          </button>
+        </form>
+        <form method="POST" action="/empleados/<%= e.id %>/delete" style="display:inline" data-confirm="¿Eliminar este empleado?">
+          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('partials/footer') %>

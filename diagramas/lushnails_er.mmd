@@ -1,0 +1,180 @@
+erDiagram
+    %% ===== CATÁLOGO =====
+    categoria_servicio {
+        serial id PK
+        varchar nombre
+        varchar label
+        text descripcion
+        int orden
+        boolean activo
+    }
+    servicio {
+        serial id PK
+        int id_categoria FK
+        varchar nombre
+        numeric precio
+        int duracion_minutos
+        int orden
+        boolean activo
+    }
+    sucursal {
+        serial id PK
+        varchar nombre
+        varchar direccion
+        varchar link_whatsapp
+        varchar embed_maps
+        numeric latitud
+        numeric longitud
+        int orden
+        boolean activo
+    }
+
+    %% ===== OPERACIÓN =====
+    empleado {
+        serial id PK
+        int id_sucursal FK
+        varchar nombre
+        varchar especialidad
+        varchar telefono
+        varchar horario
+        boolean activo
+    }
+    horario_empleado {
+        serial id PK
+        int id_empleado FK
+        int dia_semana
+        time hora_inicio
+        time hora_fin
+        boolean activo
+    }
+    cliente {
+        serial id PK
+        varchar nombre
+        varchar telefono
+        varchar correo
+        varchar direccion
+        text alergias
+        text notas
+        date ultima_visita
+        boolean activo
+    }
+    cita {
+        serial id PK
+        int id_cliente FK
+        int id_sucursal FK
+        int id_empleado FK
+        date fecha
+        time hora
+        text notas
+        varchar estado
+    }
+    cita_servicio {
+        int id_cita PK,FK
+        int id_servicio PK,FK
+    }
+    servicio_realizado {
+        serial id PK
+        int id_cita FK
+        int id_servicio FK
+        int id_empleado FK
+        int id_sucursal FK
+        numeric monto
+        date fecha
+        text notas
+    }
+
+    %% ===== CONTENIDO Y RECLUTAMIENTO =====
+    galeria {
+        serial id PK
+        int id_categoria FK
+        int id_sucursal FK
+        varchar titulo
+        varchar url_imagen
+        int orden
+        boolean activo
+    }
+    postulacion {
+        serial id PK
+        varchar nombre
+        varchar correo
+        varchar telefono
+        varchar archivo_cv
+        text mensaje
+        boolean leida
+        timestamp fecha
+    }
+    proveedor {
+        serial id PK
+        varchar nombre
+        varchar contacto
+        varchar telefono
+        varchar correo
+        varchar tipo_insumo
+        boolean activo
+    }
+    aliado {
+        serial id PK
+        varchar nombre
+        varchar descripcion
+        varchar link
+        boolean activo
+    }
+    configuracion {
+        varchar clave PK
+        text valor
+        text descripcion
+    }
+
+    %% ===== SEGURIDAD =====
+    rol {
+        serial id PK
+        varchar codigo
+        varchar nombre
+        text descripcion
+    }
+    permiso {
+        serial id PK
+        varchar codigo
+        varchar nombre
+        varchar modulo
+    }
+    rol_permiso {
+        int id_rol PK,FK
+        int id_permiso PK,FK
+    }
+    usuario_admin {
+        serial id PK
+        int id_rol FK
+        int id_sucursal FK
+        varchar nombre
+        varchar email
+        varchar password_hash
+        varchar rol
+        boolean activo
+        timestamp ultimo_acceso
+    }
+    session {
+        varchar sid PK
+        json sess
+        timestamp expire
+    }
+
+    %% ===== RELACIONES =====
+    categoria_servicio ||--o{ servicio : "tiene"
+    sucursal ||--o{ empleado : "emplea"
+    sucursal ||--o{ cita : "recibe"
+    sucursal ||--o{ servicio_realizado : "registra"
+    sucursal ||--o{ galeria : "publica"
+    sucursal ||--o{ usuario_admin : "opera"
+    empleado ||--o{ horario_empleado : "disponibilidad"
+    empleado ||--o{ cita : "atiende"
+    empleado ||--o{ servicio_realizado : "ejecuta"
+    cliente ||--o{ cita : "reserva"
+    cita ||--|{ cita_servicio : "incluye"
+    servicio ||--|{ cita_servicio : "es parte de"
+    cita ||--o{ servicio_realizado : "genera"
+    servicio ||--o{ servicio_realizado : "se ejecuta"
+    servicio ||--o{ galeria : "se muestra en"
+    rol ||--o{ rol_permiso : "tiene"
+    permiso ||--o{ rol_permiso : "asignado a"
+    rol ||--o{ usuario_admin : "asignado a"

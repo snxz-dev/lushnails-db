@@ -118,7 +118,8 @@
     "successMsg": "Hemos recibido tu solicitud. Te contactaremos para confirmarla.",
     "newCita": "Nueva reserva",
     "alertRequired": "Por favor completa todos los campos",
-    "error": "No se pudo enviar la solicitud. Intenta de nuevo."
+    "error": "No se pudo enviar la solicitud. Intenta de nuevo.",
+    "horaPlaceholder": "Hora disponible"
   },
   "cuenta": {
     "subtitle": "Acceso para clientes",

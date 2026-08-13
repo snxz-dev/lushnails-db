@@ -5,7 +5,7 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const pool = require('./config/db');
-const { requireRole } = require('./middleware/auth');
+const { requireRole, cargarPermisos } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const serviciosRoutes = require('./routes/servicios');
@@ -21,6 +21,8 @@ const proveedoresRoutes = require('./routes/proveedores');
 const aliadosRoutes = require('./routes/aliados');
 const rolesRoutes = require('./routes/roles');
 const clientesRoutes = require('./routes/clientes');
+const empleadosRoutes = require('./routes/empleados');
+const historialRoutes = require('./routes/historial');
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 4000;
@@ -45,6 +47,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/', cargarPermisos);
 app.use('/', requireRole);
 
 app.use('/', authRoutes);
@@ -70,6 +73,8 @@ app.use('/proveedores', proveedoresRoutes);
 app.use('/roles', rolesRoutes);
 app.use('/clientes', clientesRoutes);
 app.use('/aliados', aliadosRoutes);
+app.use('/empleados', empleadosRoutes);
+app.use('/historial', historialRoutes);
 
 app.listen(PORT, () => {
   console.log(`Panel admin: http://localhost:${PORT}`);

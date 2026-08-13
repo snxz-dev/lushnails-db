@@ -116,6 +116,24 @@
     .form-error { color: #c0392b; font-size: 0.75rem; display: none; }
     .form-error.visible { display: block; }
 
+    /* Grid de franjas horarias (disponibilidad) */
+    .slots-grid-admin {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 6px; margin-top: 6px;
+    }
+    .slots-msg-admin { grid-column: 1 / -1; color: #888; font-size: 0.8rem; }
+    .slot-admin {
+      padding: 8px 4px; border: 2px solid #ccc; border-radius: 6px;
+      background: #fff; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .slot-admin:hover:not(:disabled) { border-color: #2F4A34; background: #eef5f0; }
+    .slot-admin.slot-selected { border-color: #2F4A34; background: #2F4A34; color: #fff; }
+    .slot-admin.slot-ocupado {
+      background: #f2f2f2; color: #aaa; border-color: #e0e0e0;
+      cursor: not-allowed; text-decoration: line-through;
+    }
+
     /* Stats */
     .stats-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -140,6 +158,7 @@
     .badge-true { background: #d4edda; color: #155724; }
     .badge-false { background: #f8d7da; color: #721c24; }
     .badge-mejorable { background: #fef3cd; color: #856404; }
+    .badge-permiso { background: #e7f0ec; color: #2F4A34; border: 1px solid #c8d9cf; }
 
     .empty { text-align: center; padding: 40px; color: #999; }
     .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem; }
@@ -282,22 +301,47 @@
   </h2>
   <nav aria-label="Secciones del panel">
     <a href="/" <%= path === '/' ? 'aria-current="page" class="active"' : '' %> role="menuitem">🏠 Dashboard</a>
-    <% if (user.rol === 'superadmin' || user.rol === 'reportes') { %>
+    <% if (user.permisos.includes('bsc.ver')) { %>
     <a href="/bsc" <%= path.startsWith('/bsc') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📊 BSC</a>
+    <% } %>
+    <% if (user.permisos.includes('tablero.ver')) { %>
     <a href="/tablero" <%= path.startsWith('/tablero') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🎯 Tablero</a>
     <% } %>
-    <% if (user.rol === 'superadmin' || user.rol === 'ventas') { %>
+    <% if (user.permisos.includes('servicios.gestionar')) { %>
     <a href="/servicios" <%= path.startsWith('/servicios') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📋 Servicios</a>
+    <% } %>
+    <% if (user.permisos.includes('sucursales.gestionar')) { %>
     <a href="/sucursales" <%= path.startsWith('/sucursales') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📍 Sucursales</a>
+    <% } %>
+    <% if (user.permisos.includes('citas.gestionar')) { %>
     <a href="/citas" <%= path.startsWith('/citas') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📅 Citas</a>
+    <% } %>
+    <% if (user.permisos.includes('clientes.gestionar')) { %>
     <a href="/clientes" <%= path.startsWith('/clientes') ? 'aria-current="page" class="active"' : '' %> role="menuitem">👤 Clientes</a>
+    <% } %>
+    <% if (user.permisos.includes('historial.ver')) { %>
+    <a href="/historial" <%= path.startsWith('/historial') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🕐 Historial</a>
+    <% } %>
+    <% if (user.permisos.includes('empleados.gestionar')) { %>
+    <a href="/empleados" <%= path.startsWith('/empleados') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🧑‍🔬 Empleados</a>
+    <a href="/empleados/horarios" <%= path.startsWith('/empleados/horarios') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🗓️ Horarios</a>
+    <% } %>
+    <% if (user.permisos.includes('galeria.gestionar')) { %>
     <a href="/galeria" <%= path.startsWith('/galeria') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🖼️ Galería</a>
+    <% } %>
+    <% if (user.permisos.includes('proveedores.gestionar')) { %>
     <a href="/proveedores" <%= path.startsWith('/proveedores') ? 'aria-current="page" class="active"' : '' %> role="menuitem">📦 Proveedores</a>
+    <% } %>
+    <% if (user.permisos.includes('aliados.gestionar')) { %>
     <a href="/aliados" <%= path.startsWith('/aliados') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🤝 Aliados</a>
     <% } %>
-    <% if (user.rol === 'superadmin') { %>
+    <% if (user.permisos.includes('postulaciones.gestionar')) { %>
     <a href="/postulaciones" <%= path.startsWith('/postulaciones') ? 'aria-current="page" class="active"' : '' %> role="menuitem">👥 Postulaciones</a>
+    <% } %>
+    <% if (user.permisos.includes('roles.gestionar')) { %>
     <a href="/roles" <%= path.startsWith('/roles') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🔐 Roles</a>
+    <% } %>
+    <% if (user.permisos.includes('configuracion.gestionar')) { %>
     <a href="/configuracion" <%= path.startsWith('/configuracion') ? 'aria-current="page" class="active"' : '' %> role="menuitem">⚙️ Configuración</a>
     <% } %>
   </nav>
