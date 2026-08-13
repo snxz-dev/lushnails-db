@@ -294,7 +294,7 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!formData.nombre || !formData.correo || !formData.telefono) {
       alert(t('work.alertRequired'));
       return;
@@ -304,7 +304,7 @@ function App() {
       `Nombre: ${formData.nombre}\nCorreo: ${formData.correo}\nTeléfono: ${formData.telefono}`
     )}`;
     window.location.href = mailtoLink;
-    
+
     setFormEnviado(true);
     setFormData({ nombre: '', correo: '', telefono: '', archivo: null });
     alert(t('work.alertSuccess'));
@@ -376,9 +376,9 @@ function App() {
           </div>
         </div>
         <div className="hero-image-container">
-          <img 
-            src={unas12} 
-            alt="Lush Nails Premium" 
+          <img
+            src={unas12}
+            alt="Lush Nails Premium"
             className="hero-image"
           />
         </div>
@@ -408,13 +408,13 @@ function App() {
           <span className="section-subtitle" style={{color: '#000000', fontSize: '2rem', fontWeight: '600'}}>{t('services.title')}</span>
           <div className="divider"></div>
         </div>
-        
+
         <div className="services-container">
           {Object.entries(services).map(([category, data]) => {
             return (
               <div key={category} className={`service-category-block ${category === 'otros' ? 'service-category-otros' : ''} ${servicioActivo === 'all' || servicioActivo === category ? 'expanded' : ''}`}>
-              <img 
-                src={data.image} 
+              <img
+                src={data.image}
                 alt={category}
                 onClick={() => setServicioActivo(servicioActivo === 'all' ? null : 'all')}
                 style={{
@@ -423,7 +423,7 @@ function App() {
                   borderRadius: '8px',
                   cursor: 'pointer',
                   display: 'block'
-                }} 
+                }}
               />
                 <h3 className="category-title" style={category === 'cabello' ? { marginTop: '25px' } : {}}>{t('services.' + category)}</h3>
                 <span style={{ cursor: 'pointer', fontSize: '20px', display: 'flex', justifyContent: 'center', color: '#2F4A34' }} onClick={toggleServicios}>
@@ -450,9 +450,9 @@ function App() {
         <div className="gallery-grid">
           {fotosUñas.map((foto, index) => (
             <div key={index} className="gallery-item">
-              <img 
-                src={foto} 
-                alt={`Trabajo de uñas ${index + 1}`} 
+              <img
+                src={foto}
+                alt={`Trabajo de uñas ${index + 1}`}
                 onClick={() => setImagenAmpliada(foto)}
               />
             </div>
@@ -477,13 +477,13 @@ function App() {
             <h3>{t('branches.sanantonio')}</h3>
             <p>{t('branches.sanantonioDir')}</p>
             <div className="map-container">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0436544892345!2d-78.45093467129654!3d-0.011645414317095574!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d47efc3d3f0b7d%3A0x0!2sSan+Antonio+de+Pichincha!5e0!3m2!1ses!2sec!4v1700000000000" 
-                width="100%" 
-                height="200" 
-                style={{border:0}} 
-                allowFullScreen="" 
-                loading="lazy" 
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0436544892345!2d-78.45093467129654!3d-0.011645414317095574!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d47efc3d3f0b7d%3A0x0!2sSan+Antonio+de+Pichincha!5e0!3m2!1ses!2sec!4v1700000000000"
+                width="100%"
+                height="200"
+                style={{border:0}}
+                allowFullScreen=""
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="San Antonio de Pichincha"
               ></iframe>
@@ -498,13 +498,13 @@ function App() {
             <h3>{t('branches.pusuqui')}</h3>
             <p>{t('branches.pusuquiDir')}</p>
             <div className="map-container">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.4567890123456!2d-78.45678901234567!3d-0.008!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d47ef123456789%3A0x0!2sCalle+Rafael+Cuervo%2C+Pusuqui!5e0!3m2!1ses!2sec!4v1700000000000" 
-                width="100%" 
-                height="200" 
-                style={{border:0}} 
-                allowFullScreen="" 
-                loading="lazy" 
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.4567890123456!2d-78.45678901234567!3d-0.008!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d47ef123456789%3A0x0!2sCalle+Rafael+Cuervo%2C+Pusuqui!5e0!3m2!1ses!2sec!4v1700000000000"
+                width="100%"
+                height="200"
+                style={{border:0}}
+                allowFullScreen=""
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Pusuqui"
               ></iframe>
@@ -519,13 +519,13 @@ function App() {
             <h3>{t('branches.calderon')}</h3>
             <p>{t('branches.calderonDir')}</p>
             <div className="map-container">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.289376953546!2d-78.43545201888296!3d-0.09247969680315883!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d5ab7e9c559f49%3A0x0!2sCalder%C3%B3n%2C+Quito!5e0!3m2!1ses!2sec!4v1700000000000" 
-                width="100%" 
-                height="200" 
-                style={{border:0}} 
-                allowFullScreen="" 
-                loading="lazy" 
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.289376953546!2d-78.43545201888296!3d-0.09247969680315883!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d5ab7e9c559f49%3A0x0!2sCalder%C3%B3n%2C+Quito!5e0!3m2!1ses!2sec!4v1700000000000"
+                width="100%"
+                height="200"
+                style={{border:0}}
+                allowFullScreen=""
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Calderon"
               ></iframe>
@@ -560,7 +560,7 @@ function App() {
           <h2>{t('work.title')}</h2>
           <div className="divider"></div>
         </div>
-        
+
         <div className="work-form">
           {formEnviado ? (
             <div className="success-message">
@@ -580,7 +580,7 @@ function App() {
                   placeholder={t('work.namePlaceholder')}
                 />
               </div>
-              
+
               <div className="form-group">
                 <input
                   type="email"
@@ -592,7 +592,7 @@ function App() {
                   placeholder={t('work.emailPlaceholder')}
                 />
               </div>
-              
+
               <div className="form-group">
                 <input
                   type="tel"
@@ -604,7 +604,7 @@ function App() {
                   placeholder={t('work.phonePlaceholder')}
                 />
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="archivo">{t('work.fileLabel')}</label>
                 <input
@@ -616,7 +616,7 @@ function App() {
                 />
                 <p className="file-hint">{t('work.fileHint')}</p>
               </div>
-              
+
               <button type="submit" className="submit-btn">
                 {t('work.submit')}
               </button>
@@ -905,7 +905,7 @@ function App() {
       </div>
 
       <div className="whatsapp-float-container">
-        <button 
+        <button
           className="whatsapp-btn"
           onClick={() => setWhatsappMenuOpen(!whatsappMenuOpen)}
           aria-label={t('whatsapp.aria')}

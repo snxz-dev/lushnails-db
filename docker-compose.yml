@@ -20,6 +20,26 @@ services:
       timeout: 5s
       retries: 5
 
+  backend:
+    build: ./backend
+    container_name: lushnails-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: lushnails_spa
+      DB_USER: lushnails_admin
+      DB_PASSWORD: ${DB_PASSWORD:-LushNails2024}
+      SESSION_SECRET: ${SESSION_SECRET:-cambiar-esta-clave-en-produccion}
+      ADMIN_PORT: "4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lushnails-network
+
 volumes:
   pgdata:
     driver: local

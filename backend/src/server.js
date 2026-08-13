@@ -41,14 +41,14 @@ app.use(session({
   cookie: { maxAge: 24 * 60 * 60 * 1000 }
 }));
 
+app.use('/', cargarPermisos);
+app.use('/', requireRole);
+
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.path = req.path;
   next();
 });
-
-app.use('/', cargarPermisos);
-app.use('/', requireRole);
 
 app.use('/', authRoutes);
 app.use('/', dashboardRoutes);
