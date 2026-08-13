@@ -70,8 +70,6 @@ function App() {
   const [serviciosSel, setServiciosSel] = useState([]);
   const [citaEnviada, setCitaEnviada] = useState(false);
   const [citaError, setCitaError] = useState('');
-  const [slotsDb, setSlotsDb] = useState([]);
-  const [slotsCargando, setSlotsCargando] = useState(false);
   // Admin / horarios panel state
   const [adminFecha, setAdminFecha] = useState(new Date().toISOString().slice(0,10));
   const [adminSucursal, setAdminSucursal] = useState('');
@@ -182,28 +180,9 @@ function App() {
       .catch(() => {});
   }, []);
 
-  // Cargar franjas disponibles según fecha, sucursal y servicios elegidos
+  // Cargar valores derivados de citaForm
   const citaFecha = citaForm.fecha;
   const citaSucursal = citaForm.id_sucursal;
-  const citaHora = citaForm.hora;
-  useEffect(() => {
-    if (!citaFecha || !citaSucursal || serviciosSel.length === 0) {
-      setSlotsDb([]);
-      setSlotsCargando(false);
-      return;
-    }
-    setSlotsCargando(true);
-    fetch(`${API_URL}/disponibilidad?fecha=${citaFecha}&id_sucursal=${citaSucursal}&servicios=${serviciosSel.join(',')}`)
-      .then(r => r.json())
-      .then(data => {
-        setSlotsDb(data.slots || []);
-        setSlotsCargando(false);
-      })
-      .catch(() => {
-        setSlotsDb([]);
-        setSlotsCargando(false);
-      });
-  }, [citaFecha, citaSucursal, serviciosSel]);
 
   // Admin panel: fetch slots for selected fecha/sucursal/servicios
   useEffect(() => {
@@ -227,9 +206,8 @@ function App() {
 
   // Al cambiar fecha/sucursal/servicios se descarta la hora previamente elegida
   useEffect(() => {
-    if (citaHora) {
-      setCitaForm(prev => ({ ...prev, hora: '' }));
-    }
+    // reset hora only when date/sucursal/servicios change; avoid depending on current hora to prevent clearing on selection
+    setCitaForm(prev => (prev.hora ? { ...prev, hora: '' } : prev));
   }, [citaFecha, citaSucursal, serviciosSel]);
 
   const handleCitaChange = (e) => {
