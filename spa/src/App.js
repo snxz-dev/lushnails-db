@@ -751,9 +751,6 @@ function App() {
               </div>
               <div className="form-group">
                 <label className="form-label">{t('cita.horaPlaceholder')}</label>
-                {slotsCargando ? (
-                  <div className="slots-grid"><span className="slots-msg">Cargando horarios…</span></div>
-                ) : (
                   <div className="time-input-row">
                     <input
                       type="time"
@@ -767,7 +764,6 @@ function App() {
                     />
                     <div className="slots-msg">Elige una hora entre 09:00 y 19:00. El sistema validará disponibilidad al enviar.</div>
                   </div>
-                )}
                 <input type="hidden" name="hora" value={citaForm.hora} />
               </div>
               <div className="form-group">
