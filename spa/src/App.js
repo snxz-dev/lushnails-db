@@ -197,7 +197,8 @@ function App() {
       return;
     }
     setAdminLoading(true);
-    fetch(`${API_URL}/disponibilidad?fecha=${adminFecha}&id_sucursal=${adminSucursal}&servicios=${adminServicios.join(',')}`)
+    const serviciosParam = adminServicios && adminServicios.length ? `&servicios=${adminServicios.join(',')}` : '';
+    fetch(`${API_URL}/disponibilidad?fecha=${adminFecha}&id_sucursal=${adminSucursal}${serviciosParam}`)
       .then(r => r.json())
       .then(data => {
         setAdminSlots(data.slots || []);
@@ -852,7 +853,7 @@ function App() {
               ) : adminSlots.length === 0 ? (
                 <div className="slots-grid"><span className="slots-msg">Seleccione fecha y sucursal para ver franjas.</span></div>
               ) : (
-                <SlotsTable slots={adminSlots} selected={''} readOnly={true} />
+              <SlotsMatrix slots={adminSlots} selected={''} readOnly={true} cols={6} />
               )}
             </div>
           </div>

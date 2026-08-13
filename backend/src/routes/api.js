@@ -58,20 +58,24 @@ const HORA_FIN = 19 * 60;      // 19:00
 router.get('/disponibilidad', async (req, res) => {
   try {
     const { fecha, id_sucursal, servicios } = req.query;
-    if (!fecha || !id_sucursal || !servicios) {
-      return res.status(400).json({ error: 'Faltan fecha, id_sucursal o servicios' });
+    if (!fecha || !id_sucursal) {
+      return res.status(400).json({ error: 'Faltan fecha o id_sucursal' });
     }
-    const ids = String(servicios).split(',').map(Number).filter(Boolean);
-    if (ids.length === 0) {
-      return res.status(400).json({ error: 'servicios inválidos' });
-    }
+    // servicios is optional. If provided, parse ids; otherwise treat as empty and use default duration
+    const ids = servicios ? String(servicios).split(',').map(Number).filter(Boolean) : [];
 
     // Duración total = suma de las duraciones de los servicios seleccionados
-    const durResult = await pool.query(
-      'SELECT COALESCE(SUM(COALESCE(duracion_minutos, 60)), 60) AS total FROM servicio WHERE id = ANY($1)',
-      [ids]
-    );
-    const duracion = Number(durResult.rows[0].total);
+    let duracion;
+    if (ids.length === 0) {
+      // default slot length when no services provided (admin overview)
+      duracion = 60; // 60 minutes default
+    } else {
+      const durResult = await pool.query(
+        'SELECT COALESCE(SUM(COALESCE(duracion_minutos, 60)), 60) AS total FROM servicio WHERE id = ANY($1)',
+        [ids]
+      );
+      duracion = Number(durResult.rows[0].total);
+    }
 
     // Citas existentes de esa fecha+sucursal (no canceladas) con su duración
     const citas = await pool.query(
