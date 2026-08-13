@@ -891,6 +891,34 @@ function App() {
               </div>
               )}
             </div>
+
+            <div className="form-group">
+              <h4>Reservas del día</h4>
+              {adminCitas.length === 0 ? (
+                <div className="slots-grid"><span className="slots-msg">No hay reservas para la fecha/sucursal seleccionada.</span></div>
+              ) : (
+                <table className="admin-citas-table">
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Hora</th>
+                      <th>Duración</th>
+                      <th>Empleado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminCitas.map(c => (
+                      <tr key={c.id}>
+                        <td>{c.cliente || '-'}</td>
+                        <td>{c.hora}</td>
+                        <td>{c.duracion || '-'}</td>
+                        <td>{c.id_empleado || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         </section>
       )}
