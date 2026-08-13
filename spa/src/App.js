@@ -325,11 +325,13 @@ function App() {
 
   const handleNavClick = (targetId) => {
     setMenuOpen(false);
-    if (targetId === 'cuenta' || targetId === 'cita') {
-      setVista('cuenta');
+    // Sections that are full-page views (not rendered inside home)
+    if (targetId === 'cuenta' || targetId === 'cita' || targetId === 'horarios') {
+      setVista(targetId === 'cuenta' || targetId === 'cita' ? 'cuenta' : 'horarios');
       window.scrollTo(0, 0);
       return;
     }
+    // Default: scroll to section inside home
     setVista('home');
     const element = document.getElementById(targetId);
     if (element) {
