@@ -80,6 +80,7 @@ function App() {
   const [adminServicios, setAdminServicios] = useState([]);
   const [adminSlotsMatrix, setAdminSlotsMatrix] = useState({ times: [], empleados: [] });
   const [adminLoading, setAdminLoading] = useState(false);
+  const [adminCitas, setAdminCitas] = useState([]);
   const [cliente, setCliente] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('lushnails_cliente')) || null;
@@ -208,6 +209,18 @@ function App() {
         setAdminLoading(false);
       });
   }, [adminFecha, adminSucursal, adminServicios]);
+
+  // Admin: also fetch raw citas for this fecha/sucursal to show client table
+  useEffect(() => {
+    if (!adminFecha || !adminSucursal) {
+      setAdminCitas([]);
+      return;
+    }
+    fetch(`${API_URL}/disponibilidad?fecha=${adminFecha}&id_sucursal=${adminSucursal}`)
+      .then(r => r.json())
+      .then(data => setAdminCitas(data.citas || []))
+      .catch(() => setAdminCitas([]));
+  }, [adminFecha, adminSucursal]);
 
   // Client: fetch slots for selected fecha/sucursal/servicios (used by matrix view)
   useEffect(() => {
