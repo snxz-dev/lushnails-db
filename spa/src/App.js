@@ -80,7 +80,6 @@ function App() {
   const [adminServicios, setAdminServicios] = useState([]);
   const [adminSlotsMatrix, setAdminSlotsMatrix] = useState({ times: [], empleados: [] });
   const [adminLoading, setAdminLoading] = useState(false);
-  const [adminCitas, setAdminCitas] = useState([]);
   const [cliente, setCliente] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('lushnails_cliente')) || null;
@@ -210,18 +209,6 @@ function App() {
       });
   }, [adminFecha, adminSucursal, adminServicios]);
 
-  // Admin: also fetch raw citas for this fecha/sucursal to show client table
-  useEffect(() => {
-    if (!adminFecha || !adminSucursal) {
-      setAdminCitas([]);
-      return;
-    }
-    fetch(`${API_URL}/disponibilidad?fecha=${adminFecha}&id_sucursal=${adminSucursal}`)
-      .then(r => r.json())
-      .then(data => setAdminCitas(data.citas || []))
-      .catch(() => setAdminCitas([]));
-  }, [adminFecha, adminSucursal]);
-
   // Client: fetch slots for selected fecha/sucursal/servicios (used by matrix view)
   useEffect(() => {
     if (!citaFecha || !citaSucursal || serviciosSel.length === 0) {
@@ -325,13 +312,11 @@ function App() {
 
   const handleNavClick = (targetId) => {
     setMenuOpen(false);
-    // Sections that are full-page views (not rendered inside home)
-    if (targetId === 'cuenta' || targetId === 'cita' || targetId === 'horarios') {
-      setVista(targetId === 'cuenta' || targetId === 'cita' ? 'cuenta' : 'horarios');
+    if (targetId === 'cuenta' || targetId === 'cita') {
+      setVista('cuenta');
       window.scrollTo(0, 0);
       return;
     }
-    // Default: scroll to section inside home
     setVista('home');
     const element = document.getElementById(targetId);
     if (element) {
@@ -894,33 +879,6 @@ function App() {
               )}
             </div>
 
-            <div className="form-group">
-              <h4>Reservas del día</h4>
-              {adminCitas.length === 0 ? (
-                <div className="slots-grid"><span className="slots-msg">No hay reservas para la fecha/sucursal seleccionada.</span></div>
-              ) : (
-                <table className="admin-citas-table">
-                  <thead>
-                    <tr>
-                      <th>Cliente</th>
-                      <th>Hora</th>
-                      <th>Duración</th>
-                      <th>Empleado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {adminCitas.map(c => (
-                      <tr key={c.id}>
-                        <td>{c.cliente || '-'}</td>
-                        <td>{c.hora}</td>
-                        <td>{c.duracion || '-'}</td>
-                        <td>{c.id_empleado || '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
           </div>
         </section>
       )}
