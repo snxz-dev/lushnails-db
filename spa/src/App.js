@@ -5,6 +5,7 @@ import './styles/menu.css';
 import './styles/accessibility.css';
 import AccessibilityWidget from './AccessibilityWidget';
 import SlotsTable from './components/SlotsTable';
+import SlotsMatrix from './components/SlotsMatrix';
 import logoImage from './assets/logo.svg';
 import unas18 from './assets/uñas18.jpeg';
 import unas1000 from './assets/uñas1000.jpeg';
@@ -70,6 +71,10 @@ function App() {
   const [serviciosSel, setServiciosSel] = useState([]);
   const [citaEnviada, setCitaEnviada] = useState(false);
   const [citaError, setCitaError] = useState('');
+  // Client slots state (for matrix view)
+  const [slotsDb, setSlotsDb] = useState([]);
+  const [slotsCargando, setSlotsCargando] = useState(false);
+  const [showMatrix, setShowMatrix] = useState(false);
   // Admin / horarios panel state
   const [adminFecha, setAdminFecha] = useState(new Date().toISOString().slice(0,10));
   const [adminSucursal, setAdminSucursal] = useState('');
@@ -752,17 +757,31 @@ function App() {
               <div className="form-group">
                 <label className="form-label">{t('cita.horaPlaceholder')}</label>
                   <div className="time-input-row">
-                    <input
-                      type="time"
-                      name="hora_input"
-                      value={citaForm.hora}
-                      onChange={e => setCitaForm(prev => ({ ...prev, hora: e.target.value }))}
-                      min="09:00"
-                      max="19:00"
-                      step="900"
-                      required
-                    />
+                    <div style={{display:'flex',gap:12,alignItems:'center'}}>
+                      <input
+                        type="time"
+                        name="hora_input"
+                        value={citaForm.hora}
+                        onChange={e => setCitaForm(prev => ({ ...prev, hora: e.target.value }))}
+                        min="09:00"
+                        max="19:00"
+                        step="900"
+                        required
+                      />
+                      <label style={{fontSize: '0.9rem'}}>
+                        <input type="checkbox" checked={showMatrix} onChange={e => setShowMatrix(e.target.checked)} /> Mostrar tabla (estilo cine)
+                      </label>
+                    </div>
                     <div className="slots-msg">Elige una hora entre 09:00 y 19:00. El sistema validará disponibilidad al enviar.</div>
+                    {showMatrix && (
+                      <div style={{marginTop:12}}>
+                        {slotsDb.length === 0 ? (
+                          <div className="slots-grid"><span className="slots-msg">No hay franjas precomputadas para la fecha/sucursal/servicios seleccionados.</span></div>
+                        ) : (
+                          <SlotsMatrix slots={slotsDb} selected={citaForm.hora} onSelect={(hora) => setCitaForm(prev => ({...prev, hora}))} cols={6} />
+                        )}
+                      </div>
+                    )}
                   </div>
                 <input type="hidden" name="hora" value={citaForm.hora} />
               </div>

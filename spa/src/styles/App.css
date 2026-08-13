@@ -1878,4 +1878,25 @@
 .legend-busy { background: #ff9b9b; }
 .slots-empty { color: #666; padding: 8px; }
 
+/* Slots matrix (cinema-like) */
+.slots-matrix-wrapper { margin-top: 10px; }
+.slots-matrix { width: 100%; border-collapse: separate; border-spacing: 8px; }
+.seat-cell { padding: 0; }
+.seat-btn {
+  width: 100%;
+  padding: 10px 6px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f7fff7;
+  cursor: pointer;
+  font-weight: 700;
+  color: #2F4A34;
+}
+.seat-btn:disabled { cursor: not-allowed; opacity: 0.9; }
+.seat-free .seat-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(47,74,52,0.08); }
+.seat-free .seat-btn { background: #f7fff7; border-color: #dff3df; }
+.seat-selected .seat-btn { background: #2F4A34; color: white; border-color: #2F4A34; }
+.seat-busy .seat-btn { background: #fff5f5; color: #9a2b2b; border-color: #f3c6c6; }
+.slots-matrix-legend { display:flex; gap:16px; margin-top:8px; align-items:center; }
+
 
