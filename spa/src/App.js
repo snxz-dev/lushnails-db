@@ -339,7 +339,6 @@ function App() {
           <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
           <button onClick={() => handleNavClick('services')}>{t('nav.services')}</button>
           <button onClick={() => handleNavClick('cita')}>{t('nav.cita')}</button>
-          <button onClick={() => handleNavClick('horarios')}>Horarios</button>
           <button onClick={() => handleNavClick('gallery')}>{t('nav.gallery')}</button>
           <button onClick={() => handleNavClick('branches')}>{t('nav.branches')}</button>
           <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
