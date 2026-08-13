@@ -3,6 +3,51 @@
   <h1>Citas</h1>
 </div>
 
+<div class="filters-row">
+  <form method="GET" action="/citas" style="display:flex;gap:8px;align-items:center">
+    <label>Fecha: <input type="date" name="fecha" value="<%= matrix ? (new Date().toISOString().slice(0,10)) : '' %>" /></label>
+    <label>Sucursal:
+      <select name="id_sucursal">
+        <option value="">--Seleccione--</option>
+        <% if (sucursales) { sucursales.forEach(s => { %>
+          <option value="<%= s.id %>"><%= s.nombre %></option>
+        <% }) } %>
+      </select>
+    </label>
+    <button type="submit" class="btn">Ver matriz</button>
+  </form>
+</div>
+
+<% if (matrix) { %>
+  <h3>Matriz de horarios (duración <%= matrix.duracion %> min)</h3>
+  <div class="admin-matrix">
+    <table class="admin-matrix-table">
+      <thead>
+        <tr>
+          <th>Empleado</th>
+          <% matrix.times.forEach(function(t){ %>
+            <th><%= t %></th>
+          <% }) %>
+        </tr>
+      </thead>
+      <tbody>
+        <% matrix.empleados.forEach(function(emp){ %>
+          <tr>
+            <td class="emp-name"><%= emp.nombre %></td>
+            <% emp.slots.forEach(function(s){ %>
+              <td class="emp-cell <%= s.trabaja ? '' : 'emp-off' %>">
+                <button class="seat-btn <%= s.ocupado ? 'seat-busy' : s.trabaja ? 'seat-free' : 'seat-off' %>" <%= (!s.trabaja || s.ocupado) ? 'disabled' : '' %> title="<%= s.ocupado && s.detalle ? s.detalle.cliente : '' %>">
+                  <%= s.hora %>
+                </button>
+              </td>
+            <% }) %>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
 <table>
   <thead><tr><th>Cliente</th><th>Teléfono</th><th>Sucursal</th><th>Fecha</th><th>Hora</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead>
   <tbody>
