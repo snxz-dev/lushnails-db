@@ -4,6 +4,7 @@ import './styles/App.css';
 import './styles/menu.css';
 import './styles/accessibility.css';
 import AccessibilityWidget from './AccessibilityWidget';
+import SlotsTable from './components/SlotsTable';
 import logoImage from './assets/logo.svg';
 import unas18 from './assets/uñas18.jpeg';
 import unas1000 from './assets/uñas1000.jpeg';
@@ -71,6 +72,12 @@ function App() {
   const [citaError, setCitaError] = useState('');
   const [slotsDb, setSlotsDb] = useState([]);
   const [slotsCargando, setSlotsCargando] = useState(false);
+  // Admin / horarios panel state
+  const [adminFecha, setAdminFecha] = useState(new Date().toISOString().slice(0,10));
+  const [adminSucursal, setAdminSucursal] = useState('');
+  const [adminServicios, setAdminServicios] = useState([]);
+  const [adminSlots, setAdminSlots] = useState([]);
+  const [adminLoading, setAdminLoading] = useState(false);
   const [cliente, setCliente] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('lushnails_cliente')) || null;
@@ -198,6 +205,26 @@ function App() {
       });
   }, [citaFecha, citaSucursal, serviciosSel]);
 
+  // Admin panel: fetch slots for selected fecha/sucursal/servicios
+  useEffect(() => {
+    if (!adminFecha || !adminSucursal) {
+      setAdminSlots([]);
+      setAdminLoading(false);
+      return;
+    }
+    setAdminLoading(true);
+    fetch(`${API_URL}/disponibilidad?fecha=${adminFecha}&id_sucursal=${adminSucursal}&servicios=${adminServicios.join(',')}`)
+      .then(r => r.json())
+      .then(data => {
+        setAdminSlots(data.slots || []);
+        setAdminLoading(false);
+      })
+      .catch(() => {
+        setAdminSlots([]);
+        setAdminLoading(false);
+      });
+  }, [adminFecha, adminSucursal, adminServicios]);
+
   // Al cambiar fecha/sucursal/servicios se descarta la hora previamente elegida
   useEffect(() => {
     if (citaHora) {
@@ -309,6 +336,7 @@ function App() {
           <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
           <button onClick={() => handleNavClick('services')}>{t('nav.services')}</button>
           <button onClick={() => handleNavClick('cita')}>{t('nav.cita')}</button>
+          <button onClick={() => handleNavClick('horarios')}>Horarios</button>
           <button onClick={() => handleNavClick('gallery')}>{t('nav.gallery')}</button>
           <button onClick={() => handleNavClick('branches')}>{t('nav.branches')}</button>
           <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
@@ -750,19 +778,12 @@ function App() {
                 ) : slotsDb.length === 0 ? (
                   <div className="slots-grid"><span className="slots-msg">Elija fecha, sucursal y al menos un servicio para ver horas.</span></div>
                 ) : (
-                  <div className="slots-grid">
-                    {slotsDb.map(s => (
-                      <button
-                        key={s.hora}
-                        type="button"
-                        disabled={s.ocupado}
-                        className={`slot ${citaForm.hora === s.hora ? 'slot-selected' : ''} ${s.ocupado ? 'slot-ocupado' : ''}`}
-                        onClick={() => setCitaForm(prev => ({ ...prev, hora: s.hora }))}
-                      >
-                        {s.hora}
-                      </button>
-                    ))}
-                  </div>
+                  <SlotsTable
+                    slots={slotsDb}
+                    selected={citaForm.hora}
+                    onSelect={(hora) => setCitaForm(prev => ({ ...prev, hora }))}
+                    readOnly={false}
+                  />
                 )}
                 <input type="hidden" name="hora" value={citaForm.hora} />
               </div>
@@ -777,6 +798,48 @@ function App() {
       </section>
       )}
       </>)}
+
+      {vista === 'horarios' && (
+        <section id="horarios" className="cita">
+          <div className="section-title">
+            <span className="section-subtitle">Horarios</span>
+            <h2>Visualizador de franjas</h2>
+            <div className="divider"></div>
+          </div>
+          <div className="cita-wrapper">
+            <div className="form-group form-row">
+              <input type="date" value={adminFecha} onChange={e => setAdminFecha(e.target.value)} />
+              <select value={adminSucursal} onChange={e => setAdminSucursal(e.target.value)}>
+                <option value="">Seleccionar sucursal</option>
+                {sucursalesDb.map(s => (
+                  <option key={s.id} value={s.id}>{s.nombre}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Servicios (opcional)</label>
+              <div className="chips-list">
+                {serviciosDb.map(s => (
+                  <button key={s.id} type="button" className={`chip ${adminServicios.includes(s.id) ? 'chip-selected' : ''}`} onClick={() => setAdminServicios(prev => prev.includes(s.id) ? prev.filter(x => x !== s.id) : [...prev, s.id])}>
+                    {s.nombre}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="form-group">
+              {adminLoading ? (
+                <div className="slots-grid"><span className="slots-msg">Cargando horarios…</span></div>
+              ) : adminSlots.length === 0 ? (
+                <div className="slots-grid"><span className="slots-msg">Seleccione fecha y sucursal para ver franjas.</span></div>
+              ) : (
+                <SlotsTable slots={adminSlots} selected={''} readOnly={true} />
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       <footer className="footer">
         <p>© {new Date().getFullYear()} LUSH NAILS SPA. {t('footer.rights')}</p>
