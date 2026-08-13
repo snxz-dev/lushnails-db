@@ -209,6 +209,26 @@ function App() {
       });
   }, [adminFecha, adminSucursal, adminServicios]);
 
+  // Client: fetch slots for selected fecha/sucursal/servicios (used by matrix view)
+  useEffect(() => {
+    if (!citaFecha || !citaSucursal || serviciosSel.length === 0) {
+      setSlotsDb([]);
+      setSlotsCargando(false);
+      return;
+    }
+    setSlotsCargando(true);
+    fetch(`${API_URL}/disponibilidad?fecha=${citaFecha}&id_sucursal=${citaSucursal}&servicios=${serviciosSel.join(',')}`)
+      .then(r => r.json())
+      .then(data => {
+        setSlotsDb(data.slots || []);
+        setSlotsCargando(false);
+      })
+      .catch(() => {
+        setSlotsDb([]);
+        setSlotsCargando(false);
+      });
+  }, [citaFecha, citaSucursal, serviciosSel]);
+
   // Al cambiar fecha/sucursal/servicios se descarta la hora previamente elegida
   useEffect(() => {
     // reset hora only when date/sucursal/servicios change; avoid depending on current hora to prevent clearing on selection
