@@ -73,7 +73,7 @@ function App() {
   const [citaError, setCitaError] = useState('');
   // Client slots state (for matrix view)
   const [slotsDb, setSlotsDb] = useState([]);
-  const [slotsCargando, setSlotsCargando] = useState(false);
+  const [, setSlotsCargando] = useState(false);
   const [showMatrix, setShowMatrix] = useState(false);
   // Admin / horarios panel state
   const [adminFecha, setAdminFecha] = useState(new Date().toISOString().slice(0,10));
