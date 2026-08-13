@@ -13,4 +13,16 @@
   <% }) %>
   <div><button type="submit" class="btn btn-primary">Guardar Cambios</button></div>
 </form>
+
+<form method="POST" action="/configuracion/clear-test-data" onsubmit="return confirm('¿Seguro? Esto eliminará clientes y citas de prueba.');" style="margin-top:20px">
+  <button type="submit" class="btn btn-danger">Eliminar datos de prueba</button>
+</form>
+
+<% if (typeof message !== 'undefined') { %>
+  <div class="alert alert-success" style="margin-top:12px"><%= message %></div>
+<% } %>
+<% if (typeof error !== 'undefined') { %>
+  <div class="alert alert-danger" style="margin-top:12px"><%= error %></div>
+<% } %>
+
 <%- include('partials/footer') %>

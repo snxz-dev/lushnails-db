@@ -42,4 +42,29 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
+router.post('/clear-test-data', requireAuth, async (req, res) => {
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Only remove test data: citas and clientes
+      await client.query('DELETE FROM cita_servicio');
+      await client.query('DELETE FROM servicio_realizado');
+      await client.query('DELETE FROM cita');
+      await client.query('DELETE FROM cliente');
+      await client.query('COMMIT');
+      res.render('configuracion', { configs: (await pool.query('SELECT * FROM configuracion ORDER BY clave')).rows, message: 'Datos de prueba eliminados.' });
+    } catch (e) {
+      await client.query('ROLLBACK');
+      console.error('Error clearing test data:', e);
+      res.render('configuracion', { configs: (await pool.query('SELECT * FROM configuracion ORDER BY clave')).rows, error: 'Error al eliminar datos de prueba' });
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    console.error(err);
+    res.redirect('/configuracion');
+  }
+});
+
 module.exports = router;
