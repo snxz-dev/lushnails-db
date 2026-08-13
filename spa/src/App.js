@@ -79,7 +79,7 @@ function App() {
   const [adminFecha, setAdminFecha] = useState(new Date().toISOString().slice(0,10));
   const [adminSucursal, setAdminSucursal] = useState('');
   const [adminServicios, setAdminServicios] = useState([]);
-  const [adminSlots, setAdminSlots] = useState([]);
+  const [adminSlotsMatrix, setAdminSlotsMatrix] = useState({ times: [], empleados: [] });
   const [adminLoading, setAdminLoading] = useState(false);
   const [cliente, setCliente] = useState(() => {
     try {
@@ -192,20 +192,20 @@ function App() {
   // Admin panel: fetch slots for selected fecha/sucursal/servicios
   useEffect(() => {
     if (!adminFecha || !adminSucursal) {
-      setAdminSlots([]);
+      setAdminSlotsMatrix({ times: [], empleados: [] });
       setAdminLoading(false);
       return;
     }
     setAdminLoading(true);
     const serviciosParam = adminServicios && adminServicios.length ? `&servicios=${adminServicios.join(',')}` : '';
-    fetch(`${API_URL}/disponibilidad?fecha=${adminFecha}&id_sucursal=${adminSucursal}${serviciosParam}`)
+    fetch(`${API_URL}/disponibilidad/empleados?fecha=${adminFecha}&id_sucursal=${adminSucursal}${serviciosParam}`)
       .then(r => r.json())
       .then(data => {
-        setAdminSlots(data.slots || []);
+        setAdminSlotsMatrix({ times: data.times || [], empleados: data.empleados || [] });
         setAdminLoading(false);
       })
       .catch(() => {
-        setAdminSlots([]);
+        setAdminSlotsMatrix({ times: [], empleados: [] });
         setAdminLoading(false);
       });
   }, [adminFecha, adminSucursal, adminServicios]);
@@ -850,10 +850,33 @@ function App() {
             <div className="form-group">
               {adminLoading ? (
                 <div className="slots-grid"><span className="slots-msg">Cargando horarios…</span></div>
-              ) : adminSlots.length === 0 ? (
+              ) : adminSlotsMatrix.empleados.length === 0 ? (
                 <div className="slots-grid"><span className="slots-msg">Seleccione fecha y sucursal para ver franjas.</span></div>
               ) : (
-              <SlotsMatrix slots={adminSlots} selected={''} readOnly={true} cols={6} />
+              <div className="admin-matrix">
+                <table className="admin-matrix-table">
+                  <thead>
+                    <tr>
+                      <th>Empleado</th>
+                      {adminSlotsMatrix.times.map((t, i) => <th key={i}>{t}</th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminSlotsMatrix.empleados.map(emp => (
+                      <tr key={emp.id}>
+                        <td className="emp-name">{emp.nombre}</td>
+                        {emp.slots.map((s, si) => (
+                          <td key={si} className={`emp-cell ${s.trabaja ? '' : 'emp-off'}`}>
+                            <button className={`seat-btn ${s.ocupado ? 'seat-busy' : s.trabaja ? 'seat-free' : 'seat-off'}`} disabled={!s.trabaja || s.ocupado} title={s.ocupado && s.detalle ? `${s.detalle.cliente}` : ''}>
+                              {s.hora}
+                            </button>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               )}
             </div>
           </div>

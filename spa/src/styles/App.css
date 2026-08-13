@@ -1893,10 +1893,18 @@
   color: #2F4A34;
 }
 .seat-btn:disabled { cursor: not-allowed; opacity: 0.9; }
-.seat-free .seat-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(47,74,52,0.08); }
+.seat-free:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(47,74,52,0.08); }
 .seat-free .seat-btn { background: #f7fff7; border-color: #dff3df; }
 .seat-selected .seat-btn { background: #2F4A34; color: white; border-color: #2F4A34; }
 .seat-busy .seat-btn { background: #fff5f5; color: #9a2b2b; border-color: #f3c6c6; }
 .slots-matrix-legend { display:flex; gap:16px; margin-top:8px; align-items:center; }
+
+/* Admin matrix table */
+.admin-matrix-table { width: 100%; border-collapse: collapse; }
+.admin-matrix-table th, .admin-matrix-table td { border: 1px solid #eee; padding: 6px; text-align: center; }
+.admin-matrix-table th { background: #f5f5f5; font-weight: 700; }
+.emp-name { text-align: left; padding-left: 12px; font-weight: 700; color: #2F4A34; }
+.emp-off .seat-btn { background: #f0f0f0; color: #999; border-color: #ddd; cursor: not-allowed; }
+.emp-cell { min-width: 80px; }
 
 
