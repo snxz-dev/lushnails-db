@@ -4,7 +4,6 @@ import './styles/App.css';
 import './styles/menu.css';
 import './styles/accessibility.css';
 import AccessibilityWidget from './AccessibilityWidget';
-import SlotsTable from './components/SlotsTable';
 import SlotsMatrix from './components/SlotsMatrix';
 import logoImage from './assets/logo.svg';
 import unas18 from './assets/uñas18.jpeg';
