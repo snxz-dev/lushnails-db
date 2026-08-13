@@ -44,6 +44,13 @@ router.post('/', requireAuth, async (req, res) => {
 
 router.post('/clear-test-data', requireAuth, async (req, res) => {
   try {
+    // Only allow admin or superadmin roles to perform this action
+    const user = req.session.user || {};
+    if (user.rol !== 'admin' && user.rol !== 'superadmin') {
+      const configs = (await pool.query('SELECT * FROM configuracion ORDER BY clave')).rows;
+      return res.status(403).render('configuracion', { configs, error: 'No tienes permisos para ejecutar esta acción' });
+    }
+
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
