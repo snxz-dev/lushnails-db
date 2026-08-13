@@ -203,7 +203,7 @@ function App() {
     if (citaHora) {
       setCitaForm(prev => ({ ...prev, hora: '' }));
     }
-  }, [citaFecha, citaSucursal, serviciosSel, citaHora]);
+  }, [citaFecha, citaSucursal, serviciosSel]);
 
   const handleCitaChange = (e) => {
     const { name, value } = e.target;
