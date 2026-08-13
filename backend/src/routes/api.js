@@ -57,12 +57,18 @@ const HORA_FIN = 19 * 60;      // 19:00
 
 router.get('/disponibilidad', async (req, res) => {
   try {
-    const { fecha, id_sucursal, servicios } = req.query;
+    const { fecha } = req.query;
+    let { id_sucursal, servicios } = req.query;
     if (!fecha || !id_sucursal) {
       return res.status(400).json({ error: 'Faltan fecha o id_sucursal' });
     }
+    // sanitize id_sucursal (strip non-digit characters like smart quotes) and parse
+    id_sucursal = parseInt(String(id_sucursal).replace(/[^\d-]/g, ''), 10);
+    if (!Number.isInteger(id_sucursal)) {
+      return res.status(400).json({ error: 'id_sucursal inválido' });
+    }
     // servicios is optional. If provided, parse ids; otherwise treat as empty and use default duration
-    const ids = servicios ? String(servicios).split(',').map(Number).filter(Boolean) : [];
+    const ids = servicios ? String(servicios).split(',').map(s => parseInt(String(s).replace(/[^\d-]/g, ''), 10)).filter(Number.isInteger) : [];
 
     // Duración total = suma de las duraciones de los servicios seleccionados
     let duracion;
@@ -117,9 +123,13 @@ router.get('/disponibilidad', async (req, res) => {
 // Disponibilidad por empleado: devuelve matriz de timeslots por empleado con flags de trabajo y ocupación
 router.get('/disponibilidad/empleados', async (req, res) => {
   try {
-    const { fecha, id_sucursal, servicios } = req.query;
+    const { fecha } = req.query;
+    let { id_sucursal, servicios } = req.query;
     if (!fecha || !id_sucursal) return res.status(400).json({ error: 'Faltan fecha o id_sucursal' });
-    const ids = servicios ? String(servicios).split(',').map(Number).filter(Boolean) : [];
+    // sanitize id_sucursal and servicios
+    id_sucursal = parseInt(String(id_sucursal).replace(/[^\d-]/g, ''), 10);
+    if (!Number.isInteger(id_sucursal)) return res.status(400).json({ error: 'id_sucursal inválido' });
+    const ids = servicios ? String(servicios).split(',').map(s => parseInt(String(s).replace(/[^\d-]/g, ''), 10)).filter(Number.isInteger) : [];
     const duracion = ids.length === 0 ? 60 : Number((await pool.query('SELECT COALESCE(SUM(COALESCE(duracion_minutos,60)),60) AS total FROM servicio WHERE id = ANY($1)', [ids])).rows[0].total);
 
     // empleados activos en la sucursal
