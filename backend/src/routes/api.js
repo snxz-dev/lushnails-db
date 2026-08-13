@@ -77,15 +77,17 @@ router.get('/disponibilidad', async (req, res) => {
       duracion = Number(durResult.rows[0].total);
     }
 
-    // Citas existentes de esa fecha+sucursal (no canceladas) con su duración
+    // Citas existentes de esa fecha+sucursal (no canceladas) with their durations and assigned employee
     const citas = await pool.query(
-      `SELECT c.hora,
-              COALESCE(SUM(COALESCE(s.duracion_minutos, 60)), 60) AS duracion
+      `SELECT c.id, c.hora, c.id_empleado,
+              COALESCE(SUM(COALESCE(s.duracion_minutos, 60)), 60) AS duracion,
+              cl.nombre AS cliente
        FROM cita c
        LEFT JOIN cita_servicio cs ON cs.id_cita = c.id
        LEFT JOIN servicio s ON s.id = cs.id_servicio
+       LEFT JOIN cliente cl ON cl.id = c.id_cliente
        WHERE c.id_sucursal = $1 AND c.fecha = $2 AND c.estado IN ('pendiente', 'confirmada')
-       GROUP BY c.id, c.hora`,
+       GROUP BY c.id, c.hora, c.id_empleado, cl.nombre`,
       [id_sucursal, fecha]
     );
 
@@ -105,9 +107,78 @@ router.get('/disponibilidad', async (req, res) => {
       slots.push({ hora: fHora(inicio), ocupado });
     }
 
-    res.json({ duracion, slots });
+    res.json({ duracion, slots, citas: citas.rows });
   } catch (err) {
     console.error('Error al calcular disponibilidad:', err);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+});
+
+// Disponibilidad por empleado: devuelve matriz de timeslots por empleado con flags de trabajo y ocupación
+router.get('/disponibilidad/empleados', async (req, res) => {
+  try {
+    const { fecha, id_sucursal, servicios } = req.query;
+    if (!fecha || !id_sucursal) return res.status(400).json({ error: 'Faltan fecha o id_sucursal' });
+    const ids = servicios ? String(servicios).split(',').map(Number).filter(Boolean) : [];
+    const duracion = ids.length === 0 ? 60 : Number((await pool.query('SELECT COALESCE(SUM(COALESCE(duracion_minutos,60)),60) AS total FROM servicio WHERE id = ANY($1)', [ids])).rows[0].total);
+
+    // empleados activos en la sucursal
+    const empleadosRes = await pool.query('SELECT id, nombre FROM empleado WHERE activo = true AND (id_sucursal = $1 OR id_sucursal IS NULL) ORDER BY nombre', [id_sucursal]);
+    const empleados = empleadosRes.rows;
+
+    // horarios empleados para el dia de semana
+    const diaSemana = (new Date(fecha)).getDay(); // 0=Sunday..6=Sat
+    const diaIndex = diaSemana === 0 ? 7 : diaSemana; // convert to 1..7
+    const horariosRes = await pool.query('SELECT id_empleado, hora_inicio, hora_fin FROM horario_empleado WHERE dia_semana = $1 AND activo = true', [diaIndex]);
+    const horariosMap = new Map();
+    for (const h of horariosRes.rows) horariosMap.set(h.id_empleado, { inicio: h.hora_inicio, fin: h.hora_fin });
+
+    // citas existentes con cliente and empleado
+    const citasRes = await pool.query(`SELECT c.id, c.hora, c.id_empleado, c.id_cliente, cl.nombre as cliente, COALESCE(SUM(COALESCE(s.duracion_minutos,60)),60) AS duracion
+      FROM cita c
+      LEFT JOIN cita_servicio cs ON cs.id_cita = c.id
+      LEFT JOIN servicio s ON s.id = cs.id_servicio
+      LEFT JOIN cliente cl ON cl.id = c.id_cliente
+      WHERE c.id_sucursal = $1 AND c.fecha = $2 AND c.estado IN ('pendiente','confirmada')
+      GROUP BY c.id, c.hora, c.id_empleado, c.id_cliente, cl.nombre`, [id_sucursal, fecha]);
+
+    const citas = citasRes.rows;
+
+    const aMin = (h) => { const [hh, mm] = String(h).split(':').map(Number); return hh * 60 + (mm || 0); };
+    const fHora = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+
+    const times = [];
+    for (let t = HORA_INICIO; t + duracion <= HORA_FIN; t += duracion) times.push({ inicio: t, label: fHora(t) });
+
+    const empleadosSlots = empleados.map(emp => {
+      const horario = horariosMap.get(emp.id);
+      const slots = times.map(t => {
+        const inicio = t.inicio;
+        const fin = inicio + duracion;
+        let trabaja = true;
+        if (!horario) trabaja = false;
+        else {
+          const hIni = aMin(horario.inicio);
+          const hFin = aMin(horario.fin);
+          if (inicio < hIni || fin > hFin) trabaja = false;
+        }
+        // check citas for this employee (if any assigned)
+        let ocupado = false;
+        let detalle = null;
+        for (const c of citas) {
+          if (c.id_empleado && c.id_empleado !== emp.id) continue;
+          const cIni = aMin(c.hora);
+          const cFin = cIni + Number(c.duracion);
+          if (inicio < cFin && fin > cIni) { ocupado = true; detalle = { cliente: c.cliente, citaId: c.id }; break; }
+        }
+        return { hora: t.label, trabaja, ocupado, detalle };
+      });
+      return { id: emp.id, nombre: emp.nombre, slots };
+    });
+
+    res.json({ duracion, times: times.map(t => t.label), empleados: empleadosSlots });
+  } catch (err) {
+    console.error('Error disponibilidad por empleados:', err);
     res.status(500).json({ error: 'Error del servidor' });
   }
 });
