@@ -11,6 +11,7 @@ El archivo resultante (plan_lushnails.xml) se abre en ProjectLibre con:
 
 import xml.etree.ElementTree as ET
 from datetime import date, timedelta
+from pathlib import Path
 
 NS = "http://schemas.microsoft.com/project"
 ET.register_namespace("", NS)
@@ -24,6 +25,7 @@ TAREAS = [
     ("1.1", "Levantar base de datos PostgreSQL (Docker)", 1, "", 1),
     ("1.2", "Diseño del modelo entidad-relación (19 tablas)", 3, "", 1),
     ("1.3", "Definición de vistas financieras (v_financiero, v_citas_completas)", 2, "1.2", 1),
+    ("1.4", "Hito 1: Base de datos completada", 0, "1.3", None),
     # Fase 2: Panel administrativo
     ("2", "Panel administrativo", None, "", None),
     ("2.1", "Panel admin: autenticación y roles (Express + EJS)", 4, "1.1", 2),
@@ -82,7 +84,9 @@ def planificar():
         if dur is None:
             fechas[tid] = None
             continue
-        if preds:
+        if preds and dur == 0:
+            inicio = max(fechas[p][1] for p in preds.split(";"))
+        elif preds:
             inicio = max(siguiente_laborable(fechas[p][1]) for p in preds.split(";"))
         else:
             inicio = FECHA_INICIO
@@ -149,7 +153,9 @@ def construir_xml(fechas):
         ET.SubElement(t, f"{{{NS}}}OutlineLevel").text = str(tid.count(".") + 1)
         ET.SubElement(t, f"{{{NS}}}OutlineNumber").text = tid
         es_resumen = dur is None
+        es_hito = dur == 0
         ET.SubElement(t, f"{{{NS}}}Summary").text = "1" if es_resumen else "0"
+        ET.SubElement(t, f"{{{NS}}}Milestone").text = "1" if es_hito else "0"
         if es_resumen:
             ET.SubElement(t, f"{{{NS}}}Duration").text = iso_dur((fechas[tid][1] - fechas[tid][0]).days + 1)
         else:
@@ -168,7 +174,7 @@ def construir_xml(fechas):
                 ET.SubElement(pl, f"{{{NS}}}PredecessorUID").text = str(uid_map[p])
                 ET.SubElement(pl, f"{{{NS}}}Type").text = "1"  # Fin-Comienzo
                 ET.SubElement(pl, f"{{{NS}}}LinkLag").text = "0"
-        if not es_resumen:
+        if not es_resumen and recurso is not None:
             ET.SubElement(t, f"{{{NS}}}ResourceNames").text = dict((r[0], r[1]) for r in RECURSOS)[recurso]
 
     # ---- Recursos ----
@@ -204,7 +210,7 @@ def main():
     fechas = planificar()
     root = construir_xml(fechas)
     ET.indent(root, space="  ")
-    ruta = "/home/snxz/Proyectos/Emprendimientos/lushnails-db/informe/plan_lushnails.xml"
+    ruta = Path(__file__).with_name("plan_lushnails.xml")
     ET.ElementTree(root).write(ruta, encoding="utf-8", xml_declaration=True)
     print(f"Plan generado: {ruta}")
     print("\nCronograma calculado:")
