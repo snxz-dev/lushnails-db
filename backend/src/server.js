@@ -35,7 +35,7 @@ app.use(express.json());
 
 app.use(session({
   store: new pgSession({ pool }),
-  secret: process.env.SESSION_SECRET || 'cambiar-clave',
+  secret: process.env.SESSION_SECRET || 'demo-session-7c9L-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 24 * 60 * 60 * 1000 }

@@ -29,11 +29,11 @@ docker compose exec postgres psql -U lushnails_admin -d lushnails_spa
 | Puerto | 5432 |
 | Base de Datos | lushnails_spa |
 | Usuario | lushnails_admin |
-| Password | LushNails2024 |
+| Password | DemoDb_7c9L_2026 |
 
 **Admin del sistema** (panel de administración):
-- Email: admin@lushnails.com
-- Password: LushNails2024
+- Email: demo-admin@lushnails.example
+- Password: DemoAdmin_7c9L_2026
 
 ## Diagrama de Tablas
 
@@ -100,7 +100,7 @@ lazydocker
    - Port: 5432
    - Database: lushnails_spa
    - Username: lushnails_admin
-   - Password: LushNails2024
+   - Password: DemoDb_7c9L_2026
 5. Test Connection y Finish
 
 ## Estructura de Archivos

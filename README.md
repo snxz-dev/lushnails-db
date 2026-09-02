@@ -64,7 +64,7 @@ docker compose exec postgres psql -U lushnails_admin -d lushnails_spa
 | Puerto | 5432 |
 | Base de Datos | lushnails_spa |
 | Usuario | lushnails_admin |
-| Contraseña | LushNails2024 |
+| Contraseña | DemoDb_7c9L_2026 |
 
 ### Estructura de la base de datos
 
@@ -112,8 +112,10 @@ pnpm start            # http://localhost:4000
 
 ### Credenciales del administrador
 
-- **Email**: `admin@lushnails.com`
-- **Contraseña**: `LushNails2024`
+- **Email**: `demo-admin@lushnails.example`
+- **Contraseña**: `DemoAdmin_7c9L_2026`
+
+> Estas credenciales son exclusivas para la demostración local. Deben reemplazarse mediante variables de entorno antes de cualquier despliegue real.
 
 ### Módulos del panel
 
@@ -147,7 +149,7 @@ npm run build           # genera build/
 1. `docker compose up -d` → levanta y verifica la BD (la pieza principal).
 2. `cd backend && pnpm start` → abre el panel admin en `http://localhost:4000`.
 3. `cd spa && npm start` → abre el sitio corporativo en `http://localhost:3000`.
-4. Login admin con `admin@lushnails.com` / `LushNails2024`.
+4. Login admin con `demo-admin@lushnails.example` / `DemoAdmin_7c9L_2026`.
 
 ---
 

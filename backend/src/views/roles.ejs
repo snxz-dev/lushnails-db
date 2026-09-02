@@ -41,7 +41,7 @@
       <td><span class="badge badge-<%= u.activo %>"><%= u.activo ? 'Sí' : 'No' %></span></td>
       <td><%= u.created_at ? new Date(u.created_at).toLocaleDateString() : '-' %></td>
       <td>
-        <% if (u.email !== 'admin@lushnails.com') { %>
+        <% if (u.email !== 'demo-admin@lushnails.example') { %>
         <form method="POST" action="/roles/<%= u.id %>/toggle" style="display:inline">
           <button type="submit" class="btn btn-sm <%= u.activo ? 'btn-warning' : 'btn-success' %>">
             <%= u.activo ? 'Desactivar' : 'Activar' %>

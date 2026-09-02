@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_DB: lushnails_spa
       POSTGRES_USER: lushnails_admin
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-LushNails2024}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-DemoDb_7c9L_2026}
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -31,8 +31,8 @@ services:
       DB_PORT: "5432"
       DB_NAME: lushnails_spa
       DB_USER: lushnails_admin
-      DB_PASSWORD: ${DB_PASSWORD:-LushNails2024}
-      SESSION_SECRET: ${SESSION_SECRET:-cambiar-esta-clave-en-produccion}
+      DB_PASSWORD: ${DB_PASSWORD:-DemoDb_7c9L_2026}
+      SESSION_SECRET: ${SESSION_SECRET:-demo-session-7c9L-change-in-production}
       ADMIN_PORT: "4000"
     depends_on:
       postgres:

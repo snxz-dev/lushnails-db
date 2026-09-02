@@ -6,7 +6,7 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT) || 5432,
   database: process.env.DB_NAME || 'lushnails_spa',
   user: process.env.DB_USER || 'lushnails_admin',
-  password: process.env.DB_PASSWORD || 'LushNails2024',
+  password: process.env.DB_PASSWORD || 'DemoDb_7c9L_2026',
 });
 
 pool.on('error', (err) => {

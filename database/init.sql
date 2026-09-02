@@ -561,12 +561,12 @@ WHERE r.codigo = 'contabilidad'
 ON CONFLICT (id_rol, id_permiso) DO NOTHING;
 
 -- 6.8. Usuario Administrador por Defecto
--- Password por defecto: LushNails2024 (cambiarlo en producción)
+-- Credenciales exclusivas para la demostración local; reemplazarlas en producción.
 INSERT INTO usuario_admin (nombre, email, password_hash, rol, id_rol) VALUES
     (
         'Administrador',
-        'admin@lushnails.com',
-        crypt('LushNails2024', gen_salt('bf')),
+        'demo-admin@lushnails.example',
+        crypt('DemoAdmin_7c9L_2026', gen_salt('bf')),
         'superadmin',
         (SELECT id FROM rol WHERE codigo = 'superadmin')
     )
