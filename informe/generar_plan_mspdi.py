@@ -40,7 +40,22 @@ TAREAS = [
     ("4", "Documentación y pruebas", None, "", None),
     ("4.1", "Diagramas BPMN de procesos", 2, "1.2", 4),
     ("4.2", "Pruebas integrales y revisión de entregables", 3, "2.4;3.2;4.1", 4),
-    ("4.3", "Presentación final del proyecto", 1, "4.2", 4),
+    # Fase 5: Accesibilidad y usabilidad
+    ("5", "Accesibilidad y usabilidad", None, "", None),
+    ("5.1", "Evaluación heurística del portal", 2, "3.2", 5),
+    ("5.2", "Corrección de navegación por teclado y foco visible", 2, "5.1", 3),
+    ("5.3", "Mejora de etiquetas, textos alternativos y formularios", 2, "5.2", 3),
+    ("5.4", "Pruebas responsive en escritorio, tablet y móvil", 2, "5.3", 5),
+    ("5.5", "Encuesta de usabilidad y código QR", 1, "5.4", 5),
+    # Fase 6: Despliegue
+    ("6", "Despliegue y validación en la nube", None, "", None),
+    ("6.1", "Preparación de variables de entorno para producción", 1, "4.2;5.4", 2),
+    ("6.2", "Configuración de base de datos PostgreSQL en Neon", 1, "6.1", 1),
+    ("6.3", "Despliegue de backend API y panel administrativo", 2, "6.2", 2),
+    ("6.4", "Despliegue del portal React en Vercel", 1, "6.3", 3),
+    ("6.5", "Validación final de accesibilidad, responsive y conexión API", 2, "6.4;5.5", 5),
+    ("6.6", "Hito 2: Portal desplegado y validado", 0, "6.5", None),
+    ("4.3", "Presentación final del proyecto", 1, "6.6", 4),
 ]
 
 RECURSOS = [
@@ -48,6 +63,7 @@ RECURSOS = [
     (2, "Desarrollador Backend", "12.00"),
     (3, "Desarrollador Frontend", "10.00"),
     (4, "Analista", "8.00"),
+    (5, "Analista UX Accesibilidad", "9.00"),
 ]
 
 

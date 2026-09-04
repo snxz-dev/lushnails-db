@@ -1,0 +1,23 @@
+Fase,Actividad,Recurso,Duracion dias,Horas,Tarifa hora USD,Costo USD,Tipo
+1. Base de datos,Levantar base de datos PostgreSQL con Docker,Desarrollador BD,1,8,10,80,Desarrollo
+1. Base de datos,Diseno del modelo entidad-relacion de 19 tablas,Desarrollador BD,3,24,10,240,Desarrollo
+1. Base de datos,Definicion de vistas financieras y citas completas,Desarrollador BD,2,16,10,160,Desarrollo
+2. Panel administrativo,Autenticacion y roles en Express/EJS,Desarrollador Backend,4,32,12,384,Desarrollo
+2. Panel administrativo,Modulo de citas y clientes,Desarrollador Backend,3,24,12,288,Desarrollo
+2. Panel administrativo,Modulo de historial de atenciones,Desarrollador Backend,2,16,12,192,Desarrollo
+2. Panel administrativo,Balanced Scorecard y tablero de comando,Desarrollador Backend,3,24,12,288,Desarrollo
+3. Sitio web corporativo,Sitio web corporativo en React,Desarrollador Frontend,5,40,10,400,Desarrollo
+3. Sitio web corporativo,Integracion web con API del panel,Desarrollador Frontend,3,24,10,240,Desarrollo
+4. Documentacion y pruebas,Diagramas BPMN de procesos,Analista,2,16,8,128,Documentacion
+4. Documentacion y pruebas,Pruebas integrales y revision de entregables,Analista,3,24,8,192,Pruebas
+5. Accesibilidad y usabilidad,Evaluacion heuristica del portal,Analista UX Accesibilidad,2,16,9,144,Pruebas
+5. Accesibilidad y usabilidad,Correccion de navegacion por teclado y foco visible,Desarrollador Frontend,2,16,10,160,Desarrollo
+5. Accesibilidad y usabilidad,"Mejora de etiquetas, textos alternativos y formularios",Desarrollador Frontend,2,16,10,160,Desarrollo
+5. Accesibilidad y usabilidad,"Pruebas responsive en escritorio, tablet y movil",Analista UX Accesibilidad,2,16,9,144,Pruebas
+5. Accesibilidad y usabilidad,Encuesta de usabilidad y codigo QR,Analista UX Accesibilidad,1,8,9,72,Investigacion
+6. Despliegue,Preparacion de variables de entorno para produccion,Desarrollador Backend,1,8,12,96,Despliegue
+6. Despliegue,Configuracion de PostgreSQL en Neon,Desarrollador BD,1,8,10,80,Despliegue
+6. Despliegue,Despliegue de backend API y panel administrativo,Desarrollador Backend,2,16,12,192,Despliegue
+6. Despliegue,Despliegue del portal React en Vercel,Desarrollador Frontend,1,8,10,80,Despliegue
+6. Despliegue,Validacion final de accesibilidad responsive y conexion API,Analista UX Accesibilidad,2,16,9,144,Pruebas
+4. Cierre,Presentacion final del proyecto,Analista,1,8,8,64,Documentacion

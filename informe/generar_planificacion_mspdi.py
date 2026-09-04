@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Genera el plan independiente de la fase de planificación de Lush Nails.
+"""Genera el plan independiente de planificacion y diseno de Lush Nails.
 
-El XML resultante es compatible con ProjectLibre y cubre 20 días
-laborables. El periodo oficial inicia el 1 de julio de 2026 y las
-actividades de levantamiento y encuestas comienzan el 5 de julio.
+El XML resultante es compatible con ProjectLibre. El periodo oficial
+inicia el 1 de julio de 2026 e incluye dos bloques principales:
+planificacion y fase de diseno.
 """
 
 import xml.etree.ElementTree as ET
@@ -27,6 +27,13 @@ TAREAS = [
     ("1.4.1", "Requerimientos funcionales", 5, "1.3"),
     ("1.4.2", "Requerimientos no funcionales", 4, "1.4.1"),
     ("1.5", "Hito: Planificación aprobada", 0, "1.4.2"),
+    ("2", "Fase de diseño del portal empresarial", None, ""),
+    ("2.1", "Diseño de arquitectura del sistema", 3, "1.5"),
+    ("2.2", "Diseño de base de datos y relaciones", 3, "2.1"),
+    ("2.3", "Diseño de interfaz y experiencia de usuario", 4, "2.1"),
+    ("2.4", "Diseño de accesibilidad y navegación por teclado", 2, "2.3"),
+    ("2.5", "Validación del diseño con criterios de usabilidad", 2, "2.2;2.4"),
+    ("2.6", "Hito: Diseño aprobado", 0, "2.5"),
 ]
 
 
@@ -113,10 +120,10 @@ def construir_xml(fechas):
         ET.SubElement(root, f"{{{NS}}}{tag}").text = str(valor)
 
     raiz("SaveVersion", 14)
-    raiz("Name", "Lush Nails SPA - Planificación")
-    raiz("Title", "Planificación del Portal Empresarial Lush Nails SPA")
+    raiz("Name", "Lush Nails SPA - Planificación y Diseño")
+    raiz("Title", "Planificación y Diseño del Portal Empresarial Lush Nails SPA")
     raiz("StartDate", iso(FECHA_OFICIAL_INICIO))
-    raiz("EndDate", iso(fechas["1.5"][1]))
+    raiz("EndDate", iso(fechas["2.6"][1]))
     raiz("ScheduleFromStart", 1)
     raiz("MinutesPerDay", 480)
     raiz("MinutesPerWeek", 2400)
@@ -172,8 +179,7 @@ def main():
     salida = Path(__file__).with_name("planificacion_lushnails.xml")
     ET.ElementTree(root).write(salida, encoding="utf-8", xml_declaration=True)
     print(f"Plan generado: {salida}")
-    print("Duración: 20 días laborables")
-    print(f"Periodo oficial: {FECHA_OFICIAL_INICIO} -> {fechas['1.5'][1]}")
+    print(f"Periodo oficial: {FECHA_OFICIAL_INICIO} -> {fechas['2.6'][1]}")
     print(f"Inicio de levantamiento y encuestas: {FECHA_INICIO_ACTIVIDADES}")
 
 

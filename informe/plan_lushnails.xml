@@ -4,7 +4,7 @@
   <Name>Lush Nails SPA - Portal Empresarial</Name>
   <Title>Portal Empresarial Lush Nails SPA</Title>
   <StartDate>2026-08-17T09:00:00</StartDate>
-  <EndDate>2026-09-08T09:00:00</EndDate>
+  <EndDate>2026-09-24T09:00:00</EndDate>
   <ScheduleFromStart>1</ScheduleFromStart>
   <CurrencySymbol>$</CurrencySymbol>
   <CurrencyCode>USD</CurrencyCode>
@@ -343,14 +343,14 @@
       <OutlineNumber>4</OutlineNumber>
       <Summary>1</Summary>
       <Milestone>0</Milestone>
-      <Duration>PT160H0M0S</Duration>
+      <Duration>PT288H0M0S</Duration>
       <DurationFormat>7</DurationFormat>
       <Start>2026-08-20T09:00:00</Start>
-      <Finish>2026-09-08T09:00:00</Finish>
+      <Finish>2026-09-24T09:00:00</Finish>
       <EarlyStart>2026-08-20T09:00:00</EarlyStart>
-      <EarlyFinish>2026-09-08T09:00:00</EarlyFinish>
+      <EarlyFinish>2026-09-24T09:00:00</EarlyFinish>
       <LateStart>2026-08-20T09:00:00</LateStart>
-      <LateFinish>2026-09-08T09:00:00</LateFinish>
+      <LateFinish>2026-09-24T09:00:00</LateFinish>
       <PercentComplete>0</PercentComplete>
     </Task>
     <Task>
@@ -418,6 +418,341 @@
     <Task>
       <UID>17</UID>
       <ID>17</ID>
+      <Name>Accesibilidad y usabilidad</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>1</OutlineLevel>
+      <OutlineNumber>5</OutlineNumber>
+      <Summary>1</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT104H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-03T09:00:00</Start>
+      <Finish>2026-09-15T09:00:00</Finish>
+      <EarlyStart>2026-09-03T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-15T09:00:00</EarlyFinish>
+      <LateStart>2026-09-03T09:00:00</LateStart>
+      <LateFinish>2026-09-15T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+    </Task>
+    <Task>
+      <UID>18</UID>
+      <ID>18</ID>
+      <Name>Evaluación heurística del portal</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>5.1</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT16H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-03T09:00:00</Start>
+      <Finish>2026-09-04T09:00:00</Finish>
+      <EarlyStart>2026-09-03T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-04T09:00:00</EarlyFinish>
+      <LateStart>2026-09-03T09:00:00</LateStart>
+      <LateFinish>2026-09-04T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>13</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Analista UX Accesibilidad</ResourceNames>
+    </Task>
+    <Task>
+      <UID>19</UID>
+      <ID>19</ID>
+      <Name>Corrección de navegación por teclado y foco visible</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>5.2</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT16H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-07T09:00:00</Start>
+      <Finish>2026-09-08T09:00:00</Finish>
+      <EarlyStart>2026-09-07T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-08T09:00:00</EarlyFinish>
+      <LateStart>2026-09-07T09:00:00</LateStart>
+      <LateFinish>2026-09-08T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>18</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Desarrollador Frontend</ResourceNames>
+    </Task>
+    <Task>
+      <UID>20</UID>
+      <ID>20</ID>
+      <Name>Mejora de etiquetas, textos alternativos y formularios</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>5.3</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT16H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-09T09:00:00</Start>
+      <Finish>2026-09-10T09:00:00</Finish>
+      <EarlyStart>2026-09-09T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-10T09:00:00</EarlyFinish>
+      <LateStart>2026-09-09T09:00:00</LateStart>
+      <LateFinish>2026-09-10T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>19</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Desarrollador Frontend</ResourceNames>
+    </Task>
+    <Task>
+      <UID>21</UID>
+      <ID>21</ID>
+      <Name>Pruebas responsive en escritorio, tablet y móvil</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>5.4</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT16H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-11T09:00:00</Start>
+      <Finish>2026-09-14T09:00:00</Finish>
+      <EarlyStart>2026-09-11T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-14T09:00:00</EarlyFinish>
+      <LateStart>2026-09-11T09:00:00</LateStart>
+      <LateFinish>2026-09-14T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>20</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Analista UX Accesibilidad</ResourceNames>
+    </Task>
+    <Task>
+      <UID>22</UID>
+      <ID>22</ID>
+      <Name>Encuesta de usabilidad y código QR</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>5.5</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT8H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-15T09:00:00</Start>
+      <Finish>2026-09-15T09:00:00</Finish>
+      <EarlyStart>2026-09-15T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-15T09:00:00</EarlyFinish>
+      <LateStart>2026-09-15T09:00:00</LateStart>
+      <LateFinish>2026-09-15T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>21</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Analista UX Accesibilidad</ResourceNames>
+    </Task>
+    <Task>
+      <UID>23</UID>
+      <ID>23</ID>
+      <Name>Despliegue y validación en la nube</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>1</OutlineLevel>
+      <OutlineNumber>6</OutlineNumber>
+      <Summary>1</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT72H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-15T09:00:00</Start>
+      <Finish>2026-09-23T09:00:00</Finish>
+      <EarlyStart>2026-09-15T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-23T09:00:00</EarlyFinish>
+      <LateStart>2026-09-15T09:00:00</LateStart>
+      <LateFinish>2026-09-23T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+    </Task>
+    <Task>
+      <UID>24</UID>
+      <ID>24</ID>
+      <Name>Preparación de variables de entorno para producción</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>6.1</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT8H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-15T09:00:00</Start>
+      <Finish>2026-09-15T09:00:00</Finish>
+      <EarlyStart>2026-09-15T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-15T09:00:00</EarlyFinish>
+      <LateStart>2026-09-15T09:00:00</LateStart>
+      <LateFinish>2026-09-15T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>16</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <PredecessorLink>
+        <PredecessorUID>21</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Desarrollador Backend</ResourceNames>
+    </Task>
+    <Task>
+      <UID>25</UID>
+      <ID>25</ID>
+      <Name>Configuración de base de datos PostgreSQL en Neon</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>6.2</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT8H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-16T09:00:00</Start>
+      <Finish>2026-09-16T09:00:00</Finish>
+      <EarlyStart>2026-09-16T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-16T09:00:00</EarlyFinish>
+      <LateStart>2026-09-16T09:00:00</LateStart>
+      <LateFinish>2026-09-16T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>24</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Desarrollador BD</ResourceNames>
+    </Task>
+    <Task>
+      <UID>26</UID>
+      <ID>26</ID>
+      <Name>Despliegue de backend API y panel administrativo</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>6.3</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT16H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-17T09:00:00</Start>
+      <Finish>2026-09-18T09:00:00</Finish>
+      <EarlyStart>2026-09-17T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-18T09:00:00</EarlyFinish>
+      <LateStart>2026-09-17T09:00:00</LateStart>
+      <LateFinish>2026-09-18T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>25</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Desarrollador Backend</ResourceNames>
+    </Task>
+    <Task>
+      <UID>27</UID>
+      <ID>27</ID>
+      <Name>Despliegue del portal React en Vercel</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>6.4</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT8H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-21T09:00:00</Start>
+      <Finish>2026-09-21T09:00:00</Finish>
+      <EarlyStart>2026-09-21T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-21T09:00:00</EarlyFinish>
+      <LateStart>2026-09-21T09:00:00</LateStart>
+      <LateFinish>2026-09-21T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>26</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Desarrollador Frontend</ResourceNames>
+    </Task>
+    <Task>
+      <UID>28</UID>
+      <ID>28</ID>
+      <Name>Validación final de accesibilidad, responsive y conexión API</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>6.5</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>0</Milestone>
+      <Duration>PT16H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-22T09:00:00</Start>
+      <Finish>2026-09-23T09:00:00</Finish>
+      <EarlyStart>2026-09-22T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-23T09:00:00</EarlyFinish>
+      <LateStart>2026-09-22T09:00:00</LateStart>
+      <LateFinish>2026-09-23T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>27</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <PredecessorLink>
+        <PredecessorUID>22</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+      <ResourceNames>Analista UX Accesibilidad</ResourceNames>
+    </Task>
+    <Task>
+      <UID>29</UID>
+      <ID>29</ID>
+      <Name>Hito 2: Portal desplegado y validado</Name>
+      <Type>0</Type>
+      <IsNull>0</IsNull>
+      <OutlineLevel>2</OutlineLevel>
+      <OutlineNumber>6.6</OutlineNumber>
+      <Summary>0</Summary>
+      <Milestone>1</Milestone>
+      <Duration>PT0H0M0S</Duration>
+      <DurationFormat>7</DurationFormat>
+      <Start>2026-09-23T09:00:00</Start>
+      <Finish>2026-09-23T09:00:00</Finish>
+      <EarlyStart>2026-09-23T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-23T09:00:00</EarlyFinish>
+      <LateStart>2026-09-23T09:00:00</LateStart>
+      <LateFinish>2026-09-23T09:00:00</LateFinish>
+      <PercentComplete>0</PercentComplete>
+      <PredecessorLink>
+        <PredecessorUID>28</PredecessorUID>
+        <Type>1</Type>
+        <LinkLag>0</LinkLag>
+      </PredecessorLink>
+    </Task>
+    <Task>
+      <UID>30</UID>
+      <ID>30</ID>
       <Name>Presentación final del proyecto</Name>
       <Type>0</Type>
       <IsNull>0</IsNull>
@@ -427,15 +762,15 @@
       <Milestone>0</Milestone>
       <Duration>PT8H0M0S</Duration>
       <DurationFormat>7</DurationFormat>
-      <Start>2026-09-08T09:00:00</Start>
-      <Finish>2026-09-08T09:00:00</Finish>
-      <EarlyStart>2026-09-08T09:00:00</EarlyStart>
-      <EarlyFinish>2026-09-08T09:00:00</EarlyFinish>
-      <LateStart>2026-09-08T09:00:00</LateStart>
-      <LateFinish>2026-09-08T09:00:00</LateFinish>
+      <Start>2026-09-24T09:00:00</Start>
+      <Finish>2026-09-24T09:00:00</Finish>
+      <EarlyStart>2026-09-24T09:00:00</EarlyStart>
+      <EarlyFinish>2026-09-24T09:00:00</EarlyFinish>
+      <LateStart>2026-09-24T09:00:00</LateStart>
+      <LateFinish>2026-09-24T09:00:00</LateFinish>
       <PercentComplete>0</PercentComplete>
       <PredecessorLink>
-        <PredecessorUID>16</PredecessorUID>
+        <PredecessorUID>29</PredecessorUID>
         <Type>1</Type>
         <LinkLag>0</LinkLag>
       </PredecessorLink>
@@ -477,6 +812,15 @@
       <Type>1</Type>
       <IsNull>0</IsNull>
       <StandardRate>8.00</StandardRate>
+      <RateScale>1</RateScale>
+    </Resource>
+    <Resource>
+      <UID>5</UID>
+      <ID>5</ID>
+      <Name>Analista UX Accesibilidad</Name>
+      <Type>1</Type>
+      <IsNull>0</IsNull>
+      <StandardRate>9.00</StandardRate>
       <RateScale>1</RateScale>
     </Resource>
   </Resources>
@@ -560,7 +904,77 @@
     </Assignment>
     <Assignment>
       <UID>12</UID>
-      <TaskUID>17</TaskUID>
+      <TaskUID>18</TaskUID>
+      <ResourceUID>5</ResourceUID>
+      <Units>100</Units>
+      <Work>PT16H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>13</UID>
+      <TaskUID>19</TaskUID>
+      <ResourceUID>3</ResourceUID>
+      <Units>100</Units>
+      <Work>PT16H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>14</UID>
+      <TaskUID>20</TaskUID>
+      <ResourceUID>3</ResourceUID>
+      <Units>100</Units>
+      <Work>PT16H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>15</UID>
+      <TaskUID>21</TaskUID>
+      <ResourceUID>5</ResourceUID>
+      <Units>100</Units>
+      <Work>PT16H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>16</UID>
+      <TaskUID>22</TaskUID>
+      <ResourceUID>5</ResourceUID>
+      <Units>100</Units>
+      <Work>PT8H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>17</UID>
+      <TaskUID>24</TaskUID>
+      <ResourceUID>2</ResourceUID>
+      <Units>100</Units>
+      <Work>PT8H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>18</UID>
+      <TaskUID>25</TaskUID>
+      <ResourceUID>1</ResourceUID>
+      <Units>100</Units>
+      <Work>PT8H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>19</UID>
+      <TaskUID>26</TaskUID>
+      <ResourceUID>2</ResourceUID>
+      <Units>100</Units>
+      <Work>PT16H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>20</UID>
+      <TaskUID>27</TaskUID>
+      <ResourceUID>3</ResourceUID>
+      <Units>100</Units>
+      <Work>PT8H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>21</UID>
+      <TaskUID>28</TaskUID>
+      <ResourceUID>5</ResourceUID>
+      <Units>100</Units>
+      <Work>PT16H0M0S</Work>
+    </Assignment>
+    <Assignment>
+      <UID>22</UID>
+      <TaskUID>30</TaskUID>
       <ResourceUID>4</ResourceUID>
       <Units>100</Units>
       <Work>PT8H0M0S</Work>
