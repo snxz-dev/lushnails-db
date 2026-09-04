@@ -58,7 +58,19 @@ app.use('/citas', citasRoutes);
 app.use('/postulaciones', postulacionesRoutes);
 app.use('/galeria', galeriaRoutes);
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const allowedOrigins = (process.env.CORS_ORIGIN || '*')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+  const requestOrigin = req.headers.origin;
+  const allowAll = allowedOrigins.includes('*');
+
+  if (allowAll) {
+    res.header('Access-Control-Allow-Origin', '*');
+  } else if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    res.header('Access-Control-Allow-Origin', requestOrigin);
+    res.header('Vary', 'Origin');
+  }
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.sendStatus(200);

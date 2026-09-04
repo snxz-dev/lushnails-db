@@ -19,6 +19,8 @@ function saveFeatures(features) {
 export default function AccessibilityWidget() {
   const { t, i18n } = useTranslation();
   const widgetRef = useRef(null);
+  const menuRef = useRef(null);
+  const triggerRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [features, setFeatures] = useState(loadFeatures);
   const [fontLevel, setFontLevel] = useState(() => {
@@ -59,6 +61,22 @@ export default function AccessibilityWidget() {
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    menuRef.current?.querySelector('button')?.focus();
+  }, [open]);
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape' && open) {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open]);
 
   const toggle = (key) => {
@@ -109,7 +127,7 @@ export default function AccessibilityWidget() {
   const widget = (
     <div ref={widgetRef}>
       {open && (
-        <div className="acc-menu" role="menu" aria-label={t('acc.aria')}>
+        <div id="acc-menu" ref={menuRef} className="acc-menu" role="menu" aria-label={t('acc.aria')}>
           <div className="acc-menu-section">
             {featuresList.map(f => (
               f.standalone ? (
@@ -142,7 +160,7 @@ export default function AccessibilityWidget() {
           </button>
         </div>
       )}
-      <button className="acc-fab" onClick={() => setOpen(!open)} aria-label={t('acc.aria')} aria-expanded={open}>
+      <button ref={triggerRef} className="acc-fab" onClick={() => setOpen(!open)} aria-label={t('acc.aria')} aria-expanded={open} aria-controls="acc-menu">
         <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><circle cx="12" cy="4.5" r="2.5"/><path d="M19 15c-1 0-1.8.4-2.4 1L14 10.5c-.3-.7-1-1.2-1.8-1.2H9c-1 0-1.8.8-1.8 1.8V15H5v4h4v5h4v-5h2l2.5 6H20l-2-5.5c.3-.1.7-.2 1-.2 1.5 0 2.7 1.2 2.7 2.7S20.5 19 19 19c-.5 0-1-.1-1.4-.4l-1.5 1.3c.8.7 1.8 1.1 2.9 1.1 2.5 0 4.5-2 4.5-4.5S21.5 15 19 15z"/></svg>
       </button>
     </div>

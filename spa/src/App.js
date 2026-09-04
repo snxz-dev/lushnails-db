@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import './styles/App.css';
 import './styles/menu.css';
@@ -33,7 +33,7 @@ const fotosUñas = [
 ];
 
 const CORREO_TRABAJO = 'ibethcabrera1@gmail.com';
-const API_URL = 'http://localhost:4000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
 const WHATSAPP_LINKS = {
   general: 'https://wa.me/message/C756ADRGK277F1',
@@ -91,6 +91,9 @@ function App() {
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ nombre: '', telefono: '', correo: '', password: '' });
   const [authError, setAuthError] = useState('');
+  const mobileMenuButtonRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  const lightboxCloseRef = useRef(null);
 
   useEffect(() => {
     if (cliente && cliente.id) {
@@ -328,8 +331,37 @@ function App() {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const firstMenuItem = mobileMenuRef.current?.querySelector('button');
+    firstMenuItem?.focus();
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key !== 'Escape') return;
+      if (imagenAmpliada) {
+        setImagenAmpliada(null);
+      }
+      if (menuOpen) {
+        setMenuOpen(false);
+        mobileMenuButtonRef.current?.focus();
+      }
+      if (whatsappMenuOpen) {
+        setWhatsappMenuOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [imagenAmpliada, menuOpen, whatsappMenuOpen]);
+
+  useEffect(() => {
+    if (imagenAmpliada) lightboxCloseRef.current?.focus();
+  }, [imagenAmpliada]);
+
   return (
     <div className="spa-container">
+      <a href="#main-content" className="skip-link">Saltar al contenido principal</a>
       <nav className="navbar">
         <button className="navbar-logo" onClick={() => { setVista('home'); window.scrollTo(0, 0); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }} aria-label="Ir al inicio">
           <img src={logoImage} alt="Lush Nails Spa" />
@@ -347,7 +379,12 @@ function App() {
         </div>
       </nav>
 
-      <div className={`fab-menu mobile-menu ${menuOpen ? 'active' : ''}`}>
+      <div
+        id="mobile-menu"
+        ref={mobileMenuRef}
+        className={`fab-menu mobile-menu ${menuOpen ? 'active' : ''}`}
+        aria-hidden={!menuOpen}
+      >
         <button onClick={() => { handleNavClick('cuenta'); setMenuOpen(false); }} className="cuenta-btn">{cliente ? t('nav.miCuenta') : t('nav.ingresar')}</button>
         <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
         <button onClick={() => handleNavClick('services')}>{t('nav.services')}</button>
@@ -356,15 +393,23 @@ function App() {
         <button onClick={() => handleNavClick('contact')}>{t('nav.contact')}</button>
         <button onClick={() => handleNavClick('work')}>{t('nav.work')}</button>
       </div>
-      {menuOpen && <div className="menu-overlay" onClick={() => setMenuOpen(false)}></div>}
+      {menuOpen && <button type="button" className="menu-overlay" onClick={() => setMenuOpen(false)} aria-label="Cerrar menú"></button>}
 
+      <main id="main-content" tabIndex="-1">
       {vista === 'home' && (<>
       <section className="hero">
         <div className="hero-logo mobile-only">
           <img src={logoImage} alt="Lush Nails Spa" />
           <span>LUSH NAILS SPA</span>
-          <button className="fab-button mobile-only" onClick={() => setMenuOpen(!menuOpen)}>
-            <span>{menuOpen ? '✕' : '☰'}</span>
+          <button
+            ref={mobileMenuButtonRef}
+            className="fab-button mobile-only"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+          >
+            <span aria-hidden="true">{menuOpen ? '✕' : '☰'}</span>
           </button>
         </div>
         <div className="hero-content animate-fade" style={{ textAlign: 'center' }}>
@@ -413,22 +458,20 @@ function App() {
           {Object.entries(services).map(([category, data]) => {
             return (
               <div key={category} className={`service-category-block ${category === 'otros' ? 'service-category-otros' : ''} ${servicioActivo === 'all' || servicioActivo === category ? 'expanded' : ''}`}>
-              <img
-                src={data.image}
-                alt={category}
+              <button
+                type="button"
+                className="service-image-button"
                 onClick={() => setServicioActivo(servicioActivo === 'all' ? null : 'all')}
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  display: 'block'
-                }}
-              />
+                aria-expanded={servicioActivo === 'all'}
+                aria-label={`Mostrar servicios de ${t('services.' + category)}`}
+              >
+                <img src={data.image} alt={`Categoría ${t('services.' + category)}`} />
+              </button>
                 <h3 className="category-title" style={category === 'cabello' ? { marginTop: '25px' } : {}}>{t('services.' + category)}</h3>
-                <span style={{ cursor: 'pointer', fontSize: '20px', display: 'flex', justifyContent: 'center', color: '#2F4A34' }} onClick={toggleServicios}>
-                  {servicioActivo === 'all' ? '▲' : '▼'}
-                </span>
+                <button type="button" className="service-toggle" onClick={toggleServicios} aria-expanded={servicioActivo === 'all'}>
+                  <span aria-hidden="true">{servicioActivo === 'all' ? '▲' : '▼'}</span>
+                  <span className="sr-only">{servicioActivo === 'all' ? 'Ocultar lista de servicios' : 'Mostrar lista de servicios'}</span>
+                </button>
                 {(servicioActivo === 'all') && (
                 <ul className="service-list" style={{marginTop: '20px', paddingLeft: '20px'}}>
                   {data.items.map((item, index) => (
@@ -449,18 +492,14 @@ function App() {
         </div>
         <div className="gallery-grid">
           {fotosUñas.map((foto, index) => (
-            <div key={index} className="gallery-item">
-              <img
-                src={foto}
-                alt={`Trabajo de uñas ${index + 1}`}
-                onClick={() => setImagenAmpliada(foto)}
-              />
-            </div>
+            <button key={index} type="button" className="gallery-item" onClick={() => setImagenAmpliada(foto)} aria-label={`Ampliar trabajo de uñas ${index + 1}`}>
+              <img src={foto} alt={`Trabajo de uñas ${index + 1}`} />
+            </button>
           ))}
         </div>
         {imagenAmpliada && (
-          <div className="lightbox" onClick={() => setImagenAmpliada(null)}>
-            <span className="lightbox-close">&times;</span>
+          <div className="lightbox" role="dialog" aria-modal="true" aria-label="Vista ampliada de imagen" onClick={() => setImagenAmpliada(null)}>
+            <button type="button" ref={lightboxCloseRef} className="lightbox-close" onClick={() => setImagenAmpliada(null)} aria-label="Cerrar imagen ampliada">&times;</button>
             <img src={imagenAmpliada} alt="Imagen ampliada" />
           </div>
         )}
@@ -570,6 +609,7 @@ function App() {
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="form-group">
+                <label className="sr-only" htmlFor="nombre">{t('work.namePlaceholder')}</label>
                 <input
                   type="text"
                   id="nombre"
@@ -582,6 +622,7 @@ function App() {
               </div>
 
               <div className="form-group">
+                <label className="sr-only" htmlFor="correo">{t('work.emailPlaceholder')}</label>
                 <input
                   type="email"
                   id="correo"
@@ -594,6 +635,7 @@ function App() {
               </div>
 
               <div className="form-group">
+                <label className="sr-only" htmlFor="telefono">{t('work.phonePlaceholder')}</label>
                 <input
                   type="tel"
                   id="telefono"
@@ -648,18 +690,22 @@ function App() {
                 {authMode === 'register' && (
                   <>
                     <div className="form-group">
-                      <input type="text" name="nombre" value={authForm.nombre} onChange={handleAuthChange} required placeholder={t('cuenta.namePlaceholder')} />
+                      <label className="sr-only" htmlFor="auth-nombre">{t('cuenta.namePlaceholder')}</label>
+                      <input id="auth-nombre" type="text" name="nombre" value={authForm.nombre} onChange={handleAuthChange} required placeholder={t('cuenta.namePlaceholder')} />
                     </div>
                     <div className="form-group">
-                      <input type="tel" name="telefono" value={authForm.telefono} onChange={handleAuthChange} required placeholder={t('cuenta.phonePlaceholder')} />
+                      <label className="sr-only" htmlFor="auth-telefono">{t('cuenta.phonePlaceholder')}</label>
+                      <input id="auth-telefono" type="tel" name="telefono" value={authForm.telefono} onChange={handleAuthChange} required placeholder={t('cuenta.phonePlaceholder')} />
                     </div>
                   </>
                 )}
                 <div className="form-group">
-                  <input type="email" name="correo" value={authForm.correo} onChange={handleAuthChange} required placeholder={t('cuenta.emailPlaceholder')} />
+                  <label className="sr-only" htmlFor="auth-correo">{t('cuenta.emailPlaceholder')}</label>
+                  <input id="auth-correo" type="email" name="correo" value={authForm.correo} onChange={handleAuthChange} required placeholder={t('cuenta.emailPlaceholder')} />
                 </div>
                 <div className="form-group">
-                  <input type="password" name="password" value={authForm.password} onChange={handleAuthChange} required placeholder={t('cuenta.passwordPlaceholder')} />
+                  <label className="sr-only" htmlFor="auth-password">{t('cuenta.passwordPlaceholder')}</label>
+                  <input id="auth-password" type="password" name="password" value={authForm.password} onChange={handleAuthChange} required placeholder={t('cuenta.passwordPlaceholder')} />
                 </div>
                 {authError && <p className="error-msg">{authError}</p>}
                 <button type="submit" className="submit-btn">{authMode === 'login' ? t('cuenta.loginBtn') : t('cuenta.registerBtn')}</button>
@@ -726,16 +772,20 @@ function App() {
           ) : (
             <form onSubmit={handleCitaSubmit} className="cita-form">
               <div className="form-group">
-                <input type="text" name="nombre" value={citaForm.nombre} onChange={handleCitaChange} required placeholder={t('cita.namePlaceholder')} />
+                <label className="sr-only" htmlFor="cita-nombre">{t('cita.namePlaceholder')}</label>
+                <input id="cita-nombre" type="text" name="nombre" value={citaForm.nombre} onChange={handleCitaChange} required placeholder={t('cita.namePlaceholder')} />
               </div>
               <div className="form-group">
-                <input type="tel" name="telefono" value={citaForm.telefono} onChange={handleCitaChange} required placeholder={t('cita.phonePlaceholder')} />
+                <label className="sr-only" htmlFor="cita-telefono">{t('cita.phonePlaceholder')}</label>
+                <input id="cita-telefono" type="tel" name="telefono" value={citaForm.telefono} onChange={handleCitaChange} required placeholder={t('cita.phonePlaceholder')} />
               </div>
               <div className="form-group">
-                <input type="email" name="correo" value={citaForm.correo} onChange={handleCitaChange} placeholder={t('cita.emailPlaceholder')} />
+                <label className="sr-only" htmlFor="cita-correo">{t('cita.emailPlaceholder')}</label>
+                <input id="cita-correo" type="email" name="correo" value={citaForm.correo} onChange={handleCitaChange} placeholder={t('cita.emailPlaceholder')} />
               </div>
               <div className="form-group">
-                <select name="id_sucursal" value={citaForm.id_sucursal} onChange={handleCitaChange} required>
+                <label className="sr-only" htmlFor="cita-sucursal">{t('cita.sucursalPlaceholder')}</label>
+                <select id="cita-sucursal" name="id_sucursal" value={citaForm.id_sucursal} onChange={handleCitaChange} required>
                   <option value="">{t('cita.sucursalPlaceholder')}</option>
                   {sucursalesDb.map(s => (
                     <option key={s.id} value={s.id}>{s.nombre}</option>
@@ -777,7 +827,9 @@ function App() {
                 <label className="form-label">{t('cita.horaPlaceholder')}</label>
                   <div className="time-input-row">
                     <div style={{display:'flex',gap:12,alignItems:'center'}}>
-                      <input
+                        <label className="sr-only" htmlFor="cita-hora">{t('cita.horaPlaceholder')}</label>
+                        <input
+                          id="cita-hora"
                         type="time"
                         name="hora_input"
                         value={citaForm.hora}
@@ -805,7 +857,8 @@ function App() {
                 <input type="hidden" name="hora" value={citaForm.hora} />
               </div>
               <div className="form-group">
-                <textarea name="notas" value={citaForm.notas} onChange={handleCitaChange} placeholder={t('cita.notasPlaceholder')} rows="2" />
+                <label className="sr-only" htmlFor="cita-notas">{t('cita.notasPlaceholder')}</label>
+                <textarea id="cita-notas" name="notas" value={citaForm.notas} onChange={handleCitaChange} placeholder={t('cita.notasPlaceholder')} rows="2" />
               </div>
               {citaError && <p className="error-msg">{citaError}</p>}
               <button type="submit" className="submit-btn">{t('cita.submit')}</button>
@@ -881,6 +934,7 @@ function App() {
           </div>
         </section>
       )}
+      </main>
 
       <footer className="footer">
         <p>© {new Date().getFullYear()} LUSH NAILS SPA. {t('footer.rights')}</p>
@@ -909,13 +963,15 @@ function App() {
           className="whatsapp-btn"
           onClick={() => setWhatsappMenuOpen(!whatsappMenuOpen)}
           aria-label={t('whatsapp.aria')}
+          aria-expanded={whatsappMenuOpen}
+          aria-controls="whatsapp-menu"
         >
           <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
           </svg>
         </button>
         {whatsappMenuOpen && (
-          <div className="whatsapp-menu">
+          <div id="whatsapp-menu" className="whatsapp-menu">
             <a href={WHATSAPP_LINKS.sanAntonio} target="_blank" rel="noopener noreferrer" className="whatsapp-option">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
               <span>San Antonio</span>
