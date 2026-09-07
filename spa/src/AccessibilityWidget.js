@@ -8,12 +8,12 @@ const STORAGE_KEY = 'acc-features';
 function loadFeatures() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return saved && typeof saved === 'object' ? saved : {};
+    return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
   } catch { return {}; }
 }
 
 function saveFeatures(features) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(features));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(features)); } catch { /* Storage may be unavailable. */ }
 }
 
 export default function AccessibilityWidget() {
@@ -24,8 +24,10 @@ export default function AccessibilityWidget() {
   const [open, setOpen] = useState(false);
   const [features, setFeatures] = useState(loadFeatures);
   const [fontLevel, setFontLevel] = useState(() => {
-    const saved = localStorage.getItem('acc-font-level');
-    return saved ? parseInt(saved, 10) : 0;
+    try {
+      const saved = Number(localStorage.getItem('acc-font-level'));
+      return Number.isInteger(saved) ? Math.min(4, Math.max(-2, saved)) : 0;
+    } catch { return 0; }
   });
 
   const applyFeatures = useCallback((feats, level) => {
@@ -38,18 +40,22 @@ export default function AccessibilityWidget() {
     root.classList.toggle('acc-underline', !!feats.underline);
     root.classList.toggle('acc-readable-font', !!feats.readableFont);
 
+    document.body.classList.toggle('acc-grayscale', !!feats.grayscale);
+    document.body.classList.toggle('acc-negative', !!feats.negative);
     document.body.classList.toggle('acc-high-contrast', !!feats.highContrast);
     document.body.classList.toggle('acc-light-bg', !!feats.lightBg);
     document.body.classList.toggle('acc-underline', !!feats.underline);
     document.body.classList.toggle('acc-readable-font', !!feats.readableFont);
 
     const sizes = { '-2': '80%', '-1': '90%', '0': '', '1': '110%', '2': '125%', '3': '140%', '4': '160%' };
-    document.body.style.fontSize = sizes[level] || '';
+    document.documentElement.style.fontSize = sizes[level] || '';
+    document.body.style.fontSize = '';
   }, []);
 
   useEffect(() => {
     applyFeatures(features, fontLevel);
     saveFeatures(features);
+    try { localStorage.setItem('acc-font-level', String(fontLevel)); } catch { /* Optional persistence. */ }
   }, [features, fontLevel, applyFeatures]);
 
   useEffect(() => {
@@ -83,7 +89,11 @@ export default function AccessibilityWidget() {
     setFeatures(prev => {
       const next = { ...prev };
       if (next[key]) delete next[key];
-      else next[key] = true;
+      else {
+        next[key] = true;
+        if (key === 'highContrast') delete next.lightBg;
+        if (key === 'lightBg') delete next.highContrast;
+      }
       return next;
     });
   };
@@ -91,20 +101,22 @@ export default function AccessibilityWidget() {
   const changeFont = (dir) => {
     setFontLevel(prev => {
       const next = Math.min(4, Math.max(-2, prev + dir));
-      localStorage.setItem('acc-font-level', next);
       return next;
     });
   };
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
+    try { localStorage.setItem('i18nextLng', lng); } catch { /* Optional persistence. */ }
+    document.documentElement.lang = lng;
     setOpen(false);
+    triggerRef.current?.focus();
   };
 
   const resetAll = () => {
     setFeatures({});
     setFontLevel(0);
-    localStorage.setItem('acc-font-level', '0');
+
   };
 
   const featuresList = [
@@ -124,19 +136,25 @@ export default function AccessibilityWidget() {
     { code: 'en', label: 'English', flag: 'lang-en' },
   ];
 
+  useEffect(() => {
+    document.documentElement.lang = i18n.resolvedLanguage || 'es';
+  }, [i18n.resolvedLanguage]);
+
   const widget = (
-    <div ref={widgetRef}>
+    <div ref={widgetRef} onBlur={(event) => {
+      if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+    }}>
       {open && (
-        <div id="acc-menu" ref={menuRef} className="acc-menu" role="menu" aria-label={t('acc.aria')}>
+        <div id="acc-menu" ref={menuRef} className="acc-menu" role="region" aria-label={t('acc.aria')}>
           <div className="acc-menu-section">
             {featuresList.map(f => (
               f.standalone ? (
-                <button key={f.icon + f.label} className="acc-option acc-standalone" onClick={f.fn} role="menuitem" aria-label={f.label}>
+                <button key={f.icon + f.label} className="acc-option acc-standalone" onClick={f.fn} disabled={f.key === 'bigger' ? fontLevel >= 4 : fontLevel <= -2} aria-label={f.label}>
                   <span className="acc-icon">{f.icon}</span>
                   <span className="acc-label">{f.label}</span>
                 </button>
               ) : (
-                <button key={f.key} className={`acc-option ${features[f.key] ? 'active' : ''}`} onClick={() => toggle(f.key)} role="menuitem" aria-label={f.label + (features[f.key] ? ' (activado)' : ' (desactivado)')}>
+                <button key={f.key} className={`acc-option ${features[f.key] ? 'active' : ''}`} onClick={() => toggle(f.key)} aria-label={f.label} aria-pressed={!!features[f.key]}>
                   <span className="acc-icon">{f.icon}</span>
                   <span className="acc-label">{f.label}</span>
                 </button>
@@ -145,23 +163,27 @@ export default function AccessibilityWidget() {
           </div>
           <div className="acc-divider"></div>
           <div className="acc-menu-section acc-lang-section">
-            <span className="acc-section-title">Idioma</span>
+            <span className="acc-section-title">{t('acc.language')}</span>
             {languages.map(l => (
-              <button key={l.code} className={`acc-option ${i18n.language === l.code ? 'active' : ''}`} onClick={() => changeLanguage(l.code)} role="menuitem" aria-label={l.label}>
+              <button key={l.code} className={`acc-option ${i18n.language === l.code ? 'active' : ''}`} onClick={() => changeLanguage(l.code)} aria-label={l.label} aria-pressed={i18n.language === l.code}>
                 <span className={`acc-icon acc-flag-icon ${l.flag}`}></span>
                 <span className="acc-label">{l.label}</span>
               </button>
             ))}
           </div>
           <div className="acc-divider"></div>
-          <button className="acc-option acc-reset" onClick={resetAll} role="menuitem" aria-label={t('acc.reset')}>
+          <button className="acc-option acc-reset" onClick={resetAll} aria-label={t('acc.reset')}>
             <span className="acc-icon">↺</span>
             <span className="acc-label">{t('acc.reset')}</span>
           </button>
         </div>
       )}
-      <button ref={triggerRef} className="acc-fab" onClick={() => setOpen(!open)} aria-label={t('acc.aria')} aria-expanded={open} aria-controls="acc-menu">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><circle cx="12" cy="4.5" r="2.5"/><path d="M19 15c-1 0-1.8.4-2.4 1L14 10.5c-.3-.7-1-1.2-1.8-1.2H9c-1 0-1.8.8-1.8 1.8V15H5v4h4v5h4v-5h2l2.5 6H20l-2-5.5c.3-.1.7-.2 1-.2 1.5 0 2.7 1.2 2.7 2.7S20.5 19 19 19c-.5 0-1-.1-1.4-.4l-1.5 1.3c.8.7 1.8 1.1 2.9 1.1 2.5 0 4.5-2 4.5-4.5S21.5 15 19 15z"/></svg>
+      <button id="accessibility-trigger" ref={triggerRef} className="acc-fab" onClick={() => setOpen(!open)} aria-label={t('acc.aria')} aria-expanded={open} aria-controls="acc-menu">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="7" r="1.5" fill="currentColor" stroke="none" />
+          <path d="M6.5 10 12 11l5.5-1M12 11v3m0 0-3 4m3-4 3 4" />
+        </svg>
       </button>
     </div>
   );

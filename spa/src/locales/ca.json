@@ -120,7 +120,8 @@
     "lightbg": "Fons clar",
     "underline": "Subratllar enllaços",
     "readable": "Font llegible",
-    "reset": "Restablir"
+    "reset": "Restablir",
+    "language": "Idioma"
   },
   "lang": {
     "es": "ES",

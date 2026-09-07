@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import './styles/App.css';
 import './styles/menu.css';
@@ -356,16 +357,33 @@ function App() {
   }, [imagenAmpliada, menuOpen, whatsappMenuOpen]);
 
   useEffect(() => {
-    if (imagenAmpliada) lightboxCloseRef.current?.focus();
+    if (!imagenAmpliada) return;
+    const previousFocus = document.activeElement;
+    lightboxCloseRef.current?.focus();
+    const keepFocus = (event) => {
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        lightboxCloseRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', keepFocus);
+    return () => {
+      document.removeEventListener('keydown', keepFocus);
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
   }, [imagenAmpliada]);
 
   return (
     <div className="spa-container">
       <a href="#main-content" className="skip-link">Saltar al contenido principal</a>
+      <a href="#accessibility-trigger" className="skip-link" onClick={(event) => {
+        event.preventDefault();
+        document.getElementById('accessibility-trigger')?.focus();
+      }}>Opciones de accesibilidad</a>
       <nav className="navbar">
         <button className="navbar-logo" onClick={() => { setVista('home'); window.scrollTo(0, 0); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }} aria-label="Ir al inicio">
           <img src={logoImage} alt="Lush Nails Spa" />
-          <span>{t('brand')}</span>
+          <span translate="no" className="notranslate">LUSH NAILS SPA</span>
         </button>
         <div className="navbar-links">
           <button onClick={() => handleNavClick('about')}>{t('nav.about')}</button>
@@ -400,7 +418,7 @@ function App() {
       <section className="hero">
         <div className="hero-logo mobile-only">
           <img src={logoImage} alt="Lush Nails Spa" />
-          <span>LUSH NAILS SPA</span>
+          <span translate="no" className="notranslate">LUSH NAILS SPA</span>
           <button
             ref={mobileMenuButtonRef}
             className="fab-button mobile-only"
@@ -412,7 +430,7 @@ function App() {
             <span aria-hidden="true">{menuOpen ? '✕' : '☰'}</span>
           </button>
         </div>
-        <div className="hero-content animate-fade" style={{ textAlign: 'center' }}>
+        <div className="hero-content intro-card animate-fade" style={{ textAlign: 'center' }}>
           <h1 style={{color: '#000000'}}>{t('hero.title')}</h1>
           <p style={{color: '#000000'}}>{t('hero.description')}</p>
           <div className="hero-cta" style={{ justifyContent: 'center', display: 'flex', gap: '15px' }}>
@@ -434,7 +452,7 @@ function App() {
           <div className="about-image">
             <img src={unas18} alt="Spa Experience" />
           </div>
-          <div className="about-text">
+          <div className="about-text intro-card">
             <span className="section-subtitle">{t('about.subtitle')}</span>
             <h2 style={{color: '#000000'}}>{t('about.title')}</h2>
             <p>{t('about.p1')}</p>
@@ -467,7 +485,7 @@ function App() {
               >
                 <img src={data.image} alt={`Categoría ${t('services.' + category)}`} />
               </button>
-                <h3 className="category-title" style={category === 'cabello' ? { marginTop: '25px' } : {}}>{t('services.' + category)}</h3>
+                <h3 className="category-title">{t('services.' + category)}</h3>
                 <button type="button" className="service-toggle" onClick={toggleServicios} aria-expanded={servicioActivo === 'all'}>
                   <span aria-hidden="true">{servicioActivo === 'all' ? '▲' : '▼'}</span>
                   <span className="sr-only">{servicioActivo === 'all' ? 'Ocultar lista de servicios' : 'Mostrar lista de servicios'}</span>
@@ -940,6 +958,7 @@ function App() {
         <p>© {new Date().getFullYear()} LUSH NAILS SPA. {t('footer.rights')}</p>
       </footer>
 
+      {createPortal(<>
       <div className="social-float">
         <a href={REDES_SOCIALES.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" data-tooltip="Facebook">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -987,6 +1006,7 @@ function App() {
           </div>
         )}
       </div>
+      </>, document.body)}
       <AccessibilityWidget />
     </div>
   );

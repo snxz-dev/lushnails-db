@@ -164,7 +164,8 @@
     "lightbg": "Fondo claro",
     "underline": "Subrayar enlaces",
     "readable": "Fuente legible",
-    "reset": "Restablecer"
+    "reset": "Restablecer",
+    "language": "Idioma"
   },
   "lang": {
     "es": "ES",

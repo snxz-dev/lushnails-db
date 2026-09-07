@@ -175,77 +175,48 @@
 
 /* ── Accessibility body classes ── */
 
-#root.acc-grayscale {
-  filter: grayscale(100%) !important;
+#root {
+  --acc-grayscale: grayscale(0);
+  --acc-negative: invert(0);
 }
-
-#root.acc-high-contrast {
-  background: #000 !important;
-  color: #fff !important;
+#root.acc-grayscale { --acc-grayscale: grayscale(1); }
+#root.acc-negative { --acc-negative: invert(1) hue-rotate(180deg); }
+#root.acc-grayscale, #root.acc-negative {
+  filter: var(--acc-grayscale) var(--acc-negative) !important;
 }
-
-#root.acc-high-contrast .navbar,
-#root.acc-high-contrast .footer {
-  background: #111 !important;
-  color: #fff !important;
-}
-
-#root.acc-high-contrast .hero-content h1,
-#root.acc-high-contrast .hero-content p,
-#root.acc-high-contrast .section-title h2,
-#root.acc-high-contrast .section-title span,
-#root.acc-high-contrast .about-text h2,
-#root.acc-high-contrast .contact-info h2 {
-  color: #fff !important;
-}
-
-#root.acc-high-contrast .glass-card,
-#root.acc-high-contrast .branch-card,
-#root.acc-high-contrast .contact-wrapper,
-#root.acc-high-contrast .work-form {
-  background: #1a1a1a !important;
-  color: #fff !important;
-  border: 1px solid #555 !important;
-}
-
-#root.acc-high-contrast a {
-  color: #64B5F6 !important;
-}
-
-#root.acc-high-contrast .whatsapp-btn,
-body.acc-high-contrast .acc-fab {
-  background: #333 !important;
-  border: 2px solid white;
-}
-
-#root.acc-negative {
+#root.acc-negative img, #root.acc-negative video, #root.acc-negative iframe {
   filter: invert(1) hue-rotate(180deg) !important;
 }
-
-#root.acc-negative img,
-#root.acc-negative video,
-#root.acc-negative iframe {
-  filter: invert(1) hue-rotate(180deg) !important;
+#root.acc-high-contrast { --acc-bg: #000; --acc-fg: #fff; --acc-link: #ffff00; }
+#root.acc-light-bg { --acc-bg: #fff8f0; --acc-fg: #202020; --acc-link: #244b30; }
+#root.acc-high-contrast, #root.acc-light-bg,
+#root.acc-high-contrast :where(*):not(svg):not(svg *),
+#root.acc-light-bg :where(*):not(svg):not(svg *) {
+  background-color: var(--acc-bg) !important;
+  background-image: none !important;
+  color: var(--acc-fg) !important;
+  text-shadow: none !important;
 }
-
-#root.acc-light-bg {
-  background: #fff8f0 !important;
+#root.acc-high-contrast :is(a, button), #root.acc-light-bg :is(a, button) {
+  color: var(--acc-link) !important;
 }
-
-#root.acc-light-bg .navbar {
-  background: #fff8f0 !important;
+#root:is(.acc-high-contrast, .acc-light-bg) :is(button, input, select, textarea) {
+  border: 1px solid currentColor !important;
 }
-
-#root.acc-underline a {
-  text-decoration: underline !important;
+#root:is(.acc-high-contrast, .acc-light-bg) input::placeholder,
+#root:is(.acc-high-contrast, .acc-light-bg) textarea::placeholder {
+  color: var(--acc-fg) !important;
+  opacity: 1;
 }
-
-#root.acc-readable-font,
-#root.acc-readable-font * {
-  font-family: 'Verdana', 'Arial', sans-serif !important;
+#root.acc-underline a { text-decoration: underline !important; }
+#root.acc-readable-font, #root.acc-readable-font * {
+  font-family: Verdana, Arial, sans-serif !important;
   letter-spacing: 0.03em !important;
   word-spacing: 0.05em !important;
 }
+.acc-option:disabled { opacity: 0.45; cursor: not-allowed; }
+.acc-menu { box-sizing: border-box; max-width: calc(100vw - 90px); }
+.acc-label { overflow-wrap: anywhere; }
 
 @media (max-width: 768px) {
   .acc-fab {
@@ -259,6 +230,109 @@ body.acc-high-contrast .acc-fab {
   .acc-menu {
     left: 75px;
     bottom: 15px;
-    min-width: 200px;
+    min-width: 0;
+    width: min(280px, calc(100vw - 90px));
   }
 }
+
+/* Portaled floating controls stay anchored to the viewport, outside filtered #root. */
+body { --acc-grayscale: grayscale(0); --acc-negative: invert(0); }
+body.acc-grayscale { --acc-grayscale: grayscale(1); }
+body.acc-negative { --acc-negative: invert(1) hue-rotate(180deg); }
+body:is(.acc-grayscale, .acc-negative) :is(.social-float, .whatsapp-float-container, .acc-fab) {
+  filter: var(--acc-grayscale) var(--acc-negative);
+}
+body.acc-underline :is(.social-float, .whatsapp-float-container) a {
+  text-decoration: underline !important;
+}
+body.acc-readable-font .whatsapp-float-container * {
+  font-family: Verdana, Arial, sans-serif !important;
+}
+body.acc-high-contrast :is(.social-float a, .whatsapp-btn, .whatsapp-option) {
+  background: #000 !important;
+  color: #fff !important;
+  border: 2px solid #fff;
+}
+body.acc-light-bg :is(.social-float a, .whatsapp-btn, .whatsapp-option) {
+  background: #fff8f0 !important;
+  color: #244b30 !important;
+}
+
+/* Preserve the transparent link covering each embedded map. */
+#root:is(.acc-high-contrast, .acc-light-bg) .map-overlay {
+  background: transparent !important;
+}
+
+/* Delineate cards and controls against the high-contrast background. */
+#root.acc-high-contrast :is(.intro-card, .glass-card, .branch-card, .service-category-block, .cita-card, .work-form, .auth-card, .map-container) {
+  border: 2px solid #fff !important;
+  box-shadow: none !important;
+}
+#root.acc-high-contrast :is(button, input, select, textarea, .outline-button, .cta-button, .map-link, .submit-btn, .whatsapp-branch-btn, .whatsapp-button) {
+  border: 2px solid #fff !important;
+}
+#root.acc-high-contrast :is(button, a)[aria-pressed="true"],
+#root.acc-high-contrast .chip-selected {
+  outline: 2px solid #ffff00;
+  outline-offset: 2px;
+}
+body.acc-high-contrast .acc-menu {
+  background: #000;
+  color: #fff;
+  border: 2px solid #fff;
+}
+body.acc-high-contrast .acc-option {
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+}
+body.acc-high-contrast .acc-option.active {
+  border: 2px solid #ffff00;
+  color: #ffff00;
+}
+body.acc-high-contrast .acc-option:hover {
+  background: #222;
+}
+body.acc-high-contrast .acc-section-title { color: #fff; }
+
+/* Reflect the selected appearance on the accessibility trigger itself. */
+body.acc-high-contrast .acc-fab {
+  background: #000;
+  color: #fff;
+  border: 2px solid #fff;
+}
+body.acc-high-contrast .acc-fab[aria-expanded="true"] {
+  color: #ffff00;
+  border-color: #ffff00;
+}
+body.acc-light-bg .acc-fab {
+  background: #fff8f0;
+  color: #244b30;
+  border: 2px solid #244b30;
+}
+
+/* Clear boundaries on the light background, matching high-contrast coverage. */
+#root.acc-light-bg :is(.intro-card, .glass-card, .branch-card, .service-category-block, .cita-card, .work-form, .auth-card, .map-container) {
+  border: 2px solid #000 !important;
+  box-shadow: none !important;
+}
+#root.acc-light-bg :is(button, input, select, textarea, .premium-button, .outline-button, .cta-button, .map-link, .submit-btn, .whatsapp-branch-btn, .whatsapp-button) {
+  border: 2px solid #000 !important;
+}
+body.acc-light-bg .acc-menu {
+  background: #fff8f0;
+  color: #000;
+  border: 2px solid #000;
+}
+body.acc-light-bg .acc-option {
+  background: #fff8f0;
+  color: #000;
+  border: 1px solid #000;
+}
+body.acc-light-bg .acc-option.active {
+  background: #000;
+  color: #fff;
+}
+body.acc-light-bg .acc-option:hover { background: #e8dfd4; }
+body.acc-light-bg .acc-option.active:hover { background: #222; }
+body.acc-light-bg .acc-section-title { color: #000; }

@@ -4,7 +4,11 @@ import es from './locales/es.json';
 import ca from './locales/ca.json';
 import en from './locales/en.json';
 
-const savedLang = localStorage.getItem('i18nextLng') || 'es';
+let savedLang = 'es';
+try {
+  const stored = localStorage.getItem('i18nextLng');
+  if (['es', 'en', 'ca'].includes(stored)) savedLang = stored;
+} catch { /* Use Spanish when storage is unavailable. */ }
 
 i18n.use(initReactI18next).init({
   resources: { es: { translation: es }, ca: { translation: ca }, en: { translation: en } },

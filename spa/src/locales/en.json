@@ -120,7 +120,8 @@
     "lightbg": "Light background",
     "underline": "Underline links",
     "readable": "Readable font",
-    "reset": "Reset"
+    "reset": "Reset",
+    "language": "Language"
   },
   "lang": {
     "es": "ES",
