@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS cliente (
     nombre          VARCHAR(150) NOT NULL,
     telefono        VARCHAR(20)  NOT NULL,
     correo          VARCHAR(255),
+    password_hash   VARCHAR(255),
     direccion       VARCHAR(255),
     alergias        TEXT,
     notas           TEXT,
