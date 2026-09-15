@@ -4,7 +4,7 @@ const { requireAuth } = require('../middleware/auth');
 
 const router = Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get(['/', '/dashboard', '/admin'], requireAuth, async (req, res) => {
   try {
     const [servicios, sucursales, citas, postulaciones, proveedores, aliados] = await Promise.all([
       pool.query('SELECT COUNT(*) count FROM servicio WHERE activo = true'),

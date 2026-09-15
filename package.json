@@ -1,8 +1,8 @@
 {
-  "name": "lushnails-db",
+  "name": "lushnails-admin",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run build --prefix spa && mkdir -p public && cp -r spa/build/* public/"
+    "build": "echo 'Admin build ready'"
   }
 }

@@ -6,6 +6,12 @@ const { requireAuth } = require('../middleware/auth');
 const router = Router();
 
 router.get('/login', (req, res) => {
+  if (req.query.logout === '1' || req.query.force === '1') {
+    req.session.destroy(() => {
+      res.render('login', { error: null });
+    });
+    return;
+  }
   if (req.session.userId) return res.redirect('/');
   res.render('login', { error: null });
 });
@@ -36,8 +42,9 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect('/login');
+  req.session.destroy(() => {
+    res.redirect('/login?logout=1');
+  });
 });
 
 module.exports = router;

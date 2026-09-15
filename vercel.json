@@ -1,22 +1,6 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/login(.*)", "destination": "/api/index.js" },
-    { "source": "/logout(.*)", "destination": "/api/index.js" },
-    { "source": "/bsc(.*)", "destination": "/api/index.js" },
-    { "source": "/tablero(.*)", "destination": "/api/index.js" },
-    { "source": "/servicios(.*)", "destination": "/api/index.js" },
-    { "source": "/sucursales(.*)", "destination": "/api/index.js" },
-    { "source": "/citas(.*)", "destination": "/api/index.js" },
-    { "source": "/clientes(.*)", "destination": "/api/index.js" },
-    { "source": "/historial(.*)", "destination": "/api/index.js" },
-    { "source": "/empleados(.*)", "destination": "/api/index.js" },
-    { "source": "/galeria(.*)", "destination": "/api/index.js" },
-    { "source": "/proveedores(.*)", "destination": "/api/index.js" },
-    { "source": "/aliados(.*)", "destination": "/api/index.js" },
-    { "source": "/postulaciones(.*)", "destination": "/api/index.js" },
-    { "source": "/roles(.*)", "destination": "/api/index.js" },
-    { "source": "/configuracion(.*)", "destination": "/api/index.js" },
-    { "source": "/api/(.*)", "destination": "/api/index.js" }
+    { "source": "/(.*)", "destination": "/api/index.js" }
   ]
 }
