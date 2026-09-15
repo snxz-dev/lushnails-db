@@ -88,6 +88,10 @@ app.use('/aliados', aliadosRoutes);
 app.use('/empleados', empleadosRoutes);
 app.use('/historial', historialRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Panel admin: http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Panel admin: http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
