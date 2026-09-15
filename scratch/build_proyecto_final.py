@@ -267,12 +267,13 @@ def build_technical_sheet(doc):
     
     add_body_p(doc, "El presente proyecto corresponde a una solución de software completa, modular y desplegada en infraestructura de nube moderna. A continuación se presentan las coordenadas de acceso y trazabilidad técnica del sistema:")
     
-    table = doc.add_table(rows=6, cols=2)
+    table = doc.add_table(rows=7, cols=2)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_apa_borders(table)
     
     headers = [
-        ("Portal Web en Producción (Vercel Global Edge):", "https://lushnails-db.vercel.app"),
+        ("Portal Web de Clientes (Frontend con Accesibilidad):", "https://lushnails-portal.vercel.app"),
+        ("Panel de Administración y Control (Backend / BSC):", "https://lushnails-db.vercel.app\nAcceso directo: https://lushnails-db.vercel.app/login"),
         ("Repositorio Público de Código (GitHub):", "https://github.com/snxz-dev/lushnails-db"),
         ("Credenciales Demo Administrador (Intranet):", "Usuario: demo-admin@lushnails.example\nContraseña: admin123"),
         ("Base de Datos en la Nube (Neon Serverless):", "PostgreSQL 16 en AWS Ohio (us-east-2)\nHost: ep-rough-mountain-a5byi7v7.us-east-2.aws.neon.tech\nBase de datos: lushnails_spa (19 tablas relacionales)"),
