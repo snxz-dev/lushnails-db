@@ -24,3 +24,5 @@ Thumbs.db
 # BD
 *.dump
 backup.sql
+.vercel
+.env*

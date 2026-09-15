@@ -33,16 +33,42 @@
       border-bottom: 1px solid rgba(255,255,255,0.1);
       letter-spacing: 1px;
     }
-    .sidebar nav { flex: 1; padding: 12px 0; }
     .sidebar a {
-      display: block; padding: 12px 20px; font-size: 0.9rem;
-      transition: all 0.2s; border-left: 3px solid transparent;
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px; font-size: 0.92rem; font-weight: 500;
+      color: rgba(255,255,255,0.85); text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border-left: 5px solid transparent;
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+      border-right: 1px solid transparent;
+      margin: 3px 12px 3px 0;
+      border-radius: 0 10px 10px 0;
+      position: relative;
     }
-    .sidebar a:hover, .sidebar a.active {
-      background: rgba(255,255,255,0.1);
-      border-left-color: #A7B8A0;
+    .sidebar a:hover {
+      background: rgba(255,255,255,0.14);
+      color: #FFFFFF;
+      border-left-color: #6EE7B7;
+      border-top-color: rgba(255,255,255,0.1);
+      border-bottom-color: rgba(255,255,255,0.1);
+      border-right-color: rgba(255,255,255,0.1);
+      transform: translateX(8px);
+      box-shadow: 2px 4px 14px rgba(0,0,0,0.22);
     }
-    .sidebar a.active { background: rgba(255,255,255,0.15); font-weight: 600; }
+    .sidebar a.active {
+      background: linear-gradient(90deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.1) 100%);
+      color: #FFFFFF;
+      font-weight: 700;
+      border-left: 5px solid #F59E0B;
+      border-top: 1px solid rgba(245,158,11,0.3);
+      border-bottom: 1px solid rgba(245,158,11,0.3);
+      border-right: 1px solid rgba(245,158,11,0.3);
+      transform: translateX(8px);
+      box-shadow: 0 0 14px rgba(245,158,11,0.35), 2px 5px 16px rgba(0,0,0,0.28);
+      position: relative;
+      z-index: 2;
+    }
     .sidebar a:focus-visible {
       outline: 2px solid white; outline-offset: -2px;
     }
@@ -323,7 +349,7 @@
     <a href="/historial" <%= path.startsWith('/historial') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🕐 Historial</a>
     <% } %>
     <% if (user.permisos.includes('empleados.gestionar')) { %>
-    <a href="/empleados" <%= path.startsWith('/empleados') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🧑‍🔬 Empleados</a>
+    <a href="/empleados" <%= path === '/empleados' ? 'aria-current="page" class="active"' : '' %> role="menuitem">🧑‍🔬 Empleados</a>
     <a href="/empleados/horarios" <%= path.startsWith('/empleados/horarios') ? 'aria-current="page" class="active"' : '' %> role="menuitem">🗓️ Horarios</a>
     <% } %>
     <% if (user.permisos.includes('galeria.gestionar')) { %>
@@ -397,7 +423,26 @@ document.addEventListener('DOMContentLoaded', function() {
   const msg = urlParams.get('msg');
   if (msg) { toast(decodeURIComponent(msg), 'success'); }
 
-  // Load saved accessibility preferences
+  // Resaltado dinamico del enlace activo segun URL actual
+  var curPath = window.location.pathname.replace(/\/$/, '') || '/';
+  var links = document.querySelectorAll('.sidebar nav a');
+  links.forEach(function(a) {
+    var href = (a.getAttribute('href') || '').replace(/\/$/, '') || '/';
+    var matches = false;
+    if (href === '/' && curPath === '/') {
+      matches = true;
+    } else if (href === '/empleados' && curPath === '/empleados') {
+      matches = true;
+    } else if (href !== '/' && href !== '/empleados' && curPath.indexOf(href) === 0) {
+      matches = true;
+    }
+    if (matches) {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    }
+  });
+
+  // Cargar preferencias de accesibilidad
   if (localStorage.getItem('acc-contrast') === 'true') document.body.classList.add('high-contrast');
   var savedFont = localStorage.getItem('acc-font-size');
   if (savedFont) {
