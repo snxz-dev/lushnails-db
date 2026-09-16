@@ -100,10 +100,63 @@ function App() {
     if (cliente && cliente.id) {
       fetch(`${API_URL}/clientes/${cliente.id}/citas`)
         .then(r => r.json())
-        .then(setMisCitas)
-        .catch(() => {});
+        .then(data => setMisCitas(Array.isArray(data) ? data : []))
+        .catch(e => console.error(e));
     }
   }, [cliente]);
+
+  // Lector de Pantalla (TTS)
+  useEffect(() => {
+    let debounceTimer;
+    const handleMouseOver = (e) => {
+      const features = JSON.parse(localStorage.getItem('acc-features') || '{}');
+      if (!features.screenReader) return;
+
+      const target = e.target;
+      if (target.closest('.acc-fab') || target.closest('#acc-menu')) return;
+
+      let textToSpeak = '';
+      if (target.tagName === 'IMG') {
+        textToSpeak = target.alt || 'Imagen';
+      } else if (['H1','H2','H3','H4','H5','H6','P','BUTTON','A','LABEL','SPAN','LI','TH','TD'].includes(target.tagName)) {
+        // Read text content directly if it's a reasonably sized element
+        const clone = target.cloneNode(true);
+        textToSpeak = clone.textContent.trim().replace(/\s+/g, ' ');
+      }
+
+      // Avoid reading very large container divs or empty text
+      if (textToSpeak && textToSpeak.length > 0 && textToSpeak.length < 300) {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(textToSpeak);
+          utterance.lang = document.documentElement.lang || 'es';
+          
+          document.querySelectorAll('.acc-reading').forEach(el => el.classList.remove('acc-reading'));
+          target.classList.add('acc-reading');
+          
+          utterance.onend = () => target.classList.remove('acc-reading');
+          utterance.onerror = () => target.classList.remove('acc-reading');
+          window.speechSynthesis.speak(utterance);
+        }, 500); // 500ms hover delay
+      }
+    };
+
+    const handleMouseOut = (e) => {
+      if (e.target.classList.contains('acc-reading')) {
+        e.target.classList.remove('acc-reading');
+        window.speechSynthesis.cancel();
+      }
+    };
+
+    document.addEventListener('mouseover', handleMouseOver);
+    document.addEventListener('mouseout', handleMouseOut);
+    return () => {
+      document.removeEventListener('mouseover', handleMouseOver);
+      document.removeEventListener('mouseout', handleMouseOut);
+      window.speechSynthesis.cancel();
+    };
+  }, []);
 
   const handleAuthChange = (e) => {
     const { name, value } = e.target;

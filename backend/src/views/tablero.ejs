@@ -1,5 +1,19 @@
 <%- include('partials/header') %>
-<div class="top-bar"><h1>🎯 Tablero de Comando</h1></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .cmd-row { cursor: pointer; transition: background 0.2s; }
+  .cmd-row:hover { background: var(--bg) !important; }
+  .cmd-panel-row { display: none; background: #fafafa; }
+  .cmd-panel-row.active { display: table-row; }
+  .cmd-panel-content { padding: 24px !important; border-top: 1px dashed #e2e8f0; }
+  
+  .chat-box { border: 1px solid #ddd; border-radius: 8px; height: 200px; overflow-y: auto; padding: 12px; background: white; margin-bottom: 12px; }
+  .chat-msg { margin-bottom: 10px; padding: 10px 14px; background: #e2e8f0; border-radius: 8px; max-width: 80%; }
+  .chat-msg.me { background: var(--primary-light); color: white; margin-left: auto; }
+  .chat-input-grp { display: flex; gap: 8px; }
+  .chat-input-grp input { flex: 1; }
+</style>
+<div class="top-bar"><h1><i data-lucide="target"></i> Tablero de Comando</h1></div>
 
 <h2 style="margin-bottom:15px">Indicadores Clave</h2>
 <div class="stats-grid">
@@ -29,32 +43,106 @@
   </div>
 </div>
 
-<h2 style="margin:30px 0 15px">📋 Tabla de Comandos del Sistema</h2>
+<h2 style="margin:30px 0 15px; display: flex; align-items: center; gap: 10px;"><i data-lucide="terminal"></i> Tabla de Comandos Interactiva</h2>
 <table>
-  <thead><tr><th>Comando</th><th>Descripción</th><th>Frecuencia</th><th>Responsable</th></tr></thead>
+  <thead><tr><th>Acción</th><th>Comando</th><th>Descripción</th></tr></thead>
   <tbody>
     <% comandos.forEach(c => { %>
-    <tr>
-      <td><code style="background:#f0ebe3;padding:3px 6px;border-radius:4px"><%= c.comando %></code></td>
+    <tr class="cmd-row" onclick="togglePanel('<%= c.id %>')">
+      <td style="width: 50px; text-align: center;"><i data-lucide="<%= c.icon %>" style="color: var(--primary)"></i></td>
+      <td><span style="font-weight: 600; color: var(--primary);"><%= c.comando %></span></td>
       <td><%= c.descripcion %></td>
-      <td><%= c.frecuencia %></td>
-      <td><%= c.responsable %></td>
+    </tr>
+    <tr class="cmd-panel-row" id="panel-<%= c.id %>">
+      <td colspan="3" class="cmd-panel-content">
+        <% if (c.accion === 'reportes') { %>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <p>Seleccione el formato para descargar el reporte operativo del mes:</p>
+            <button class="btn btn-primary" onclick="toast('Generando PDF...', 'info')"><i data-lucide="file-text"></i> PDF</button>
+            <button class="btn btn-success" onclick="toast('Exportando CSV...', 'info')"><i data-lucide="sheet"></i> CSV / Excel</button>
+          </div>
+        <% } else if (c.accion === 'sucursales') { %>
+          <table style="box-shadow: none; border: 1px solid #eee;">
+            <thead><tr><th>Sucursal</th><th>Total Citas</th><th>Empleados Activos</th></tr></thead>
+            <tbody>
+              <% infoSucursales.forEach(suc => { %>
+                <tr>
+                  <td><strong><%= suc.nombre %></strong></td>
+                  <td><%= suc.total_citas %></td>
+                  <td><%= suc.empleados_activos %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else if (c.accion === 'graficas') { %>
+          <div style="width: 100%; max-width: 600px; margin: 0 auto;">
+            <canvas id="chartServicios"></canvas>
+          </div>
+        <% } else if (c.accion === 'comunicacion') { %>
+          <div class="form-grid" style="margin-bottom: 0; box-shadow: none; border: 1px solid #eee;">
+            <div class="field">
+              <label>Chat de Sucursales / Red de Emprendimientos</label>
+              <div class="chat-box" id="chatBox">
+                <div class="chat-msg"><strong>Matriz:</strong> Hola, ¿cómo van con los insumos?</div>
+                <div class="chat-msg me"><strong>Local Norte:</strong> Todo en orden, recibimos los acrílicos.</div>
+              </div>
+              <div class="chat-input-grp">
+                <input type="text" id="chatInput" placeholder="Escribe un mensaje..." onkeypress="if(event.key === 'Enter') sendChat()">
+                <button class="btn btn-primary" onclick="sendChat()"><i data-lucide="send"></i></button>
+              </div>
+            </div>
+          </div>
+        <% } else if (c.accion === 'lector') { %>
+          <p>La funcionalidad de Texto a Voz (TTS) y Accesibilidad está disponible en el <strong>Portal Público (Frontend)</strong>.</p>
+          <p style="margin-top: 10px; color: var(--text-muted);">En el portal de clientes, pasa el mouse por encima de los elementos para que el asistente de voz lea la página en tiempo real.</p>
+        <% } %>
+      </td>
     </tr>
     <% }) %>
   </tbody>
 </table>
 
-<h2 style="margin:30px 0 15px">📊 Estándares del Portal</h2>
-<table>
-  <thead><tr><th>Estándar</th><th>Descripción</th><th>Nivel Actual</th></tr></thead>
-  <tbody>
-    <tr><td>Accesibilidad WCAG 2.1</td><td>Texto alternativo en imágenes, etiquetas semánticas, ARIA labels</td><td><span class="badge badge-true">Aceptable</span></td></tr>
-    <tr><td>Seguridad</td><td>Autenticación por sesión, contraseñas hasheadas (bcrypt)</td><td><span class="badge badge-true">Implementado</span></td></tr>
-    <tr><td>Base de Datos</td><td>PostgreSQL 16, relaciones normalizadas, índices, RLS</td><td><span class="badge badge-true">Implementado</span></td></tr>
-    <tr><td>Comunicación</td><td>API REST entre frontend (React) y backend (Express)</td><td><span class="badge badge-true">Implementado</span></td></tr>
-    <tr><td>Usabilidad</td><td>Panel admin responsive, navegación lateral, feedback visual</td><td><span class="badge badge-true">Aceptable</span></td></tr>
-    <tr><td>Balanced Scorecard</td><td>4 perspectivas con KPIs y estado de cumplimiento</td><td><span class="badge badge-true">Implementado</span></td></tr>
-    <tr><td>Tablero de Comando</td><td>Indicadores en tiempo real + tabla de comandos operativos</td><td><span class="badge badge-true">Implementado</span></td></tr>
-  </tbody>
-</table>
+<script>
+  function togglePanel(id) {
+    document.querySelectorAll('.cmd-panel-row').forEach(row => {
+      if (row.id !== 'panel-' + id) row.classList.remove('active');
+    });
+    document.getElementById('panel-' + id).classList.toggle('active');
+  }
+
+  function sendChat() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    const box = document.getElementById('chatBox');
+    box.innerHTML += `<div class="chat-msg me"><strong>Tú:</strong> ${msg}</div>`;
+    input.value = '';
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // Inicializar Gráfica
+  document.addEventListener('DOMContentLoaded', () => {
+    const rawData = <%- topServicios || '[]' %>;
+    if (rawData.length > 0) {
+      const ctx = document.getElementById('chartServicios').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: rawData.map(d => d.nombre),
+          datasets: [{
+            label: 'Citas Realizadas (Top 5)',
+            data: rawData.map(d => d.cantidad),
+            backgroundColor: '#F59E0B',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+      });
+    }
+  });
+</script>
 <%- include('partials/footer') %>

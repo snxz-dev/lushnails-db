@@ -337,3 +337,16 @@ body.acc-light-bg .acc-option.active {
 body.acc-light-bg .acc-option:hover { background: #e8dfd4; }
 body.acc-light-bg .acc-option.active:hover { background: #222; }
 body.acc-light-bg .acc-section-title { color: #000; }
+
+.acc-reading {
+  outline: 3px solid #2F4A34 !important;
+  outline-offset: 3px !important;
+  background-color: rgba(47, 74, 52, 0.1) !important;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+body.acc-high-contrast .acc-reading {
+  outline-color: #4CAF50 !important;
+  background-color: rgba(76, 175, 80, 0.2) !important;
+}

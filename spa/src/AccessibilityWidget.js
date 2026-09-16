@@ -125,9 +125,10 @@ export default function AccessibilityWidget() {
     { key: 'grayscale', icon: '◐', label: t('acc.grayscale') },
     { key: 'highContrast', icon: '☯', label: t('acc.contrast') },
     { key: 'negative', icon: '👁', label: t('acc.negative') },
-    { key: 'lightBg', icon: '☀', label: t('acc.lightbg') },
-    { key: 'underline', icon: 'U', label: t('acc.underline') },
-    { key: 'readableFont', icon: 'Aa', label: t('acc.readable') },
+    { key: 'lightBg', icon: '☀', label: t('acc.lightbg', 'Fondo Claro') },
+    { key: 'underline', icon: 'U', label: t('acc.underline', 'Subrayar Enlaces') },
+    { key: 'readableFont', icon: 'Aa', label: t('acc.readable', 'Fuente Legible') },
+    { key: 'screenReader', icon: '🗣️', label: t('acc.screenReader', 'Lector de Voz') },
   ];
 
   const languages = [
