@@ -29,6 +29,24 @@ export default function AccessibilityWidget() {
       return Number.isInteger(saved) ? Math.min(4, Math.max(-2, saved)) : 0;
     } catch { return 0; }
   });
+  const [ttsRate, setTtsRate] = useState(() => {
+    try {
+      const saved = parseFloat(localStorage.getItem('acc-tts-rate'));
+      return saved && !isNaN(saved) ? saved : 1.0;
+    } catch { return 1.0; }
+  });
+
+  const changeTtsRate = (newRate) => {
+    setTtsRate(newRate);
+    try { localStorage.setItem('acc-tts-rate', String(newRate)); } catch { /* Storage may be unavailable. */ }
+  };
+
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      document.querySelectorAll('.acc-reading').forEach(el => el.classList.remove('acc-reading'));
+    }
+  };
 
   const applyFeatures = useCallback((feats, level) => {
     var root = document.getElementById('root');
@@ -161,6 +179,34 @@ export default function AccessibilityWidget() {
                 </button>
               )
             ))}
+            {features.screenReader && (
+              <div className="acc-tts-panel" role="region" aria-label="Controles del lector de voz">
+                <div className="acc-tts-controls">
+                  <span className="acc-tts-title">Velocidad:</span>
+                  {[0.8, 1.0, 1.2].map(rate => (
+                    <button
+                      key={rate}
+                      type="button"
+                      className={`acc-rate-btn ${ttsRate === rate ? 'active' : ''}`}
+                      onClick={() => changeTtsRate(rate)}
+                      aria-label={`Velocidad ${rate}x`}
+                      aria-pressed={ttsRate === rate}
+                    >
+                      {rate}x
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="acc-option acc-tts-stop"
+                  onClick={stopSpeaking}
+                  aria-label="Detener lectura de voz"
+                >
+                  <span className="acc-icon">⏹</span>
+                  <span className="acc-label">Detener voz (Esc)</span>
+                </button>
+              </div>
+            )}
           </div>
           <div className="acc-divider"></div>
           <div className="acc-menu-section acc-lang-section">

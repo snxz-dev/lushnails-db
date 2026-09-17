@@ -350,3 +350,69 @@ body.acc-high-contrast .acc-reading {
   outline-color: #4CAF50 !important;
   background-color: rgba(76, 175, 80, 0.2) !important;
 }
+
+/* ── TTS Controls (Lector de Voz de Apoyo) ── */
+.acc-tts-panel {
+  background: #f8f6f2;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 4px 0;
+  border: 1px solid #e0d8cc;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.acc-tts-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.acc-tts-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.acc-rate-btn {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.acc-rate-btn:hover {
+  background: #ebe5dc;
+}
+
+.acc-rate-btn.active {
+  background: #2F4A34;
+  color: #fff;
+  border-color: #2F4A34;
+}
+
+.acc-tts-stop {
+  background: #fff0f0 !important;
+  border-color: #e74c3c !important;
+  color: #c0392b !important;
+  font-size: 0.85rem !important;
+  padding: 6px 10px !important;
+}
+
+.acc-tts-stop:hover {
+  background: #ffe0e0 !important;
+}
+
+.acc-tts-stop .acc-icon {
+  width: 28px !important;
+  height: 28px !important;
+  background: #e74c3c !important;
+  color: #fff !important;
+  font-size: 0.75rem !important;
+}
