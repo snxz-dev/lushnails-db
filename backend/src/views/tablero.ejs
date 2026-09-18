@@ -1,148 +1,375 @@
 <%- include('partials/header') %>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  .cmd-row { cursor: pointer; transition: background 0.2s; }
-  .cmd-row:hover { background: var(--bg) !important; }
-  .cmd-panel-row { display: none; background: #fafafa; }
-  .cmd-panel-row.active { display: table-row; }
-  .cmd-panel-content { padding: 24px !important; border-top: 1px dashed #e2e8f0; }
-  
-  .chat-box { border: 1px solid #ddd; border-radius: 8px; height: 200px; overflow-y: auto; padding: 12px; background: white; margin-bottom: 12px; }
-  .chat-msg { margin-bottom: 10px; padding: 10px 14px; background: #e2e8f0; border-radius: 8px; max-width: 80%; }
-  .chat-msg.me { background: var(--primary-light); color: white; margin-left: auto; }
-  .chat-input-grp { display: flex; gap: 8px; }
-  .chat-input-grp input { flex: 1; }
-</style>
-<div class="top-bar"><h1><i data-lucide="target"></i> Tablero de Comando</h1></div>
-
-<h2 style="margin-bottom:15px">Indicadores Clave</h2>
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="num"><%= indicadores.nuevos_clientes %></div>
-    <div class="label">Nuevos Clientes (30d)</div>
-  </div>
-  <div class="stat-card">
-    <div class="num"><%= indicadores.atenciones_mes %></div>
-    <div class="label">Atenciones del Mes</div>
-  </div>
-  <div class="stat-card">
-    <div class="num"><%= indicadores.tiempo_promedio_min || '—' %> min</div>
-    <div class="label">Tiempo Promedio x Servicio</div>
-  </div>
-  <div class="stat-card">
-    <div class="num"><%= indicadores.postulaciones_pendientes %></div>
-    <div class="label">Postulaciones Pendientes</div>
-  </div>
-  <div class="stat-card">
-    <div class="num"><%= indicadores.tasa_exito || '—' %>%</div>
-    <div class="label">Tasa de Éxito (Citas)</div>
-  </div>
-  <div class="stat-card">
-    <div class="num"><%= indicadores.citas_hoy %></div>
-    <div class="label">Citas para Hoy</div>
-  </div>
-</div>
-
-<h2 style="margin:30px 0 15px; display: flex; align-items: center; gap: 10px;"><i data-lucide="terminal"></i> Tabla de Comandos Interactiva</h2>
-<table>
-  <thead><tr><th>Acción</th><th>Comando</th><th>Descripción</th></tr></thead>
-  <tbody>
-    <% comandos.forEach(c => { %>
-    <tr class="cmd-row" onclick="togglePanel('<%= c.id %>')">
-      <td style="width: 50px; text-align: center;"><i data-lucide="<%= c.icon %>" style="color: var(--primary)"></i></td>
-      <td><span style="font-weight: 600; color: var(--primary);"><%= c.comando %></span></td>
-      <td><%= c.descripcion %></td>
-    </tr>
-    <tr class="cmd-panel-row" id="panel-<%= c.id %>">
-      <td colspan="3" class="cmd-panel-content">
-        <% if (c.accion === 'reportes') { %>
-          <div style="display: flex; gap: 12px; align-items: center;">
-            <p>Seleccione el formato para descargar el reporte operativo del mes:</p>
-            <button class="btn btn-primary" onclick="toast('Generando PDF...', 'info')"><i data-lucide="file-text"></i> PDF</button>
-            <button class="btn btn-success" onclick="toast('Exportando CSV...', 'info')"><i data-lucide="sheet"></i> CSV / Excel</button>
-          </div>
-        <% } else if (c.accion === 'sucursales') { %>
-          <table style="box-shadow: none; border: 1px solid #eee;">
-            <thead><tr><th>Sucursal</th><th>Total Citas</th><th>Empleados Activos</th></tr></thead>
-            <tbody>
-              <% infoSucursales.forEach(suc => { %>
-                <tr>
-                  <td><strong><%= suc.nombre %></strong></td>
-                  <td><%= suc.total_citas %></td>
-                  <td><%= suc.empleados_activos %></td>
-                </tr>
-              <% }) %>
-            </tbody>
-          </table>
-        <% } else if (c.accion === 'graficas') { %>
-          <div style="width: 100%; max-width: 600px; margin: 0 auto;">
-            <canvas id="chartServicios"></canvas>
-          </div>
-        <% } else if (c.accion === 'comunicacion') { %>
-          <div class="form-grid" style="margin-bottom: 0; box-shadow: none; border: 1px solid #eee;">
-            <div class="field">
-              <label>Chat de Sucursales / Red de Emprendimientos</label>
-              <div class="chat-box" id="chatBox">
-                <div class="chat-msg"><strong>Matriz:</strong> Hola, ¿cómo van con los insumos?</div>
-                <div class="chat-msg me"><strong>Local Norte:</strong> Todo en orden, recibimos los acrílicos.</div>
-              </div>
-              <div class="chat-input-grp">
-                <input type="text" id="chatInput" placeholder="Escribe un mensaje..." onkeypress="if(event.key === 'Enter') sendChat()">
-                <button class="btn btn-primary" onclick="sendChat()"><i data-lucide="send"></i></button>
-              </div>
-            </div>
-          </div>
-        <% } else if (c.accion === 'lector') { %>
-          <p>La funcionalidad de Texto a Voz (TTS) y Accesibilidad está disponible en el <strong>Portal Público (Frontend)</strong>.</p>
-          <p style="margin-top: 10px; color: var(--text-muted);">En el portal de clientes, pasa el mouse por encima de los elementos para que el asistente de voz lea la página en tiempo real.</p>
-        <% } %>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
-
-<script>
-  function togglePanel(id) {
-    document.querySelectorAll('.cmd-panel-row').forEach(row => {
-      if (row.id !== 'panel-' + id) row.classList.remove('active');
-    });
-    document.getElementById('panel-' + id).classList.toggle('active');
-  }
-
-  function sendChat() {
-    const input = document.getElementById('chatInput');
-    const msg = input.value.trim();
-    if (!msg) return;
-    const box = document.getElementById('chatBox');
-    box.innerHTML += `<div class="chat-msg me"><strong>Tú:</strong> ${msg}</div>`;
-    input.value = '';
-    box.scrollTop = box.scrollHeight;
-  }
-
-  // Inicializar Gráfica
-  document.addEventListener('DOMContentLoaded', () => {
-    const rawData = <%- topServicios || '[]' %>;
-    if (rawData.length > 0) {
-      const ctx = document.getElementById('chartServicios').getContext('2d');
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: rawData.map(d => d.nombre),
-          datasets: [{
-            label: 'Citas Realizadas (Top 5)',
-            data: rawData.map(d => d.cantidad),
-            backgroundColor: '#F59E0B',
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-        }
-      });
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .cmd-row {
+      cursor: pointer;
+      transition: background 0.2s;
     }
-  });
-</script>
-<%- include('partials/footer') %>
+
+    .cmd-row:hover {
+      background: var(--bg) !important;
+    }
+
+    .cmd-panel-row {
+      display: none;
+      background: var(--bg);
+    }
+
+    .cmd-panel-row.active {
+      display: table-row;
+    }
+
+    .cmd-panel-content {
+      padding: 24px !important;
+      border-top: 1px dashed var(--text-muted);
+    }
+
+    .chat-box {
+      border: 1px solid var(--text-muted);
+      border-radius: 8px;
+      height: 200px;
+      overflow-y: auto;
+      padding: 12px;
+      background: var(--surface);
+      margin-bottom: 12px;
+    }
+
+    .chat-msg {
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid rgba(128,128,128,0.2);
+      border-radius: 8px;
+      max-width: 80%;
+      color: var(--text);
+    }
+
+    .chat-msg.me {
+      background: var(--primary-light);
+      color: white;
+      margin-left: auto;
+    }
+
+    .chat-input-grp {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input-grp input {
+      flex: 1;
+    }
+  </style>
+  <div class="top-bar">
+    <h1><i data-lucide="target"></i> Tablero de Comando</h1>
+  </div>
+
+  <h2 style="margin-bottom:15px">Indicadores Clave</h2>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="num">
+        <%= indicadores.nuevos_clientes %>
+      </div>
+      <div class="label">Nuevos Clientes (30d)</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">
+        <%= indicadores.atenciones_mes %>
+      </div>
+      <div class="label">Atenciones del Mes</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">
+        <%= indicadores.tiempo_promedio_min || '—' %> min
+      </div>
+      <div class="label">Tiempo Promedio x Servicio</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">
+        <%= indicadores.postulaciones_pendientes %>
+      </div>
+      <div class="label">Postulaciones Pendientes</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">
+        <%= indicadores.tasa_exito || '—' %>%
+      </div>
+      <div class="label">Tasa de Éxito (Citas)</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">
+        <%= indicadores.citas_hoy %>
+      </div>
+      <div class="label">Citas para Hoy</div>
+    </div>
+  </div>
+
+  <h2 style="margin:30px 0 15px; display: flex; align-items: center; gap: 10px;"><i data-lucide="terminal"></i> Tabla de
+    Comandos Interactiva</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Acción</th>
+        <th>Comando</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% comandos.forEach(c=> { %>
+        <tr class="cmd-row" onclick="togglePanel('<%= c.id %>')">
+          <td style="width: 50px; text-align: center;"><i data-lucide="<%= c.icon %>" style="color: var(--primary)"></i>
+          </td>
+          <td><span style="font-weight: 600; color: var(--primary);">
+              <%= c.comando %>
+            </span></td>
+          <td>
+            <%= c.descripcion %>
+          </td>
+        </tr>
+        <tr class="cmd-panel-row" id="panel-<%= c.id %>">
+          <td colspan="3" class="cmd-panel-content">
+            <% if (c.accion==='reportes' ) { %>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <p>Seleccione el formato para descargar el reporte operativo del mes:</p>
+                <a href="/tablero/reportes/pdf" target="_blank" class="btn btn-primary"><i data-lucide="file-text"></i>
+                  PDF</a>
+                <a href="/tablero/reportes/csv" target="_blank" class="btn btn-success"><i data-lucide="sheet"></i>
+                  Excel</a>
+              </div>
+              <% } else if (c.accion==='sucursales' ) { %>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+                  <table style="box-shadow: none; border: 1px solid #eee; margin: 0;">
+                    <thead>
+                      <tr>
+                        <th>Sucursal</th>
+                        <th>Total Citas</th>
+                        <th>Empleados Activos</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% infoSucursales.forEach(suc=> { %>
+                        <tr>
+                          <td><strong>
+                              <%= suc.nombre %>
+                            </strong></td>
+                          <td>
+                            <%= suc.total_citas %>
+                          </td>
+                          <td>
+                            <%= suc.empleados_activos %>
+                          </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                  </table>
+                  <div>
+                    <p style="font-weight:600; margin-bottom:10px; text-align:center;">Tendencia de Ventas (Últimos 30
+                      días)</p>
+                    <canvas id="chartVentas"></canvas>
+                  </div>
+                </div>
+                <% } else if (c.accion==='graficas' ) { %>
+                  <div style="display: flex; flex-direction: column; gap: 40px; align-items: center;">
+                    <div style="width: 100%; max-width: 600px;">
+                      <p style="font-weight:600; margin-bottom:10px; text-align:center;">Top 5 Servicios Más Solicitados
+                      </p>
+                      <canvas id="chartServicios"></canvas>
+                    </div>
+                    <div style="width: 100%; max-width: 800px; text-align: center;">
+                      <p style="font-weight:600; margin-bottom:10px;">Intensidad de Citas (Mapa de Calor - Últimos 90
+                        días)</p>
+                      <div id="github-heatmap"
+                        style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
+                        <!-- Renderizado por JS -->
+                      </div>
+                    </div>
+                  </div>
+                  <% } else if (c.accion==='metas' ) { %>
+                    <div style="text-align: center; padding: 20px;">
+                      <h3 style="margin-bottom: 15px;">Meta de Ventas de los Últimos 30 días: $5,000.00</h3>
+                      <div
+                        style="width: 100%; max-width: 600px; height: 34px; background: #e2e8f0; border-radius: 17px; margin: 0 auto; overflow: hidden; position: relative;">
+                        <div id="meta-progress"
+                          style="height: 100%; width: 0%; background: var(--primary); transition: width 1.5s ease-out;">
+                        </div>
+                        <span id="meta-text"
+                          style="position: absolute; width: 100%; text-align: center; left: 0; top: 8px; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">Calculando...</span>
+                      </div>
+                      <p style="margin-top: 15px; color: var(--text-muted);">Progreso dinámico basado en las ventas
+                        reales registradas.</p>
+                    </div>
+                    <% } else if (c.accion==='inventario' ) { %>
+                      <table style="box-shadow: none; border: 1px solid #eee; margin: 0;">
+                        <thead>
+                          <tr>
+                            <th>Insumo</th>
+                            <th>Stock Actual</th>
+                            <th>Estado</th>
+                            <th>Acción Recomendada</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Acrílico Transparente 500g</td>
+                            <td>2 unidades</td>
+                            <td><span
+                                style="background: #ef4444; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px;">Crítico</span>
+                            </td>
+                            <td>Pedir a proveedor</td>
+                          </tr>
+                          <tr>
+                            <td>Monómero 1 Litro</td>
+                            <td>1 unidad</td>
+                            <td><span
+                                style="background: #ef4444; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px;">Crítico</span>
+                            </td>
+                            <td>Pedir urgente</td>
+                          </tr>
+                          <tr>
+                            <td>Esmalte Gel Semipermanente (Rojo)</td>
+                            <td>5 unidades</td>
+                            <td><span
+                                style="background: #f59e0b; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px;">Bajo</span>
+                            </td>
+                            <td>Monitorear</td>
+                          </tr>
+                          <tr>
+                            <td>Toallas Desechables</td>
+                            <td>15 paquetes</td>
+                            <td><span
+                                style="background: #10b981; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px;">Óptimo</span>
+                            </td>
+                            <td>Ninguna</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <% } else if (c.accion==='comunicacion' ) { %>
+                        <div class="form-grid" style="margin-bottom: 0; box-shadow: none; border: 1px solid #eee;">
+                          <div class="field">
+                            <label>Chat de Sucursales / Red de Emprendimientos</label>
+                            <div class="chat-box" id="chatBox">
+                              <div class="chat-msg"><strong>Matriz:</strong> Hola, ¿cómo van con los insumos?</div>
+                              <div class="chat-msg me"><strong>Local Norte:</strong> Todo en orden, recibimos los
+                                acrílicos.</div>
+                            </div>
+                            <div class="chat-input-grp">
+                              <input type="text" id="chatInput" placeholder="Escribe un mensaje..."
+                                onkeypress="if(event.key === 'Enter') sendChat()">
+                              <button class="btn btn-primary" onclick="sendChat()"><i data-lucide="send"></i></button>
+                            </div>
+                          </div>
+                        </div>
+                        <% } else if (c.accion==='lector' ) { %>
+                          <p>La funcionalidad de Texto a Voz (TTS) y Accesibilidad está disponible en el <strong>Portal
+                              Público (Frontend)</strong>.</p>
+                          <p style="margin-top: 10px; color: var(--text-muted);">En el portal de clientes, pasa el mouse
+                            por encima de los elementos para que el asistente de voz lea la página en tiempo real.</p>
+                          <% } %>
+          </td>
+        </tr>
+        <% }) %>
+    </tbody>
+  </table>
+
+  <div id="tablero-data" data-servicios='<%= topServicios || "[]" %>' data-ventas='<%= ventasXfecha || "[]" %>'
+    data-actividad='<%= actividadDiaria || "[]" %>' style="display:none;"></div>
+
+  <script>
+    function togglePanel(id) {
+      document.querySelectorAll('.cmd-panel-row').forEach(row => {
+        if (row.id !== 'panel-' + id) row.classList.remove('active');
+      });
+      document.getElementById('panel-' + id).classList.toggle('active');
+    }
+
+    function sendChat() {
+      const input = document.getElementById('chatInput');
+      const msg = input.value.trim();
+      if (!msg) return;
+      const box = document.getElementById('chatBox');
+      box.innerHTML += `<div class="chat-msg me"><strong>Tú:</strong> ${msg}</div>`;
+      input.value = '';
+      box.scrollTop = box.scrollHeight;
+    }
+
+    // Inicializar Gráfica
+    document.addEventListener('DOMContentLoaded', () => {
+      const rawData = JSON.parse(document.getElementById('tablero-data').getAttribute('data-servicios'));
+      if (rawData.length > 0 && document.getElementById('chartServicios')) {
+        const ctx = document.getElementById('chartServicios').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: rawData.map(d => d.nombre),
+            datasets: [{
+              label: 'Citas Realizadas (Top 5)',
+              data: rawData.map(d => d.cantidad),
+              backgroundColor: '#F59E0B',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+          }
+        });
+      }
+
+      const ventasData = JSON.parse(document.getElementById('tablero-data').getAttribute('data-ventas'));
+      const actividadData = JSON.parse(document.getElementById('tablero-data').getAttribute('data-actividad'));
+
+      // Chart de Ventas
+      if (ventasData.length > 0 && document.getElementById('chartVentas')) {
+        new Chart(document.getElementById('chartVentas').getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: ventasData.map(d => d.fecha.substring(5)), // MM-DD
+            datasets: [{
+              label: 'Ingresos ($)',
+              data: ventasData.map(d => parseFloat(d.total)),
+              borderColor: '#10B981',
+              tension: 0.3,
+              fill: true,
+              backgroundColor: 'rgba(16, 185, 129, 0.1)'
+            }]
+          }
+        });
+      }
+
+      // Heatmap GitHub
+      const heatmap = document.getElementById('github-heatmap');
+      if (heatmap && actividadData.length > 0) {
+        actividadData.forEach(d => {
+          const count = parseInt(d.cantidad);
+          let color = '#ebedf0'; // 0 citas
+          if (count == 1) color = '#c6e48b';
+          if (count == 2) color = '#7bc96f';
+          if (count == 3) color = '#239a3b';
+          if (count > 3) color = '#196127';
+
+          const square = document.createElement('div');
+          square.style.width = '14px';
+          square.style.height = '14px';
+          square.style.backgroundColor = color;
+          square.style.borderRadius = '2px';
+          square.title = `${d.fecha}: ${count} citas`;
+          heatmap.appendChild(square);
+        });
+      }
+
+      // Monitor de Metas
+      const metaProgress = document.getElementById('meta-progress');
+      const metaText = document.getElementById('meta-text');
+      if (metaProgress && ventasData.length > 0) {
+        const totalMes = ventasData.reduce((acc, val) => acc + parseFloat(val.total), 0);
+        const meta = 5000;
+        let pct = (totalMes / meta) * 100;
+        if (pct > 100) pct = 100;
+
+        setTimeout(() => {
+          metaProgress.style.width = pct + '%';
+          metaText.innerText = `$${totalMes.toFixed(2)} / $${meta.toFixed(2)} (${pct.toFixed(1)}%)`;
+        }, 300);
+      }
+    });
+  </script>
+  <%- include('partials/footer') %>

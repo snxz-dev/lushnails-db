@@ -1,44 +1,80 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Sucursales</h1>
+  <h1><i data-lucide="store"></i> Sucursales</h1>
 </div>
 
-<form method="POST" action="/sucursales" class="form-grid">
-  <div class="field"><label>Nombre</label><input name="nombre" required></div>
-  <div class="field"><label>Dirección</label><input name="direccion" required></div>
-  <div class="field"><label>Teléfono</label><input name="telefono"></div>
-  <div class="field"><label>WhatsApp Link</label><input name="link_whatsapp"></div>
-  <div class="field"><label>Horario</label><input name="horario" placeholder="Lun-Sáb 9:00-19:00"></div>
-  <div class="field"><label>Latitud</label><input name="latitud" type="number" step="0.0000001"></div>
-  <div class="field"><label>Longitud</label><input name="longitud" type="number" step="0.0000001"></div>
-  <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
-  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
-</form>
+<div class="controls-bar" style="display: flex; gap: 16px; margin-bottom: 24px; align-items: center; justify-content: flex-end;">
+  <button class="btn btn-primary" onclick="document.getElementById('form-sucursal').classList.toggle('visible')">
+    <i data-lucide="plus"></i> Nueva Sucursal
+  </button>
+</div>
 
-<table>
-  <thead><tr><th>Nombre</th><th>Dirección</th><th>WhatsApp</th><th>Activo</th><th>Acciones</th></tr></thead>
-  <tbody>
-    <% if (sucursales.length === 0) { %>
-    <tr><td colspan="5" class="empty">Sin sucursales registradas</td></tr>
-    <% } %>
-    <% sucursales.forEach(s => { %>
-    <tr>
-      <td><%= s.nombre %></td>
-      <td><%= s.direccion %></td>
-      <td><%= s.link_whatsapp ? '✅' : '—' %></td>
-      <td><span class="badge badge-<%= s.activo %>"><%= s.activo ? 'Sí' : 'No' %></span></td>
-      <td>
-        <form method="POST" action="/sucursales/<%= s.id %>/toggle" style="display:inline">
-          <button type="submit" class="btn btn-sm <%= s.activo ? 'btn-warning' : 'btn-success' %>">
-            <%= s.activo ? 'Desactivar' : 'Activar' %>
+<div id="form-sucursal" class="expandable-form" style="display: none; background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); margin-bottom: 24px;">
+  <h3 style="margin-bottom: 16px;">Registrar Nueva Sucursal</h3>
+  <form method="POST" action="/sucursales" class="form-grid" style="box-shadow: none; border: none; padding: 0; margin: 0; background: transparent;">
+    <div class="field"><label>Nombre</label><input name="nombre" required></div>
+    <div class="field"><label>Dirección</label><input name="direccion" required></div>
+    <div class="field"><label>Teléfono</label><input name="telefono"></div>
+    <div class="field"><label>WhatsApp Link</label><input name="link_whatsapp"></div>
+    <div class="field"><label>Horario</label><input name="horario" placeholder="Lun-Sáb 9:00-19:00"></div>
+    <div class="field"><label>Latitud</label><input name="latitud" type="number" step="0.0000001"></div>
+    <div class="field"><label>Longitud</label><input name="longitud" type="number" step="0.0000001"></div>
+    <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
+    <div class="field" style="align-self:end; display:flex; gap:8px;">
+      <button type="button" class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text);" onclick="document.getElementById('form-sucursal').classList.remove('visible')">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </form>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+  <% if (sucursales.length === 0) { %>
+    <div class="empty" style="grid-column: 1 / -1;">Sin sucursales registradas</div>
+  <% } %>
+  <% sucursales.forEach(s => { %>
+    <div class="sucursal-card" style="background: var(--surface); border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;">
+      <!-- Indicador visual de estado arriba a la derecha -->
+      <div style="position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: <%= s.activo ? 'var(--primary)' : 'var(--danger)' %>; transform: rotate(45deg) translate(20px, -30px); z-index: 0; opacity: 0.2;"></div>
+      
+      <div style="position: relative; z-index: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <h2 style="font-size: 1.4rem; color: var(--primary);"><%= s.nombre %></h2>
+          <span class="badge badge-<%= s.activo %>"><%= s.activo ? 'Activa' : 'Inactiva' %></span>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
+          <span style="display: flex; align-items: flex-start; gap: 8px;"><i data-lucide="map-pin" style="width: 16px; flex-shrink: 0; margin-top: 2px;"></i> <span><%= s.direccion %></span></span>
+          <% if (s.telefono) { %>
+            <span style="display: flex; align-items: center; gap: 8px;"><i data-lucide="phone" style="width: 16px;"></i> <%= s.telefono %></span>
+          <% } %>
+          <% if (s.horario) { %>
+            <span style="display: flex; align-items: center; gap: 8px;"><i data-lucide="clock" style="width: 16px;"></i> <%= s.horario %></span>
+          <% } %>
+          <span style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+            <i data-lucide="message-circle" style="width: 16px; color: <%= s.link_whatsapp ? '#25D366' : 'var(--text-muted)' %>;"></i> 
+            <%= s.link_whatsapp ? 'WhatsApp Configurado' : 'Sin WhatsApp' %>
+          </span>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 16px; position: relative; z-index: 1;">
+        <form method="POST" action="/sucursales/<%= s.id %>/toggle" style="margin:0">
+          <button type="submit" class="btn btn-sm <%= s.activo ? 'btn-warning' : 'btn-success' %>" title="<%= s.activo ? 'Desactivar' : 'Activar' %>">
+            <i data-lucide="<%= s.activo ? 'power-off' : 'power' %>" style="width: 16px;"></i> <%= s.activo ? 'Desactivar' : 'Activar' %>
           </button>
         </form>
-        <form method="POST" action="/sucursales/<%= s.id %>/delete" style="display:inline" data-confirm="¿Eliminar esta sucursal?">
-          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+        <form method="POST" action="/sucursales/<%= s.id %>/delete" style="margin:0" data-confirm="¿Eliminar la sucursal <%= s.nombre %>?">
+          <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i data-lucide="trash-2" style="width: 16px;"></i></button>
         </form>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<style>
+  .expandable-form.visible { display: block !important; animation: fadeIn 0.3s; }
+  .sucursal-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); border-color: var(--primary); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
 <%- include('partials/footer') %>

@@ -1,20 +1,159 @@
 <%- include('partials/header') %>
-<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#2F4A34">
-  <div style="background:white;padding:40px;border-radius:12px;width:360px;box-shadow:0 8px 30px rgba(0,0,0,0.2)">
-    <h2 style="text-align:center;margin-bottom:8px;color:#2F4A34">🌿 Lush Nails Spa</h2>
-    <p style="text-align:center;font-size:0.85rem;color:#666;margin-bottom:24px">Panel de Administración</p>
-    <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
-    <form method="POST">
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:6px">Email</label>
-        <input type="email" name="email" required style="width:100%;padding:10px 14px;border:2px solid #ddd;border-radius:6px;font-size:0.9rem">
-      </div>
-      <div style="margin-bottom:24px">
-        <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:6px">Contraseña</label>
-        <input type="password" name="password" required style="width:100%;padding:10px 14px;border:2px solid #ddd;border-radius:6px;font-size:0.9rem">
-      </div>
-      <button type="submit" class="btn btn-primary" style="width:100%;padding:12px;font-size:0.95rem">Ingresar</button>
-    </form>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+    background-size: cover;
+  }
+  .login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: rgba(47, 74, 52, 0.4); /* Overlay lush green */
+    backdrop-filter: blur(8px);
+  }
+  .login-card {
+    display: flex;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    width: 900px;
+    max-width: 90%;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+  .login-branding {
+    flex: 1;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(47,74,52,0.9) 0%, rgba(30,50,35,0.9) 100%);
+    color: white;
+  }
+  .login-branding h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    background: linear-gradient(to right, #fff, #e0e0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .login-branding p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.8);
+    margin: 0;
+  }
+  .login-form-container {
+    flex: 1;
+    padding: 60px 40px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .login-form-container h2 {
+    color: #1a1a1a;
+    font-size: 1.8rem;
+    margin: 0 0 8px 0;
+  }
+  .login-form-container p.subtitle {
+    color: #666;
+    margin: 0 0 32px 0;
+  }
+  .form-group {
+    margin-bottom: 24px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a4a4a;
+    margin-bottom: 8px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: #f9f9f9;
+    transition: all 0.3s ease;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: #2F4A34;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(47, 74, 52, 0.1);
+  }
+  .btn-login {
+    width: 100%;
+    padding: 16px;
+    background: #2F4A34;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-login:hover {
+    background: #233827;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(47, 74, 52, 0.2);
+  }
+  
+  @media (max-width: 768px) {
+    .login-card { flex-direction: column; }
+    .login-branding { padding: 40px 24px; text-align: center; }
+    .login-form-container { padding: 40px 24px; }
+  }
+</style>
+
+<div class="login-wrapper">
+  <div class="login-card">
+    <!-- Lado de la marca -->
+    <div class="login-branding">
+      <h1>🌿 Lush Nails</h1>
+      <p>Sistema Administrativo Central. Gestiona sucursales, agenda citas y controla tu negocio desde un solo lugar.</p>
+    </div>
+    
+    <!-- Lado del formulario -->
+    <div class="login-form-container">
+      <h2>Bienvenido de nuevo</h2>
+      <p class="subtitle">Ingresa tus credenciales para continuar</p>
+      
+      <% if (error) { %>
+        <div class="alert alert-error" style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 24px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
+          <%= error %>
+        </div>
+      <% } %>
+      
+      <form method="POST">
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" name="email" required placeholder="admin@lushnails.example">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" name="password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn-login">
+          Ingresar al Panel
+          <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+        </button>
+      </form>
+    </div>
   </div>
 </div>
 <%- include('partials/footer') %>

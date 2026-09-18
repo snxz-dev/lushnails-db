@@ -94,4 +94,63 @@ router.post('/:id/estado', requireAuth, async (req, res) => {
   }
 });
 
+// API: Obtener conteo de citas por día para un mes específico
+router.get('/api/mes', requireAuth, async (req, res) => {
+  try {
+    const { year, month } = req.query;
+    if (!year || !month) return res.status(400).json({ error: 'Faltan parámetros' });
+    
+    // El mes en JS es 0-indexado, PostgreSQL usa 1-12
+    const startDate = `${year}-${String(parseInt(month) + 1).padStart(2, '0')}-01`;
+    const endDate = `${year}-${String(parseInt(month) + 2).padStart(2, '0')}-01`; // Esto fallará en diciembre, mejor usar un approach diferente
+
+    const result = await pool.query(`
+      SELECT EXTRACT(DAY FROM fecha) as dia, COUNT(id) as total
+      FROM cita 
+      WHERE EXTRACT(YEAR FROM fecha) = $1 AND EXTRACT(MONTH FROM fecha) = $2
+      AND estado != 'cancelada'
+      GROUP BY dia
+    `, [parseInt(year), parseInt(month) + 1]);
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+});
+
+// API: Obtener tablero comparativo de las 3 sucursales principales para una fecha
+router.get('/api/tablero', requireAuth, async (req, res) => {
+  try {
+    const { fecha } = req.query;
+    if (!fecha) return res.status(400).json({ error: 'Falta fecha' });
+
+    // Obtenemos las 3 primeras sucursales activas (usualmente las principales)
+    const sucursalesRes = await pool.query('SELECT id, nombre FROM sucursal WHERE activo = true ORDER BY id LIMIT 3');
+    const sucursales = sucursalesRes.rows;
+
+    const tablero = [];
+    for (const suc of sucursales) {
+      const citasRes = await pool.query('SELECT COUNT(id) as total FROM cita WHERE id_sucursal = $1 AND fecha = $2 AND estado != $3', [suc.id, fecha, 'cancelada']);
+      const totalCitas = parseInt(citasRes.rows[0].total) || 0;
+      
+      const empRes = await pool.query('SELECT COUNT(id) as total FROM empleado WHERE id_sucursal = $1 AND activo = true', [suc.id]);
+      const totalEmp = parseInt(empRes.rows[0].total) || 0;
+
+      tablero.push({
+        id: suc.id,
+        nombre: suc.nombre,
+        citasHoy: totalCitas,
+        personalActivo: totalEmp,
+        ocupacion: totalEmp > 0 ? Math.min(100, Math.round((totalCitas / (totalEmp * 8)) * 100)) : 0
+      });
+    }
+
+    res.json(tablero);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+});
+
 module.exports = router;

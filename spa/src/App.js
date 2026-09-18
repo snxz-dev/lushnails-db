@@ -28,9 +28,21 @@ import imgManicure from './assets/Unas.jpeg';
 import imgPestanas from './assets/PestanasCejas.jpeg';
 
 
-const fotosUñas = [
-  unas13, unas14, unas15, unas16, unas17, unas19,
-  unas1000, unas101, unas202, unas303, unas404, unas505, unas606, unas707
+const fotosUnas = [
+  { src: unas13, alt: 'Uñas almond con base nude, decoración de nubes 3D blancas y detalles dorados con glitter' },
+  { src: unas14, alt: 'Uñas almond rosas con glitter, diseño de mariposas doradas y base blanca, estilo glamour' },
+  { src: unas15, alt: 'Manicure francesa con punta blanca, flores 3D fucsia y manchas de leopardo en dedo acento' },
+  { src: unas16, alt: 'Uñas coffin largas con esmalte amarillo pastel, cromo dorado y diseño de Minnie Mouse en dedo acento' },
+  { src: unas17, alt: 'Manicure almond estilo francesa roja y blanca, con cerezas pintadas a mano y estrellas doradas' },
+  { src: unas19, alt: 'Uñas almond burdeos oscuro con interior nude y pedrería plateada, diseño elegante bicolor' },
+  { src: unas1000, alt: 'Combo manicure y pedicure con esmalte vino oscuro, flor 3D blanca y detalles dorados en pies y manos' },
+  { src: unas101, alt: 'Uñas almond largas con punta negra y animal print de leopardo, acabado bicolor nude y negro con glitter plata' },
+  { src: unas202, alt: 'Manicure francesa corta con punta blanca, flor 3D blanca translúcida y piedras estrella doradas' },
+  { src: unas303, alt: 'Uñas almond con diseño rosa intenso, efecto mármol rosa con flores 3D y glitter, estilo romántico' },
+  { src: unas404, alt: 'Uñas almond con punta roja y blanca, moño 3D rosa, corazones y estrellas rojas pintadas a mano' },
+  { src: unas505, alt: 'Uñas almond con punta roja, flor blanca 3D pequeña, glitter rojo y detalles artesanales en rojo vino' },
+  { src: unas606, alt: 'Uñas almond nude con punta turquesa y borde dorado, estrellas brillantes y piedra turquesa incrustada' },
+  { src: unas707, alt: 'Uñas almond rosadas estilo baby boomer, punta blanca francesa, flor tropical 3D y acento de animal print' },
 ];
 
 const CORREO_TRABAJO = 'ibethcabrera1@gmail.com';
@@ -105,56 +117,118 @@ function App() {
     }
   }, [cliente]);
 
-  // Lector de Pantalla (TTS)
+  // Lector de Voz de Apoyo (TTS) - Compatible con mouse, teclado (focus) y táctil
   useEffect(() => {
     let debounceTimer;
-    const handleMouseOver = (e) => {
-      const features = JSON.parse(localStorage.getItem('acc-features') || '{}');
-      if (!features.screenReader) return;
 
-      const target = e.target;
+    const getBestVoice = (langCode) => {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return null;
+      const prefix = (langCode || 'es').split('-')[0].toLowerCase();
+      // Buscar coincidencia exacta o por prefijo de idioma (es, en, ca)
+      const matched = voices.find(v => v.lang.toLowerCase().startsWith(prefix));
+      return matched || voices[0] || null;
+    };
+
+    const speakElement = (target) => {
+      const features = JSON.parse(localStorage.getItem('acc-features') || '{}');
+      if (!features.screenReader || !('speechSynthesis' in window)) return;
       if (target.closest('.acc-fab') || target.closest('#acc-menu')) return;
 
       let textToSpeak = '';
       if (target.tagName === 'IMG') {
-        textToSpeak = target.alt || 'Imagen';
-      } else if (['H1','H2','H3','H4','H5','H6','P','BUTTON','A','LABEL','SPAN','LI','TH','TD'].includes(target.tagName)) {
-        // Read text content directly if it's a reasonably sized element
-        const clone = target.cloneNode(true);
-        textToSpeak = clone.textContent.trim().replace(/\s+/g, ' ');
+        textToSpeak = target.alt ? `Imagen: ${target.alt}` : 'Imagen ilustrativa';
+      } else if (['H1','H2','H3','H4','H5','H6','P','BUTTON','A','LABEL','SPAN','LI','TH','TD','INPUT'].includes(target.tagName)) {
+        if (target.tagName === 'INPUT') {
+          textToSpeak = target.placeholder || target.getAttribute('aria-label') || target.name || 'Campo de entrada';
+        } else {
+          const clone = target.cloneNode(true);
+          textToSpeak = clone.textContent.trim().replace(/\s+/g, ' ');
+        }
       }
 
-      // Avoid reading very large container divs or empty text
       if (textToSpeak && textToSpeak.length > 0 && textToSpeak.length < 300) {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
+          // Fix Chrome bug: speechSynthesis queda en estado 'paused'
+          if (window.speechSynthesis.paused) window.speechSynthesis.resume();
           window.speechSynthesis.cancel();
+
           const utterance = new SpeechSynthesisUtterance(textToSpeak);
-          utterance.lang = document.documentElement.lang || 'es';
-          
+          const currentLang = document.documentElement.lang || 'es';
+          utterance.lang = currentLang;
+
+          // Velocidad configurada (0.8x, 1x, 1.2x)
+          const savedRate = parseFloat(localStorage.getItem('acc-tts-rate')) || 1.0;
+          utterance.rate = savedRate;
+
+          // Asignar voz si ya está disponible; si no, el navegador usa la default
+          const voice = getBestVoice(currentLang);
+          if (voice) utterance.voice = voice;
+
           document.querySelectorAll('.acc-reading').forEach(el => el.classList.remove('acc-reading'));
           target.classList.add('acc-reading');
-          
-          utterance.onend = () => target.classList.remove('acc-reading');
-          utterance.onerror = () => target.classList.remove('acc-reading');
+
+          utterance.onend  = () => target.classList.remove('acc-reading');
+          utterance.onerror = (e) => {
+            target.classList.remove('acc-reading');
+            // Reintentar sin voz asignada si hay error de voz
+            if (e.error === 'voice-unavailable') {
+              const retry = new SpeechSynthesisUtterance(textToSpeak);
+              retry.lang = currentLang;
+              retry.rate = savedRate;
+              window.speechSynthesis.speak(retry);
+            }
+          };
+
           window.speechSynthesis.speak(utterance);
-        }, 500); // 500ms hover delay
+        }, 300);
+      }
+    };
+
+    const handleMouseOver = (e) => speakElement(e.target);
+    const handleFocusIn = (e) => speakElement(e.target); // Accesibilidad con teclado (Tab)
+    const handleClick = (e) => {
+      // Apoyo para dispositivos táctiles
+      if (window.matchMedia('(pointer: coarse)').matches) {
+        speakElement(e.target);
       }
     };
 
     const handleMouseOut = (e) => {
       if (e.target.classList.contains('acc-reading')) {
         e.target.classList.remove('acc-reading');
-        window.speechSynthesis.cancel();
       }
     };
 
+    const handleGlobalKeyDown = (e) => {
+      if (e.key === 'Escape' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        document.querySelectorAll('.acc-reading').forEach(el => el.classList.remove('acc-reading'));
+      }
+    };
+
+    // Precargar voces del navegador si aún no se han inicializado
+    if ('speechSynthesis' in window && window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
     document.addEventListener('mouseover', handleMouseOver);
     document.addEventListener('mouseout', handleMouseOut);
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('click', handleClick);
+    document.addEventListener('keydown', handleGlobalKeyDown);
+
     return () => {
       document.removeEventListener('mouseover', handleMouseOver);
       document.removeEventListener('mouseout', handleMouseOut);
-      window.speechSynthesis.cancel();
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('click', handleClick);
+      document.removeEventListener('keydown', handleGlobalKeyDown);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     };
   }, []);
 
@@ -503,7 +577,7 @@ function App() {
       <section id="about" className="about">
         <div className="about-grid">
           <div className="about-image">
-            <img src={unas18} alt="Spa Experience" />
+            <img src={unas18} alt="Instalaciones del spa Lush Nails: sala de atención con sillas de manicure" />
           </div>
           <div className="about-text intro-card">
             <span className="section-subtitle">{t('about.subtitle')}</span>
@@ -536,7 +610,7 @@ function App() {
                 aria-expanded={servicioActivo === 'all'}
                 aria-label={`Mostrar servicios de ${t('services.' + category)}`}
               >
-                <img src={data.image} alt={`Categoría ${t('services.' + category)}`} />
+                <img src={data.image} alt={`Servicio de ${t('services.' + category)} en Lush Nails Spa`} />
               </button>
                 <h3 className="category-title">{t('services.' + category)}</h3>
                 <button type="button" className="service-toggle" onClick={toggleServicios} aria-expanded={servicioActivo === 'all'}>
@@ -562,16 +636,16 @@ function App() {
           <div className="divider"></div>
         </div>
         <div className="gallery-grid">
-          {fotosUñas.map((foto, index) => (
-            <button key={index} type="button" className="gallery-item" onClick={() => setImagenAmpliada(foto)} aria-label={`Ampliar trabajo de uñas ${index + 1}`}>
-              <img src={foto} alt={`Trabajo de uñas ${index + 1}`} />
+          {fotosUnas.map((foto, index) => (
+            <button key={index} type="button" className="gallery-item" onClick={() => setImagenAmpliada(fotosUnas[index].src)} aria-label={`Ampliar imagen: ${fotosUnas[index].alt}`}>
+              <img src={foto.src} alt={foto.alt} />
             </button>
           ))}
         </div>
         {imagenAmpliada && (
           <div className="lightbox" role="dialog" aria-modal="true" aria-label="Vista ampliada de imagen" onClick={() => setImagenAmpliada(null)}>
             <button type="button" ref={lightboxCloseRef} className="lightbox-close" onClick={() => setImagenAmpliada(null)} aria-label="Cerrar imagen ampliada">&times;</button>
-            <img src={imagenAmpliada} alt="Imagen ampliada" />
+            <img src={imagenAmpliada?.src || imagenAmpliada} alt={imagenAmpliada?.alt || 'Imagen ampliada de trabajo de uñas Lush Nails'} />
           </div>
         )}
       </section>

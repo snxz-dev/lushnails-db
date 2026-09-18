@@ -1,83 +1,145 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Gestión de Usuarios y Roles</h1>
+  <h1><i data-lucide="shield"></i> Seguridad y Roles</h1>
 </div>
 
-<h3 style="margin-bottom:12px">Nuevo Usuario</h3>
-<form method="POST" action="/roles" class="form-grid">
-  <div class="field"><label>Nombre</label><input name="nombre" required></div>
-  <div class="field"><label>Email</label><input name="email" type="email" required></div>
-  <div class="field"><label>Contraseña</label><input name="password" type="password" required></div>
-  <div class="field"><label>Rol</label>
-    <select name="rol" required>
-      <% roles.forEach(r => { %>
-      <option value="<%= r.codigo %>"><%= r.nombre %></option>
-      <% }) %>
-    </select>
-  </div>
-  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
-</form>
+<div class="controls-bar" style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
+  <button class="btn btn-primary" onclick="document.getElementById('form-usuario').classList.toggle('visible')">
+    <i data-lucide="user-plus"></i> Nuevo Usuario
+  </button>
+</div>
 
-<h3 style="margin:24px 0 12px">Usuarios Existentes</h3>
-<table>
-  <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Activo</th><th>Creado</th><th>Acciones</th></tr></thead>
-  <tbody>
-    <% if (usuarios.length === 0) { %>
-    <tr><td colspan="6" class="empty">Sin usuarios registrados</td></tr>
-    <% } %>
-    <% usuarios.forEach(u => { %>
-    <tr>
-      <td><%= u.nombre %></td>
-      <td><%= u.email %></td>
-      <td>
-        <form method="POST" action="/roles/<%= u.id %>/rol" style="display:inline">
-          <select name="rol" onchange="this.form.submit()">
-            <% roles.forEach(r => { %>
-            <option value="<%= r.codigo %>" <%= u.rol === r.codigo ? 'selected' : '' %>><%= r.nombre %></option>
-            <% }) %>
-          </select>
-        </form>
-      </td>
-      <td><span class="badge badge-<%= u.activo %>"><%= u.activo ? 'Sí' : 'No' %></span></td>
-      <td><%= u.created_at ? new Date(u.created_at).toLocaleDateString() : '-' %></td>
-      <td>
-        <% if (u.email !== 'demo-admin@lushnails.example') { %>
-        <form method="POST" action="/roles/<%= u.id %>/toggle" style="display:inline">
-          <button type="submit" class="btn btn-sm <%= u.activo ? 'btn-warning' : 'btn-success' %>">
-            <%= u.activo ? 'Desactivar' : 'Activar' %>
-          </button>
-        </form>
-        <form method="POST" action="/roles/<%= u.id %>/delete" style="display:inline" data-confirm="¿Eliminar este usuario?">
-          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-        </form>
-        <% } else { %>
-        <span class="empty">principal</span>
-        <% } %>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
-
-<h3 style="margin:24px 0 12px">Permisos por Rol</h3>
-<table>
-  <thead><tr><th>Rol</th><th>Permisos asignados</th></tr></thead>
-  <tbody>
-    <% roles.forEach(r => { %>
-    <tr>
-      <td><strong><%= r.nombre %></strong><br><small class="empty"><%= r.descripcion %></small></td>
-      <td>
-        <% const perms = permisosPorRol[r.id] || []; %>
-        <% if (perms.length === 0) { %>
-        <span class="empty">Sin permisos asignados</span>
-        <% } else { %>
-        <% perms.forEach(p => { %>
-        <span class="badge badge-permiso"><%= p %></span>
+<div id="form-usuario" class="expandable-form" style="display: none; background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); margin-bottom: 32px;">
+  <h3 style="margin-bottom: 16px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 8px;">Alta de Usuario</h3>
+  <form method="POST" action="/roles" class="form-grid" style="box-shadow: none; border: none; padding: 0; margin: 0; background: transparent;">
+    <div class="field"><label>Nombre Completo</label><input name="nombre" required placeholder="Ej: Administrador General"></div>
+    <div class="field"><label>Correo Electrónico (Login)</label><input name="email" type="email" required placeholder="correo@lushnails.com"></div>
+    <div class="field"><label>Contraseña Temporal</label><input name="password" type="password" required></div>
+    <div class="field"><label>Rol Asignado</label>
+      <select name="rol" required>
+        <% roles.forEach(r => { %>
+        <option value="<%= r.codigo %>"><%= r.nombre %></option>
         <% }) %>
-        <% } %>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+      </select>
+    </div>
+    
+    <div class="field" style="grid-column: 1 / -1; display:flex; gap:8px; justify-content: flex-end; margin-top: 8px;">
+      <button type="button" class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text);" onclick="document.getElementById('form-usuario').classList.remove('visible')">Cancelar</button>
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Crear Usuario</button>
+    </div>
+  </form>
+</div>
+
+<!-- Layout Principal de Seguridad -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-top: 24px;" class="roles-layout">
+  
+  <!-- Columna Izquierda: Usuarios Activos -->
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;"><i data-lucide="users" style="color: var(--primary);"></i> Usuarios del Sistema</h3>
+    
+    <div class="data-grid-container" style="background: var(--surface); border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); overflow: hidden;">
+      <table style="margin: 0; width: 100%; border-collapse: collapse;">
+        <thead style="background: rgba(128,128,128,0.05); border-bottom: 1px solid rgba(128,128,128,0.2);">
+          <tr>
+            <th style="padding: 16px; text-align: left; color: var(--text-muted); font-weight: 500;">Usuario</th>
+            <th style="padding: 16px; text-align: left; color: var(--text-muted); font-weight: 500;">Privilegios</th>
+            <th style="padding: 16px; text-align: right; color: var(--text-muted); font-weight: 500;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (usuarios.length === 0) { %>
+            <tr><td colspan="3" class="empty" style="padding: 32px; text-align: center; color: var(--text-muted);">Sin usuarios registrados</td></tr>
+          <% } %>
+          
+          <% usuarios.forEach(u => { %>
+            <tr style="border-bottom: 1px solid rgba(128,128,128,0.1); transition: background 0.2s;">
+              
+              <td style="padding: 16px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(u.nombre) %>&background=random&color=fff&rounded=true" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                  <div>
+                    <strong style="color: var(--text); font-size: 1rem; display: block;"><%= u.nombre %></strong>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);"><%= u.email %></span>
+                  </div>
+                </div>
+              </td>
+              
+              <td style="padding: 16px;">
+                <form method="POST" action="/roles/<%= u.id %>/rol" style="margin: 0;">
+                  <select name="rol" onchange="this.form.submit()" class="input-modern" style="padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; background: var(--bg); border: 1px solid rgba(128,128,128,0.2); color: var(--text); cursor: pointer;">
+                    <% roles.forEach(r => { %>
+                    <option value="<%= r.codigo %>" <%= u.rol === r.codigo ? 'selected' : '' %>><%= r.nombre %></option>
+                    <% }) %>
+                  </select>
+                </form>
+              </td>
+              
+              <td style="padding: 16px; text-align: right;">
+                <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                  <span class="badge badge-<%= u.activo %>" style="font-size: 0.7rem;"><%= u.activo ? 'Activo' : 'Inactivo' %></span>
+                  
+                  <% if (u.email !== 'demo-admin@lushnails.example') { %>
+                    <form method="POST" action="/roles/<%= u.id %>/toggle" style="margin: 0;">
+                      <button type="submit" class="btn btn-sm <%= u.activo ? 'btn-warning' : 'btn-success' %>" title="<%= u.activo ? 'Desactivar' : 'Activar' %>" style="padding: 8px; width: 32px; display: flex; justify-content: center;">
+                        <i data-lucide="<%= u.activo ? 'power-off' : 'power' %>" style="width: 14px;"></i>
+                      </button>
+                    </form>
+                    <form method="POST" action="/roles/<%= u.id %>/delete" style="margin: 0;" data-confirm="¿Eliminar este usuario definitivamente?">
+                      <button type="submit" class="btn btn-sm btn-danger" title="Eliminar" style="padding: 8px; width: 32px; display: flex; justify-content: center;">
+                        <i data-lucide="trash-2" style="width: 14px;"></i>
+                      </button>
+                    </form>
+                  <% } else { %>
+                    <span style="font-size: 0.75rem; color: var(--primary); padding: 8px;"><i data-lucide="lock" style="width: 14px;"></i> Master</span>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Columna Derecha: Matriz de Permisos -->
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;"><i data-lucide="key" style="color: var(--primary);"></i> Matriz de Accesos</h3>
+    
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <% roles.forEach(r => { %>
+        <div style="background: var(--surface); border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); padding: 16px;">
+          <div style="margin-bottom: 12px;">
+            <strong style="color: var(--primary); font-size: 1.1rem; display: block;"><%= r.nombre %></strong>
+            <span style="font-size: 0.8rem; color: var(--text-muted);"><%= r.descripcion %></span>
+          </div>
+          
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <% const perms = permisosPorRol[r.id] || []; %>
+            <% if (perms.length === 0) { %>
+              <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Sin permisos asignados</span>
+            <% } else { %>
+              <% perms.forEach(p => { %>
+                <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: rgba(128,128,128,0.1); border-radius: 4px; font-size: 0.75rem; color: var(--text);">
+                  <i data-lucide="check" style="width: 12px; color: #28a745;"></i> <%= p %>
+                </span>
+              <% }) %>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  .expandable-form.visible { display: block !important; animation: fadeIn 0.3s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  tbody tr:hover { background: rgba(128,128,128,0.03); }
+  
+  @media (max-width: 900px) {
+    .roles-layout { grid-template-columns: 1fr !important; }
+  }
+</style>
+
 <%- include('partials/footer') %>

@@ -6,13 +6,14 @@ const router = Router();
 
 router.get(['/', '/dashboard', '/admin'], requireAuth, async (req, res) => {
   try {
-    const [servicios, sucursales, citas, postulaciones, proveedores, aliados] = await Promise.all([
+    const [servicios, sucursales, citas, postulaciones, proveedores, aliados, clientes] = await Promise.all([
       pool.query('SELECT COUNT(*) count FROM servicio WHERE activo = true'),
       pool.query('SELECT COUNT(*) count FROM sucursal WHERE activo = true'),
       pool.query("SELECT COUNT(*) count FROM cita WHERE estado IN ('pendiente','confirmada')"),
       pool.query('SELECT COUNT(*) count FROM postulacion WHERE leida = false'),
       pool.query('SELECT COUNT(*) count FROM proveedor WHERE activo = true'),
       pool.query('SELECT COUNT(*) count FROM aliado WHERE activo = true'),
+      pool.query('SELECT COUNT(*) count FROM cliente WHERE activo = true'),
     ]);
     res.render('dashboard', {
       stats: {
@@ -22,6 +23,7 @@ router.get(['/', '/dashboard', '/admin'], requireAuth, async (req, res) => {
         postulaciones: postulaciones.rows[0].count,
         proveedores: proveedores.rows[0].count,
         aliados: aliados.rows[0].count,
+        clientes: clientes.rows[0].count,
       }
     });
   } catch (err) {

@@ -12,9 +12,8 @@
     :root {
       --primary: #1e3623;
       --primary-light: #2F4A34;
-      --accent: #F59E0B;
       --accent-hover: #D97706;
-      --bg: #f8f9fa;
+      --bg: #eef1f4; /* Fondo ligeramente más gris para contrastar con las tarjetas blancas */
       --surface: #ffffff;
       --text: #1f2937;
       --text-muted: #6b7280;
@@ -59,13 +58,13 @@
       padding: 12px 0;
     }
     .sidebar a {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 20px; font-size: 0.95rem; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 16px; font-size: 0.85rem; font-weight: 500;
       color: rgba(255,255,255,0.75); text-decoration: none;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border-left: 4px solid transparent;
-      margin: 4px 12px;
-      border-radius: 8px;
+      margin: 2px 12px;
+      border-radius: 6px;
     }
     .sidebar a .lucide { width: 18px; height: 18px; stroke-width: 2.2px; transition: transform 0.3s; }
     .sidebar a:hover {
@@ -103,10 +102,9 @@
     .top-bar h1 { font-size: 1.8rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 12px; }
     .top-bar h1 .lucide { width: 28px; height: 28px; stroke-width: 2.5px; }
 
-    /* Tables */
     table {
       width: 100%; border-collapse: separate; border-spacing: 0; background: var(--surface);
-      border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.06);
       border: 1px solid rgba(0,0,0,0.05);
     }
     th, td { padding: 16px 20px; text-align: left; font-size: 0.9rem; }
@@ -148,11 +146,10 @@
     input:focus, select:focus, textarea:focus {
       outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(47,74,52,0.15);
     }
-    input.error, select.error { border-color: var(--danger); }
     .form-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 16px; background: var(--surface); padding: 24px; border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 24px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 24px;
     }
     .form-grid .field { display: flex; flex-direction: column; gap: 6px; }
     .form-grid .field label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
@@ -179,12 +176,12 @@
 
     /* Stats */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 24px; margin-bottom: 30px;
     }
     .stat-card {
       background: var(--surface); padding: 24px; border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); text-align: left;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.05); text-align: left;
       position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
     }
     .stat-card:hover {
@@ -261,72 +258,92 @@
     button:focus:not(:focus-visible) { outline: none; }
     a:focus:not(:focus-visible) { outline: none; }
 
-    /* Accessibility toolbar */
-    .acc-toolbar {
-      position: fixed; bottom: 20px; right: 30px; z-index: 9997;
-      display: flex; gap: 6px; background: white; padding: 8px 12px;
-      border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      align-items: center;
+    /* User Profile Widget */
+    .user-profile-widget {
+      padding: 16px; margin: 12px; border-radius: 12px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; gap: 12px; cursor: pointer;
+      transition: background 0.2s; position: relative;
     }
-    .acc-toolbar button {
-      width: 34px; height: 34px; border-radius: 50%; border: none;
-      cursor: pointer; font-size: 0.9rem; font-weight: 700;
+    .user-profile-widget:hover { background: rgba(255,255,255,0.1); }
+    .user-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--accent); color: white;
       display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s; background: #f0ebe3; color: #2F4A34;
+      font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
     }
-    .acc-toolbar button:hover { background: #2F4A34; color: white; }
-    .acc-toolbar button:focus-visible { outline: 3px solid #2F4A34; outline-offset: 2px; }
-    .acc-toolbar .acc-label {
-      font-size: 0.7rem; color: #999; margin-right: 4px; font-weight: 500;
+    .user-details {
+      flex: 1; overflow: hidden;
     }
-    .acc-toolbar .separator { width: 1px; height: 24px; background: #ddd; margin: 0 4px; }
-    .acc-toolbar .voice-btn.listening { background: #c0392b; color: white; animation: pulse 1s infinite; }
-    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-    .acc-toolbar .voice-btn .listening-indicator { display: none; }
-    .acc-toolbar .voice-btn.listening .listening-indicator { display: inline; }
-    .acc-toolbar .voice-btn.listening .mic-icon { display: none; }
+    .user-name {
+      font-size: 0.9rem; font-weight: 600; color: white;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .user-role {
+      font-size: 0.75rem; color: rgba(255,255,255,0.6);
+      text-transform: capitalize;
+    }
+    .user-dropdown {
+      position: absolute; bottom: calc(100% + 8px); left: 0; right: 0;
+      background: var(--surface); border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid rgba(0,0,0,0.1);
+      opacity: 0; visibility: hidden; transform: translateY(10px);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column; padding: 8px; z-index: 1000;
+    }
+    .user-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .user-dropdown a {
+      color: var(--text) !important; padding: 10px 12px !important; margin: 0 !important;
+      border-radius: 8px !important; border: none !important;
+      display: flex !important; align-items: center !important; gap: 10px !important;
+    }
+    .user-dropdown a:hover {
+      background: rgba(128,128,128,0.1) !important; transform: none !important;
+    }
+    .user-dropdown a .lucide { color: var(--text-muted) !important; }
+    .user-dropdown .logout { border-top: 1px solid rgba(128,128,128,0.1) !important; margin-top: 4px !important; color: var(--danger) !important; }
+    .user-dropdown .logout .lucide { color: var(--danger) !important; }
 
-    /* High contrast mode */
-    body.high-contrast {
-      background: #000 !important;
-      color: #fff !important;
+    /* Dark Theme */
+    body.dark-theme {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #4ade80;
+      --primary-light: #22c55e;
     }
-    body.high-contrast .sidebar { background: #111 !important; }
-    body.high-contrast .main { background: #000; }
-    body.high-contrast .stat-card,
-    body.high-contrast .form-grid,
-    body.high-contrast table { background: #1a1a1a !important; color: #fff !important; }
-    body.high-contrast .stat-card .num { color: #4CAF50 !important; }
-    body.high-contrast th { background: #333 !important; color: #fff !important; }
-    body.high-contrast td { border-color: #333 !important; }
-    body.high-contrast input,
-    body.high-contrast select,
-    body.high-contrast textarea { background: #222 !important; color: #fff !important; border-color: #555 !important; }
-    body.high-contrast .badge-true { background: #1b5e20 !important; color: #a5d6a7 !important; }
-    body.high-contrast .badge-false,
-    body.high-contrast .badge-mejorable { background: #b71c1c !important; color: #ffcdd2 !important; }
-    body.high-contrast .badge-pendiente { background: #e65100 !important; color: #ffe0b2 !important; }
-    body.high-contrast .badge-confirmada { background: #1b5e20 !important; color: #a5d6a7 !important; }
-    body.high-contrast .badge-completada { background: #0d47a1 !important; color: #bbdefb !important; }
-    body.high-contrast .badge-cancelada { background: #b71c1c !important; color: #ffcdd2 !important; }
-    body.high-contrast .acc-toolbar { background: #1a1a1a !important; border: 1px solid #555; }
-    body.high-contrast .acc-toolbar button { background: #333; color: #fff; }
-    body.high-contrast a { color: #64B5F6 !important; }
-    body.high-contrast .toast { border: 2px solid white; }
-    body.high-contrast .modal { background: #1a1a1a !important; color: #fff; border: 1px solid #555; }
-    /* Catch any remaining inline white backgrounds (BSC cards, config cards) */
-    body.high-contrast [style*="background:white"],
-    body.high-contrast [style*="background: white"],
-    body.high-contrast [style*="background:#fff"],
-    body.high-contrast [style*="background: #fff"] {
-      background: #1a1a1a !important; color: #fff !important;
+    body.dark-theme .sidebar { background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important; border-right: 1px solid rgba(255,255,255,0.1); }
+    body.dark-theme .stat-card,
+    body.dark-theme .form-grid,
+    body.dark-theme table,
+    body.dark-theme .modal,
+    body.dark-theme .acc-toolbar { border: 1px solid rgba(255,255,255,0.1) !important; box-shadow: none !important; }
+    body.dark-theme th { background: #0f172a !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+    body.dark-theme td { border-color: rgba(255,255,255,0.05) !important; }
+    body.dark-theme tr:not(:last-child) td { border-bottom: 1px solid rgba(255,255,255,0.05) !important; }
+    body.dark-theme tr:hover td { background: #0f172a !important; }
+    body.dark-theme input,
+    body.dark-theme select,
+    body.dark-theme textarea { background: #334155 !important; border-color: #475569 !important; }
+    body.dark-theme .badge-true, body.dark-theme .badge-confirmada { background: #064e3b !important; color: #34d399 !important; }
+    body.dark-theme .badge-false, body.dark-theme .badge-mejorable, body.dark-theme .badge-cancelada { background: #7f1d1d !important; color: #fca5a5 !important; }
+    body.dark-theme .badge-pendiente { background: #78350f !important; color: #fbbf24 !important; }
+    body.dark-theme .badge-completada { background: #1e3a8a !important; color: #93c5fd !important; }
+    body.dark-theme .user-dropdown { background: var(--surface) !important; border-color: rgba(255,255,255,0.1) !important; }
+    body.dark-theme .user-dropdown a { color: var(--text) !important; }
+    body.dark-theme a { color: #38bdf8; }
+    body.dark-theme .toast { border: 1px solid rgba(255,255,255,0.1); }
+    body.dark-theme [style*="background:white"],
+    body.dark-theme [style*="background: white"],
+    body.dark-theme [style*="background:#fff"],
+    body.dark-theme [style*="background: #fff"],
+    body.dark-theme [style*="background:#ffffff"],
+    body.dark-theme [style*="background: #ffffff"] {
+      background: var(--surface) !important; color: var(--text) !important; border: 1px solid rgba(255,255,255,0.1) !important;
     }
-    body.high-contrast code {
-      background: #333 !important; color: #a5d6a7 !important; padding: 3px 6px; border-radius: 4px;
-    }
-    /* Lighten dark-colored headings in high contrast */
-    body.high-contrast [style*="color:#2F4A34"] { color: #81C784 !important; }
-    body.high-contrast [style*="color: #2F4A34"] { color: #81C784 !important; }
+    body.dark-theme code { background: #334155 !important; color: #34d399 !important; padding: 3px 6px; border-radius: 4px; }
+    body.dark-theme [style*="color:#2F4A34"], body.dark-theme [style*="color: #2F4A34"] { color: #6ee7b7 !important; }
 
   </style>
 </head>
@@ -336,19 +353,6 @@
 <div id="modal-container" role="dialog" aria-modal="true" style="display:none"></div>
 
 <% if (user) { %>
-<div class="acc-toolbar" role="toolbar" aria-label="Barra de accesibilidad">
-  <span class="acc-label">Accesib.</span>
-  <button id="acc-contrast" onclick="toggleContrast()" aria-label="Activar o desactivar alto contraste" title="Alto contraste">◐</button>
-  <div class="separator"></div>
-  <button id="acc-font-minus" onclick="changeFont(-1)" aria-label="Reducir tamaño de letra" title="Reducir fuente">A−</button>
-  <button id="acc-font-reset" onclick="resetFont()" aria-label="Restablecer tamaño de letra" title="Restablecer fuente">A</button>
-  <button id="acc-font-plus" onclick="changeFont(1)" aria-label="Aumentar tamaño de letra" title="Aumentar fuente">A+</button>
-  <div class="separator"></div>
-  <button id="acc-voice" class="voice-btn" onclick="toggleVoice()" aria-label="Activar o desactivar comandos de voz" title="Comandos de voz">
-    <span class="mic-icon">🎤</span>
-    <span class="listening-indicator">🔴</span>
-  </button>
-</div>
 <aside class="sidebar" role="navigation" aria-label="Menú de navegación principal">
   <h2 aria-label="Lush Nails Spa" style="display:flex;align-items:center;gap:10px">
     <img src="/logo.svg" alt="Logo Lush Nails" style="width:32px;height:32px">
@@ -397,13 +401,35 @@
     <a href="/roles" <%= path.startsWith('/roles') ? 'aria-current="page" class="active"' : '' %> role="menuitem"><i data-lucide="shield"></i> Roles</a>
     <% } %>
     <% if (user.permisos.includes('configuracion.gestionar')) { %>
-    <a href="/configuracion" <%= path.startsWith('/configuracion') ? 'aria-current="page" class="active"' : '' %> role="menuitem"><i data-lucide="settings"></i> Configuración</a>
+    <a href="/comunicacion" <%= typeof path !== 'undefined' && path.startsWith('/comunicacion') ? 'aria-current="page" class="active"' : '' %> role="menuitem"><i data-lucide="message-square"></i> Comunicación</a>
     <% } %>
   </nav>
-  <div class="user-info" aria-label="Información de usuario">
-    <%= user.nombre %> (<%= user.rol %>)<br>
-    <a href="/logout" aria-label="Cerrar sesión">Cerrar sesión</a>
+  
+  <div class="user-profile-widget" onclick="document.getElementById('user-menu').classList.toggle('show')">
+    <div class="user-avatar"><%= user.nombre.charAt(0).toUpperCase() %></div>
+    <div class="user-details">
+      <div class="user-name"><%= user.nombre %></div>
+      <div class="user-role"><%= user.rol %></div>
+    </div>
+    <i data-lucide="chevron-up" style="color: rgba(255,255,255,0.5); width: 16px;"></i>
+    
+    <div id="user-menu" class="user-dropdown">
+      <% if (user.permisos.includes('configuracion.gestionar')) { %>
+        <a href="/configuracion"><i data-lucide="settings"></i> Configuración</a>
+      <% } %>
+      <a href="/logout" class="logout"><i data-lucide="log-out"></i> Cerrar sesión</a>
+    </div>
   </div>
+  
+  <script>
+    document.addEventListener('click', function(e) {
+      const widget = document.querySelector('.user-profile-widget');
+      const menu = document.getElementById('user-menu');
+      if (widget && menu && !widget.contains(e.target)) {
+        menu.classList.remove('show');
+      }
+    });
+  </script>
 </aside>
 <main id="main-content" class="main" tabindex="-1">
 <% } %>
@@ -472,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Cargar preferencias de accesibilidad
-  if (localStorage.getItem('acc-contrast') === 'true') document.body.classList.add('high-contrast');
+  if (localStorage.getItem('acc-darkmode') === 'true') document.body.classList.add('dark-theme');
   var savedFont = localStorage.getItem('acc-font-size');
   if (savedFont) {
     savedFont = parseFloat(savedFont);
@@ -488,10 +514,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // --- Accesibilidad: Alto Contraste ---
-function toggleContrast() {
-  var on = document.body.classList.toggle('high-contrast');
-  localStorage.setItem('acc-contrast', on);
-  toast(on ? 'Alto contraste activado' : 'Alto contraste desactivado', 'info');
+function toggleDarkMode() {
+  var on = document.body.classList.toggle('dark-theme');
+  localStorage.setItem('acc-darkmode', on);
+  toast(on ? 'Modo Oscuro activado' : 'Modo Oscuro desactivado', 'info');
 }
 
 // --- Accesibilidad: Tamaño de fuente ---

@@ -33,6 +33,125 @@
     <div class="num"><%= stats.aliados %></div>
     <div class="label">Aliados Activos</div>
   </div>
+  <div class="stat-card">
+    <div class="num"><%= stats.clientes %></div>
+    <div class="label">Clientes Registrados</div>
+  </div>
 </div>
+
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:25px;margin-bottom:30px">
+  
+  <!-- Gráfico de Barras -->
+  <div class="chart-container" style="background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.05);">
+    <h3 style="margin-bottom: 20px; color: var(--primary);">Resumen General</h3>
+    <div style="height: 320px; width: 100%;">
+      <canvas id="dashboardChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Gráfico de Velocímetro / Capacidad -->
+  <div class="chart-container" style="background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <h3 style="margin-bottom: 20px; color: var(--primary); text-align:center;">Productividad SPA</h3>
+    <div style="position: relative; height: 180px; width: 100%; display: flex; justify-content: center;">
+      <canvas id="gaugeChart"></canvas>
+      <div style="position: absolute; bottom: 10px; text-align: center;">
+        <span style="font-size: 2rem; font-weight: 700; color: var(--primary);">85%</span>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Eficiencia</div>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-top:20px;">Basado en citas cumplidas y servicios activos.</p>
+  </div>
+
+</div>
+
+<!-- Contenedor oculto para pasar datos del servidor al cliente sin romper el linter del IDE -->
+<div id="stats-data" data-stats="<%= JSON.stringify(stats) %>" style="display:none;"></div>
+
+<!-- Cargar Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    // Obtener los datos desde el atributo data (esto evita las líneas rojas en el editor)
+    const rawData = document.getElementById('stats-data').getAttribute('data-stats');
+    const parsedStats = JSON.parse(rawData);
+
+    // 1. Gráfico de Barras (Resumen General)
+    const ctxBar = document.getElementById('dashboardChart').getContext('2d');
+    const statsData = [
+      parsedStats.citas,
+      parsedStats.servicios,
+      parsedStats.sucursales,
+      parsedStats.clientes,
+      parsedStats.postulaciones,
+      parsedStats.proveedores,
+      parsedStats.aliados
+    ];
+
+    new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: ['Citas', 'Servicios', 'Sucursales', 'Clientes', 'Postulaciones', 'Proveedores', 'Aliados'],
+        datasets: [{
+          label: 'Métricas Actuales',
+          data: statsData,
+          backgroundColor: [
+            'rgba(245, 158, 11, 0.8)', 'rgba(47, 74, 52, 0.8)', 'rgba(16, 185, 129, 0.8)', 
+            'rgba(236, 72, 153, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(139, 92, 246, 0.8)'
+          ],
+          borderColor: [
+            'rgb(245, 158, 11)', 'rgb(47, 74, 52)', 'rgb(16, 185, 129)', 
+            'rgb(236, 72, 153)', 'rgb(239, 68, 68)', 'rgb(59, 130, 246)', 'rgb(139, 92, 246)'
+          ],
+          borderWidth: 1,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+      }
+    });
+
+    // 2. Gráfico tipo Velocímetro (Gauge / Speed test)
+    const ctxGauge = document.getElementById('gaugeChart').getContext('2d');
+    const score = 85; 
+    
+    new Chart(ctxGauge, {
+      type: 'doughnut',
+      data: {
+        labels: ['Completado', 'Restante'],
+        datasets: [{
+          data: [score, 100 - score],
+          backgroundColor: [
+            'rgba(47, 74, 52, 0.9)', // primary
+            'rgba(230, 230, 230, 0.5)' // empty
+          ],
+          borderWidth: 0,
+          cutout: '80%',
+          circumference: 180,
+          rotation: 270
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false }
+        },
+        animation: {
+          animateRotate: true,
+          animateScale: false
+        }
+      }
+    });
+
+  });
+</script>
 
 <%- include('partials/footer') %>

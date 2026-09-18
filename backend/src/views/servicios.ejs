@@ -1,57 +1,149 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Servicios</h1>
+  <h1><i data-lucide="scissors"></i> Servicios</h1>
 </div>
 
-<h3 style="margin-bottom:12px">Nueva Categoría</h3>
-<form method="POST" action="/servicios/categoria" class="form-grid">
-  <div class="field"><label>Nombre</label><input name="nombre" required></div>
-  <div class="field"><label>Label (opcional)</label><input name="label" placeholder="Ej: PESTAÑAS Y CEJAS"></div>
-  <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
-  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
-</form>
-
-<h3 style="margin:24px 0 12px">Nuevo Servicio</h3>
-<form method="POST" action="/servicios" class="form-grid">
-  <div class="field"><label>Categoría</label>
-    <select name="id_categoria" required>
-      <% categorias.forEach(c => { %>
-      <option value="<%= c.id %>"><%= c.nombre %><%= c.label ? ' (' + c.label + ')' : '' %></option>
-      <% }) %>
-    </select>
+<!-- Controles y Buscador -->
+<div class="controls-bar" style="display: flex; gap: 16px; margin-bottom: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+  <div style="position: relative; flex: 1; max-width: 400px;">
+    <i data-lucide="search" style="position: absolute; left: 12px; top: 12px; color: var(--text-muted); width: 18px;"></i>
+    <input type="text" id="searchInput" placeholder="Buscar por servicio o categoría..." style="width: 100%; padding: 10px 10px 10px 40px; border-radius: 8px; border: 1px solid var(--text-muted); background: var(--surface); color: var(--text);">
   </div>
-  <div class="field"><label>Nombre</label><input name="nombre" required></div>
-  <div class="field"><label>Precio</label><input name="precio" type="number" step="0.01" placeholder="0.00"></div>
-  <div class="field"><label>Duración (min)</label><input name="duracion_minutos" type="number" placeholder="60"></div>
-  <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
-  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
-</form>
+  <div style="display: flex; gap: 12px;">
+    <button class="btn btn-primary" onclick="document.getElementById('form-categoria').classList.toggle('visible')">
+      <i data-lucide="folder-plus"></i> Nueva Categoría
+    </button>
+    <button class="btn btn-success" onclick="document.getElementById('form-servicio').classList.toggle('visible')">
+      <i data-lucide="plus-circle"></i> Nuevo Servicio
+    </button>
+  </div>
+</div>
 
-<table>
-  <thead><tr><th>Categoría</th><th>Servicio</th><th>Precio</th><th>Duración</th><th>Activo</th><th>Acciones</th></tr></thead>
-  <tbody>
-    <% if (servicios.length === 0) { %>
-    <tr><td colspan="6" class="empty">Sin servicios registrados</td></tr>
-    <% } %>
-    <% servicios.forEach(s => { %>
-    <tr>
-      <td><%= s.categoria_nombre %></td>
-      <td><%= s.nombre %></td>
-      <td><%= s.precio ? '$' + parseFloat(s.precio).toFixed(2) : '-' %></td>
-      <td><%= s.duracion_minutos ? s.duracion_minutos + ' min' : '-' %></td>
-      <td><span class="badge badge-<%= s.activo %>"><%= s.activo ? 'Sí' : 'No' %></span></td>
-      <td>
-        <form method="POST" action="/servicios/<%= s.id %>/toggle" style="display:inline">
-          <button type="submit" class="btn btn-sm <%= s.activo ? 'btn-warning' : 'btn-success' %>">
-            <%= s.activo ? 'Desactivar' : 'Activar' %>
-          </button>
+<!-- Formularios Expansibles -->
+<div id="form-categoria" class="expandable-form" style="display: none; background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); margin-bottom: 24px;">
+  <h3 style="margin-bottom: 16px;">Nueva Categoría</h3>
+  <form method="POST" action="/servicios/categoria" class="form-grid" style="box-shadow: none; border: none; padding: 0; margin: 0; background: transparent;">
+    <div class="field"><label>Nombre</label><input name="nombre" required></div>
+    <div class="field"><label>Label (opcional)</label><input name="label" placeholder="Ej: PESTAÑAS Y CEJAS"></div>
+    <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
+    <div class="field" style="align-self:end; display:flex; gap:8px;">
+      <button type="button" class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text);" onclick="document.getElementById('form-categoria').classList.remove('visible')">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </form>
+</div>
+
+<div id="form-servicio" class="expandable-form" style="display: none; background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); margin-bottom: 24px;">
+  <h3 style="margin-bottom: 16px;">Nuevo Servicio</h3>
+  <form method="POST" action="/servicios" class="form-grid" style="box-shadow: none; border: none; padding: 0; margin: 0; background: transparent;">
+    <div class="field"><label>Categoría</label>
+      <select name="id_categoria" required>
+        <% categorias.forEach(c => { %>
+        <option value="<%= c.id %>"><%= c.nombre %><%= c.label ? ' (' + c.label + ')' : '' %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="field"><label>Nombre</label><input name="nombre" required></div>
+    <div class="field"><label>Precio</label><input name="precio" type="number" step="0.01" placeholder="0.00"></div>
+    <div class="field"><label>Duración (min)</label><input name="duracion_minutos" type="number" placeholder="60"></div>
+    <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
+    <div class="field" style="align-self:end; display:flex; gap:8px;">
+      <button type="button" class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text);" onclick="document.getElementById('form-servicio').classList.remove('visible')">Cancelar</button>
+      <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+  </form>
+</div>
+
+<!-- Agrupación por Categorías -->
+<div id="servicios-container">
+  <% if (categorias.length === 0) { %>
+    <div class="empty">No hay categorías ni servicios registrados.</div>
+  <% } %>
+
+  <% categorias.forEach(cat => { 
+       const servs = servicios.filter(s => s.id_categoria === cat.id);
+  %>
+    <div class="categoria-section" data-cat-name="<%= cat.nombre.toLowerCase() %>" style="margin-bottom: 32px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--primary);">
+        <h2 style="font-size: 1.4rem; color: var(--primary);"><%= cat.nombre %> <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;"><%= cat.label ? '(' + cat.label + ')' : '' %></span></h2>
+        <form method="POST" action="/servicios/categoria/<%= cat.id %>/delete" style="display:inline" data-confirm="¿Eliminar la categoría <%= cat.nombre %>?">
+          <button type="submit" class="btn btn-sm btn-danger" title="Eliminar Categoría"><i data-lucide="trash-2" style="width: 14px;"></i></button>
         </form>
-        <form method="POST" action="/servicios/<%= s.id %>/delete" style="display:inline" data-confirm="¿Eliminar este servicio?">
-          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-        </form>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+      </div>
+      
+      <% if (servs.length === 0) { %>
+        <p style="color: var(--text-muted); font-size: 0.9rem; padding-left: 12px;">Sin servicios.</p>
+      <% } else { %>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+          <% servs.forEach(s => { %>
+            <div class="servicio-card" data-nombre="<%= s.nombre.toLowerCase() %>" style="background: var(--surface); border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <h3 style="font-size: 1.1rem; margin-bottom: 8px;"><%= s.nombre %></h3>
+                  <span class="badge badge-<%= s.activo %>" style="margin-left: 8px;"><%= s.activo ? 'Activo' : 'Inactivo' %></span>
+                </div>
+                <div style="display: flex; gap: 16px; margin-bottom: 16px; color: var(--text-muted); font-size: 0.9rem;">
+                  <span style="display: flex; align-items: center; gap: 4px;"><i data-lucide="dollar-sign" style="width: 14px;"></i> <%= s.precio ? parseFloat(s.precio).toFixed(2) : '--' %></span>
+                  <span style="display: flex; align-items: center; gap: 4px;"><i data-lucide="clock" style="width: 14px;"></i> <%= s.duracion_minutos ? s.duracion_minutos + ' min' : '--' %></span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 12px;">
+                <form method="POST" action="/servicios/<%= s.id %>/toggle" style="margin:0">
+                  <button type="submit" class="btn btn-sm <%= s.activo ? 'btn-warning' : 'btn-success' %>" title="<%= s.activo ? 'Desactivar' : 'Activar' %>">
+                    <i data-lucide="<%= s.activo ? 'eye-off' : 'eye' %>" style="width: 14px;"></i>
+                  </button>
+                </form>
+                <form method="POST" action="/servicios/<%= s.id %>/delete" style="margin:0" data-confirm="¿Eliminar servicio <%= s.nombre %>?">
+                  <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i data-lucide="trash" style="width: 14px;"></i></button>
+                </form>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  <% }) %>
+</div>
+
+<style>
+  .expandable-form.visible { display: block !important; animation: fadeIn 0.3s; }
+  .servicio-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: var(--primary); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script>
+  // CSS Toggle
+  document.addEventListener('DOMContentLoaded', () => {
+    // Buscador en tiempo real
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function(e) {
+      const text = e.target.value.toLowerCase().trim();
+      const categorias = document.querySelectorAll('.categoria-section');
+      
+      categorias.forEach(cat => {
+        const catName = cat.getAttribute('data-cat-name');
+        const cards = cat.querySelectorAll('.servicio-card');
+        let catHasMatch = false;
+        
+        cards.forEach(card => {
+          const servName = card.getAttribute('data-nombre');
+          if (servName.includes(text) || catName.includes(text)) {
+            card.style.display = 'flex';
+            catHasMatch = true;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        // Ocultar la categoría completa si no tiene servicios que coincidan y su nombre no coincide
+        if (!catHasMatch && !catName.includes(text)) {
+          cat.style.display = 'none';
+        } else {
+          cat.style.display = 'block';
+        }
+      });
+    });
+  });
+</script>
+
 <%- include('partials/footer') %>

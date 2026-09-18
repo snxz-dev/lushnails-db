@@ -120,4 +120,21 @@ router.post('/horarios/:id/delete', requireAuth, async (req, res) => {
   }
 });
 
+// Editar empleado (Perfil)
+router.post('/:id/edit', requireAuth, async (req, res) => {
+  const { nombre, especialidad, telefono, horario, id_sucursal } = req.body;
+  try {
+    await pool.query(
+      `UPDATE empleado 
+       SET nombre = $1, especialidad = $2, telefono = $3, horario = $4, id_sucursal = $5 
+       WHERE id = $6`,
+      [nombre, especialidad || null, telefono || null, horario || null, id_sucursal || null, req.params.id]
+    );
+    res.redirect('/empleados');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/empleados');
+  }
+});
+
 module.exports = router;

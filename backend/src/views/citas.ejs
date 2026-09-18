@@ -1,81 +1,313 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Citas</h1>
+  <h1><i data-lucide="calendar"></i> Gestión de Citas y Reservas</h1>
 </div>
 
-<div class="filters-row">
-  <form method="GET" action="/citas" style="display:flex;gap:8px;align-items:center">
-    <label>Fecha: <input type="date" name="fecha" value="<%= matrix ? (new Date().toISOString().slice(0,10)) : '' %>" /></label>
-    <label>Sucursal:
-      <select name="id_sucursal">
-        <option value="">--Seleccione--</option>
-        <% if (sucursales) { sucursales.forEach(s => { %>
-          <option value="<%= s.id %>"><%= s.nombre %></option>
-        <% }) } %>
-      </select>
-    </label>
-    <button type="submit" class="btn">Ver matriz</button>
-  </form>
+<!-- Contenedor Principal: Calendario + Filtros -->
+<div style="display: grid; grid-template-columns: 1fr 300px; gap: 24px; margin-bottom: 32px;">
+  
+  <!-- Calendario Mensual -->
+  <div style="background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <button class="btn btn-sm" onclick="changeMonth(-1)" style="background: rgba(128,128,128,0.1); color: var(--text);"><i data-lucide="chevron-left"></i></button>
+      <h3 id="cal-month-year" style="margin: 0; font-size: 1.2rem; font-weight: 600;">Cargando...</h3>
+      <button class="btn btn-sm" onclick="changeMonth(1)" style="background: rgba(128,128,128,0.1); color: var(--text);"><i data-lucide="chevron-right"></i></button>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; font-size: 0.85rem;">
+      <div>Dom</div><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div>
+    </div>
+    <div id="cal-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;">
+      <!-- Generado por JS -->
+    </div>
+  </div>
+
+  <!-- Filtro Lateral de Matriz -->
+  <div style="background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); display: flex; flex-direction: column; justify-content: flex-start;">
+    <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="search" style="width: 18px;"></i> Visualizar Día</h3>
+    <form method="GET" action="/citas" style="display: flex; flex-direction: column; gap: 16px;">
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Fecha Seleccionada</label>
+        <input type="date" id="fecha-input" name="fecha" value="<%= matrix ? (new Date().toISOString().slice(0,10)) : '' %>" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.2); background: var(--bg); color: var(--text);" required>
+      </div>
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; display: block;">Sucursal</label>
+        <select id="sucursal-input" name="id_sucursal" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.2); background: var(--bg); color: var(--text);" required>
+          <option value="">--Seleccione Sucursal--</option>
+          <% if (sucursales) { sucursales.forEach(s => { %>
+            <option value="<%= s.id %>"><%= s.nombre %></option>
+          <% }) } %>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top: auto; padding: 12px;"><i data-lucide="calendar-check"></i> Cargar Línea de Tiempo</button>
+    </form>
+  </div>
 </div>
 
+<!-- Mini Tablero Comparativo de Sucursales -->
+<div style="margin-bottom: 32px;">
+  <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="bar-chart-2"></i> Estado de Sucursales (Día Seleccionado)</h3>
+  <div id="mini-tablero" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+    <!-- Cargado por JS -->
+    <div style="padding: 24px; text-align: center; color: var(--text-muted);">Selecciona un día en el calendario para ver métricas...</div>
+  </div>
+</div>
+
+<!-- Línea de Tiempo de 24h (Matriz) -->
 <% if (matrix) { %>
-  <h3>Matriz de horarios (duración <%= matrix.duracion %> min)</h3>
-  <div class="admin-matrix">
-    <table class="admin-matrix-table">
-      <thead>
-        <tr>
-          <th>Empleado</th>
-          <% matrix.times.forEach(function(t){ %>
-            <th><%= t %></th>
-          <% }) %>
-        </tr>
-      </thead>
-      <tbody>
-        <% matrix.empleados.forEach(function(emp){ %>
-          <tr>
-            <td class="emp-name"><%= emp.nombre %></td>
-            <% emp.slots.forEach(function(s){ %>
-              <td class="emp-cell <%= s.trabaja ? '' : 'emp-off' %>">
-                <button class="seat-btn <%= s.ocupado ? 'seat-busy' : s.trabaja ? 'seat-free' : 'seat-off' %>" <%= (!s.trabaja || s.ocupado) ? 'disabled' : '' %> title="<%= s.ocupado && s.detalle ? s.detalle.cliente : '' %>">
-                  <%= s.hora %>
-                </button>
-              </td>
-            <% }) %>
-          </tr>
+  <div style="background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); margin-bottom: 32px; overflow-x: auto;">
+    <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--primary);">
+      <i data-lucide="clock"></i> Timeline de Atención (Duración base: <%= matrix.duracion %> min)
+    </h3>
+    
+    <div class="timeline-container" style="min-width: 800px;">
+      <!-- Cabecera de horas -->
+      <div style="display: flex; border-bottom: 2px solid rgba(128,128,128,0.1); padding-bottom: 8px; margin-bottom: 16px; margin-left: 150px;">
+        <% matrix.times.forEach(function(t){ %>
+          <div style="flex: 1; text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--text-muted);"><%= t %></div>
         <% }) %>
-      </tbody>
-    </table>
+      </div>
+      
+      <!-- Filas de empleados -->
+      <% matrix.empleados.forEach(function(emp){ %>
+        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+          <!-- Nombre -->
+          <div style="width: 150px; font-weight: 600; font-size: 0.9rem; flex-shrink: 0; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;"><%= emp.nombre.charAt(0) %></div>
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100px;" title="<%= emp.nombre %>"><%= emp.nombre %></span>
+          </div>
+          <!-- Slots -->
+          <div style="display: flex; flex: 1; gap: 4px;">
+            <% emp.slots.forEach(function(s){ %>
+              <div style="flex: 1; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; cursor: <%= (!s.trabaja || s.ocupado) ? 'not-allowed' : 'pointer' %>; transition: transform 0.1s; <%= s.ocupado ? 'background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444;' : s.trabaja ? 'background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981;' : 'background: rgba(128,128,128,0.05); border: 1px solid rgba(128,128,128,0.1); color: transparent;' %>" title="<%= s.ocupado && s.detalle ? s.detalle.cliente : (s.trabaja ? 'Disponible' : 'Fuera de turno') %>">
+                <% if(s.ocupado) { %>
+                  <i data-lucide="user" style="width: 12px; margin-right: 4px;"></i>
+                <% } %>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
   </div>
 <% } %>
 
-<table>
-  <thead><tr><th>Cliente</th><th>Teléfono</th><th>Sucursal</th><th>Fecha</th><th>Hora</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead>
+<!-- Tabla Detallada de Citas -->
+<h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="list"></i> Listado Detallado (Día seleccionado)</h3>
+<table style="box-shadow: none;">
+  <thead><tr><th>Cliente</th><th>Contacto</th><th>Sucursal</th><th>Fecha/Hora</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead>
   <tbody>
     <% if (citas.length === 0) { %>
-    <tr><td colspan="8" class="empty">Sin citas registradas</td></tr>
+    <tr><td colspan="7" class="empty">No hay citas para mostrar con los filtros actuales.</td></tr>
     <% } %>
     <% citas.forEach(c => { %>
     <tr>
-      <td><%= c.cliente %></td>
-      <td><%= c.cliente_telefono %></td>
+      <td><strong style="color: var(--primary);"><%= c.cliente %></strong></td>
+      <td><%= c.cliente_telefono || '—' %></td>
       <td><%= c.sucursal %></td>
-      <td><%= c.fecha %></td>
-      <td><%= c.hora %></td>
-      <td><%= c.servicios %></td>
-      <td><span class="badge badge-<%= c.estado %>"><%= c.estado %></span></td>
       <td>
-        <form method="POST" action="/citas/<%= c.cita_id %>/estado" style="display:inline">
-          <select name="estado" style="padding:4px 8px;font-size:0.75rem">
-            <option value="pendiente" <%= c.estado === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
-            <option value="confirmada" <%= c.estado === 'confirmada' ? 'selected' : '' %>>Confirmada</option>
-            <option value="completada" <%= c.estado === 'completada' ? 'selected' : '' %>>Completada</option>
-            <option value="cancelada" <%= c.estado === 'cancelada' ? 'selected' : '' %>>Cancelada</option>
-          </select>
-          <button type="submit" class="btn btn-sm btn-primary">Actualizar</button>
-        </form>
+        <span style="display: block; font-size: 0.85rem;"><%= new Date(c.fecha).toLocaleDateString() %></span>
+        <strong style="font-size: 1.1rem;"><%= c.hora.substring(0,5) %></strong>
+      </td>
+      <td><span style="font-size: 0.85rem; color: var(--text-muted);"><%= c.servicios %></span></td>
+      <td>
+        <span class="badge" style="<%= c.estado === 'pendiente' ? 'background: rgba(245, 158, 11, 0.15); color: #f59e0b;' : c.estado === 'confirmada' ? 'background: rgba(16, 185, 129, 0.15); color: #10b981;' : c.estado === 'completada' ? 'background: rgba(59, 130, 246, 0.15); color: #3b82f6;' : 'background: rgba(239, 68, 68, 0.15); color: #ef4444;' %>; border: 1px solid currentColor;">
+          <%= c.estado.toUpperCase() %>
+        </span>
+      </td>
+      <td>
+        <% if (c.estado === 'pendiente') { %>
+          <form method="POST" action="/citas/<%= c.cita_id %>/estado" style="display:inline"><input type="hidden" name="estado" value="confirmada"><button type="submit" class="btn btn-sm btn-success" title="Confirmar"><i data-lucide="check" style="width:14px"></i></button></form>
+          <form method="POST" action="/citas/<%= c.cita_id %>/estado" style="display:inline" data-confirm="¿Marcar como cancelada?"><input type="hidden" name="estado" value="cancelada"><button type="submit" class="btn btn-sm btn-danger" title="Cancelar"><i data-lucide="x" style="width:14px"></i></button></form>
+        <% } else if (c.estado === 'confirmada') { %>
+          <form method="POST" action="/citas/<%= c.cita_id %>/estado" style="display:inline"><input type="hidden" name="estado" value="completada"><button type="submit" class="btn btn-sm btn-primary" title="Marcar Completada"><i data-lucide="check-circle" style="width:14px"></i></button></form>
+        <% } %>
       </td>
     </tr>
     <% }) %>
   </tbody>
 </table>
+
+<style>
+  .cal-day {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 1px solid rgba(128,128,128,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+    position: relative;
+  }
+  .cal-day:hover:not(.empty-day) {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .cal-day.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .cal-day.empty-day {
+    background: transparent;
+    border: none;
+    cursor: default;
+  }
+  .cal-badge {
+    position: absolute;
+    bottom: 6px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .mini-card {
+    background: var(--surface);
+    border: 1px solid rgba(128,128,128,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+</style>
+
+<script>
+  const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  let currentYear = new Date().getFullYear();
+  let currentMonth = new Date().getMonth();
+  
+  // Establecer fecha del input si existe en URL, si no, hoy.
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedDateStr = urlParams.get('fecha') || new Date().toISOString().slice(0,10);
+  if (urlParams.get('fecha')) {
+    const d = new Date(selectedDateStr + 'T00:00:00'); // forzar zona horaria
+    currentYear = d.getFullYear();
+    currentMonth = d.getMonth();
+  }
+  
+  // Preseleccionar sucursal si existe
+  if (urlParams.get('id_sucursal')) {
+    document.getElementById('sucursal-input').value = urlParams.get('id_sucursal');
+  }
+
+  async function loadCalendar() {
+    document.getElementById('cal-month-year').innerText = `${meses[currentMonth]} ${currentYear}`;
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+    
+    // Fetch data
+    let counts = {};
+    try {
+      const res = await fetch(`/citas/api/mes?year=${currentYear}&month=${currentMonth}`);
+      if (res.ok) {
+        const data = await res.json();
+        data.forEach(d => counts[parseInt(d.dia)] = parseInt(d.total));
+      }
+    } catch(e) { console.error('Error cargando mes', e); }
+
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    // Rellenar espacios vacíos
+    for (let i = 0; i < firstDay; i++) {
+      grid.innerHTML += `<div class="cal-day empty-day"></div>`;
+    }
+
+    // Rellenar días
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isActive = dateStr === selectedDateStr;
+      const count = counts[d] || 0;
+      
+      const div = document.createElement('div');
+      div.className = `cal-day ${isActive ? 'active' : ''}`;
+      div.innerHTML = `<span style="font-size: 1.1rem; font-weight: 600;">${d}</span>`;
+      
+      if (count > 0 && !isActive) {
+        div.innerHTML += `<span class="cal-badge">${count} citas</span>`;
+      }
+
+      div.onclick = () => {
+        document.getElementById('fecha-input').value = dateStr;
+        loadMiniTablero(dateStr);
+        // Highlight active visually without reloading yet
+        document.querySelectorAll('.cal-day').forEach(el => el.classList.remove('active'));
+        div.classList.add('active');
+        
+        // Auto-submit si hay sucursal seleccionada
+        if (document.getElementById('sucursal-input').value) {
+          div.closest('body').style.opacity = '0.7';
+          document.querySelector('form').submit();
+        }
+      };
+      
+      grid.appendChild(div);
+    }
+  }
+
+  function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    loadCalendar();
+  }
+
+  async function loadMiniTablero(fechaStr) {
+    const container = document.getElementById('mini-tablero');
+    container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted);"><i data-lucide="loader" class="spinner"></i> Cargando métricas...</div>';
+    lucide.createIcons();
+    
+    try {
+      const res = await fetch(`/citas/api/tablero?fecha=${fechaStr}`);
+      if (res.ok) {
+        const data = await res.json();
+        container.innerHTML = '';
+        if (data.length === 0) container.innerHTML = '<div class="empty">No hay sucursales activas.</div>';
+        
+        data.forEach(suc => {
+          container.innerHTML += `
+            <div class="mini-card">
+              <h4 style="color: var(--primary); font-size: 1.1rem; margin-bottom: 8px; border-bottom: 1px solid rgba(128,128,128,0.1); padding-bottom: 8px;">
+                <i data-lucide="store" style="width: 16px; margin-right: 6px; vertical-align: middle;"></i>${suc.nombre}
+              </h4>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.9rem;">Citas Hoy:</span>
+                <strong style="font-size: 1.2rem; color: ${suc.citasHoy > 0 ? '#10b981' : 'var(--text)'};">${suc.citasHoy}</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--text-muted); font-size: 0.9rem;">Personal Activo:</span>
+                <strong>${suc.personalActivo}</strong>
+              </div>
+              <div style="margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                  <span style="color: var(--text-muted);">Ocupación Est.</span>
+                  <strong style="color: ${suc.ocupacion > 80 ? '#ef4444' : suc.ocupacion > 50 ? '#f59e0b' : '#10b981'}">${suc.ocupacion}%</strong>
+                </div>
+                <div style="width: 100%; height: 6px; background: rgba(128,128,128,0.2); border-radius: 3px; overflow: hidden;">
+                  <div style="width: ${suc.ocupacion}%; height: 100%; background: ${suc.ocupacion > 80 ? '#ef4444' : suc.ocupacion > 50 ? '#f59e0b' : '#10b981'}; transition: width 0.5s ease-out;"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        lucide.createIcons();
+      }
+    } catch(e) {
+      container.innerHTML = '<div class="alert alert-error">Error cargando tablero.</div>';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCalendar();
+    loadMiniTablero(selectedDateStr);
+  });
+</script>
+
 <%- include('partials/footer') %>

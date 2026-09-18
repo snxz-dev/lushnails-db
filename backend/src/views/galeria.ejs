@@ -1,42 +1,127 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Galería</h1>
+  <h1><i data-lucide="image"></i> Galería Visual</h1>
 </div>
 
-<form method="POST" action="/galeria" class="form-grid">
-  <div class="field"><label>Título</label><input name="titulo"></div>
-  <div class="field"><label>URL Imagen</label><input name="url_imagen" required></div>
-  <div class="field"><label>Categoría</label>
-    <select name="id_categoria">
-      <option value="">— Sin categoría —</option>
-      <% categorias.forEach(c => { %>
-      <option value="<%= c.id %>"><%= c.nombre %></option>
-      <% }) %>
-    </select>
-  </div>
-  <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
-  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
-</form>
+<div class="controls-bar" style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
+  <button class="btn btn-primary" onclick="document.getElementById('form-galeria').classList.toggle('visible')">
+    <i data-lucide="image-plus"></i> Nueva Imagen
+  </button>
+</div>
 
-<table>
-  <thead><tr><th>Título</th><th>URL</th><th>Categoría</th><th>Activo</th><th>Acciones</th></tr></thead>
-  <tbody>
-    <% if (imagenes.length === 0) { %>
-    <tr><td colspan="5" class="empty">Sin imágenes</td></tr>
-    <% } %>
-    <% imagenes.forEach(i => { %>
-    <tr>
-      <td><%= i.titulo || '(sin título)' %></td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis"><%= i.url_imagen %></td>
-      <td><%= i.categoria_nombre || '—' %></td>
-      <td><span class="badge badge-<%= i.activo %>"><%= i.activo ? 'Sí' : 'No' %></span></td>
-      <td>
-        <form method="POST" action="/galeria/<%= i.id %>/delete" style="display:inline" data-confirm="¿Eliminar esta imagen?">
-          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-        </form>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div id="form-galeria" class="expandable-form" style="display: none; background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); margin-bottom: 32px;">
+  <h3 style="margin-bottom: 16px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 8px;">Subir Nueva Imagen</h3>
+  <form method="POST" action="/galeria" class="form-grid" style="box-shadow: none; border: none; padding: 0; margin: 0; background: transparent;">
+    <div class="field"><label>Título</label><input name="titulo" placeholder="Ej: Uñas Acrílicas Rojas"></div>
+    <div class="field" style="grid-column: 1 / -1;"><label>URL Imagen *</label><input name="url_imagen" placeholder="https://..." required></div>
+    <div class="field"><label>Categoría</label>
+      <select name="id_categoria">
+        <option value="">— Sin categoría —</option>
+        <% categorias.forEach(c => { %>
+        <option value="<%= c.id %>"><%= c.nombre %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="field"><label>Orden</label><input name="orden" type="number" value="0"></div>
+    
+    <div class="field" style="grid-column: 1 / -1; display:flex; gap:8px; justify-content: flex-end; margin-top: 8px;">
+      <button type="button" class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text);" onclick="document.getElementById('form-galeria').classList.remove('visible')">Cancelar</button>
+      <button type="submit" class="btn btn-primary"><i data-lucide="upload-cloud"></i> Agregar a Galería</button>
+    </div>
+  </form>
+</div>
+
+<!-- Grid de Mosaico (Pinterest Style) -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px;">
+  <% if (imagenes.length === 0) { %>
+    <div class="empty" style="grid-column: 1 / -1; padding: 48px; background: var(--surface); border-radius: 12px; border: 1px solid rgba(128,128,128,0.2);">La galería está vacía</div>
+  <% } %>
+  
+  <% imagenes.forEach(i => { %>
+    <div class="gallery-card <%= !i.activo ? 'inactive-img' : '' %>">
+      <div class="img-container">
+        <!-- Renderizando la imagen real desde la URL -->
+        <img src="<%= i.url_imagen %>" alt="<%= i.titulo || 'Imagen de Galería' %>" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name=Error&background=333&color=fff'">
+        
+        <!-- Overlay con acciones que aparece en Hover -->
+        <div class="img-overlay">
+          <form method="POST" action="/galeria/<%= i.id %>/delete" style="margin:0" data-confirm="¿Eliminar esta imagen permanentemente?">
+            <button type="submit" class="btn btn-sm btn-danger" title="Eliminar Imagen" style="padding: 8px;"><i data-lucide="trash-2"></i></button>
+          </form>
+        </div>
+      </div>
+      
+      <div style="padding: 16px;">
+        <h4 style="margin: 0 0 4px; font-size: 1.05rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <%= i.titulo || '(Sin Título)' %>
+        </h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+          <span style="font-size: 0.8rem; color: var(--primary); font-weight: 500; display: flex; align-items: center; gap: 4px;">
+            <i data-lucide="tag" style="width: 12px;"></i> <%= i.categoria_nombre || 'General' %>
+          </span>
+          <span class="badge badge-<%= i.activo %>" style="font-size: 0.65rem; padding: 2px 6px;"><%= i.activo ? 'Visible' : 'Oculta' %></span>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<style>
+  .expandable-form.visible { display: block !important; animation: fadeIn 0.3s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .gallery-card {
+    background: var(--surface);
+    border: 1px solid rgba(128,128,128,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .gallery-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  }
+  .gallery-card.inactive-img {
+    opacity: 0.6;
+    filter: grayscale(80%);
+  }
+
+  .img-container {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* Relación de aspecto 1:1 (cuadrado) */
+    background: #000;
+  }
+  .img-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Recorta la imagen para llenar el contenedor */
+    transition: transform 0.3s;
+  }
+  .gallery-card:hover .img-container img {
+    transform: scale(1.05); /* Zoom sutil en hover */
+  }
+
+  .img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .gallery-card:hover .img-overlay {
+    opacity: 1;
+  }
+</style>
+
 <%- include('partials/footer') %>

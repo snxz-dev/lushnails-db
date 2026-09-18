@@ -1,33 +1,90 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Postulaciones</h1>
+  <h1><i data-lucide="briefcase"></i> Postulaciones</h1>
 </div>
 
-<table>
-  <thead><tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Fecha</th><th>Leída</th><th>Acciones</th></tr></thead>
-  <tbody>
-    <% if (postulaciones.length === 0) { %>
-    <tr><td colspan="6" class="empty">Sin postulaciones</td></tr>
-    <% } %>
-    <% postulaciones.forEach(p => { %>
-    <tr>
-      <td><%= p.nombre %></td>
-      <td><%= p.correo %></td>
-      <td><%= p.telefono %></td>
-      <td><%= p.fecha %></td>
-      <td><span class="badge badge-<%= p.leida %>"><%= p.leida ? 'Leída' : 'Nueva' %></span></td>
-      <td>
-        <% if (!p.leida) { %>
-        <form method="POST" action="/postulaciones/<%= p.id %>/leida" style="display:inline">
-          <button type="submit" class="btn btn-sm btn-success">Marcar Leída</button>
-        </form>
-        <% } %>
-        <form method="POST" action="/postulaciones/<%= p.id %>/delete" style="display:inline" data-confirm="¿Eliminar esta postulación?">
-          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-        </form>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div class="data-grid-container" style="background: var(--surface); border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); overflow: hidden; margin-top: 24px;">
+  <table style="margin: 0; width: 100%; border-collapse: collapse;">
+    <thead style="background: rgba(128,128,128,0.05); border-bottom: 1px solid rgba(128,128,128,0.2);">
+      <tr>
+        <th style="padding: 16px; text-align: left; color: var(--text-muted); font-weight: 500;">Candidato</th>
+        <th style="padding: 16px; text-align: left; color: var(--text-muted); font-weight: 500;">Contacto</th>
+        <th style="padding: 16px; text-align: left; color: var(--text-muted); font-weight: 500;">Fecha</th>
+        <th style="padding: 16px; text-align: center; color: var(--text-muted); font-weight: 500;">Estado</th>
+        <th style="padding: 16px; text-align: right; color: var(--text-muted); font-weight: 500;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (postulaciones.length === 0) { %>
+        <tr><td colspan="5" class="empty" style="padding: 32px; text-align: center; color: var(--text-muted);">No hay postulaciones nuevas</td></tr>
+      <% } %>
+      
+      <% postulaciones.forEach(p => { %>
+        <tr style="border-bottom: 1px solid rgba(128,128,128,0.1); transition: background 0.2s; <%= !p.leida ? 'background: rgba(var(--primary-rgb), 0.05);' : '' %>">
+          
+          <!-- Candidato -->
+          <td style="padding: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(p.nombre) %>&background=random&color=fff&rounded=true" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+              <div>
+                <strong style="color: var(--text); font-size: 1rem; display: block;"><%= p.nombre %></strong>
+              </div>
+            </div>
+          </td>
+          
+          <!-- Contacto -->
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--text-muted);">
+              <a href="mailto:<%= p.correo %>" style="color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 6px;"><i data-lucide="mail" style="width: 12px;"></i> <%= p.correo %></a>
+              <a href="tel:<%= p.telefono %>" style="color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 6px;"><i data-lucide="phone" style="width: 12px;"></i> <%= p.telefono %></a>
+            </div>
+          </td>
+          
+          <!-- Fecha -->
+          <td style="padding: 16px; font-size: 0.9rem; color: var(--text-muted);">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <i data-lucide="calendar" style="width: 14px;"></i> <%= p.fecha %>
+            </div>
+          </td>
+          
+          <!-- Estado -->
+          <td style="padding: 16px; text-align: center;">
+            <% if (!p.leida) { %>
+              <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(255,193,7,0.15); color: #ffc107; border-radius: 6px; font-size: 0.75rem; font-weight: 500;">
+                <span style="width:6px; height:6px; border-radius:50%; background:#ffc107;"></span> Nueva
+              </span>
+            <% } else { %>
+              <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(40,167,69,0.15); color: #28a745; border-radius: 6px; font-size: 0.75rem; font-weight: 500;">
+                <i data-lucide="check-circle" style="width: 12px;"></i> Revisada
+              </span>
+            <% } %>
+          </td>
+          
+          <!-- Acciones -->
+          <td style="padding: 16px; text-align: right;">
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+              <% if (!p.leida) { %>
+                <form method="POST" action="/postulaciones/<%= p.id %>/leida" style="margin: 0;">
+                  <button type="submit" class="btn btn-sm btn-success" title="Marcar como Revisada" style="padding: 8px;">
+                    <i data-lucide="check" style="width: 16px;"></i>
+                  </button>
+                </form>
+              <% } %>
+              <form method="POST" action="/postulaciones/<%= p.id %>/delete" style="margin: 0;" data-confirm="¿Eliminar la postulación de <%= p.nombre %>?">
+                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar" style="padding: 8px;">
+                  <i data-lucide="trash-2" style="width: 16px;"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<style>
+  tbody tr:hover { background: rgba(128,128,128,0.03) !important; }
+</style>
+
 <%- include('partials/footer') %>

@@ -1,18 +1,21 @@
-/* ── Accessibility Widget ── */
+/* ============================================================
+   Accessibility Widget — compact sidebar list layout
+   ============================================================ */
+
+/* ── FAB trigger button ── */
 .acc-fab {
   position: fixed;
   left: 30px;
   bottom: 30px;
   z-index: 9997;
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: none;
-  background: #2F4A34;
+  background: linear-gradient(135deg, #2F4A34, #4a7554);
   color: white;
-  font-size: 1.5rem;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 18px rgba(47,74,52,0.45);
   transition: transform 0.2s, box-shadow 0.2s;
   display: flex;
   align-items: center;
@@ -20,8 +23,8 @@
 }
 
 .acc-fab:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  transform: scale(1.08);
+  box-shadow: 0 7px 22px rgba(47,74,52,0.52);
 }
 
 .acc-fab:focus-visible {
@@ -30,72 +33,130 @@
 }
 
 .acc-fab[aria-expanded="true"] {
-  background: #5E7F5E;
+  background: linear-gradient(135deg, #4a7554, #5d8f63);
 }
 
+/* ── Panel ── */
 .acc-menu {
   position: fixed;
-  left: 100px;
-  bottom: 30px;
+  left: 92px;
+  bottom: 20px;
   z-index: 9998;
-  background: white;
-  border: 2px solid #000;
+  background: #fff;
+  border: 1px solid #e0dbd2;
   border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-  padding: 8px;
-  min-width: 230px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06);
+  padding: 6px 5px 5px;
+  width: 210px;
+  box-sizing: border-box;
+  max-width: calc(100vw - 100px);
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  animation: accFadeIn 0.2s ease;
+  gap: 1px;
+  animation: accFadeIn 0.16s ease;
   max-height: 80vh;
   overflow-y: auto;
 }
 
 @keyframes accFadeIn {
-  from { opacity: 0; transform: translateX(-10px); }
-  to { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-.acc-menu-section {
+/* ── Section wrappers ── */
+.acc-menu-section,
+.acc-lang-section {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .acc-section-title {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #999;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #b5aca0;
   text-transform: uppercase;
   letter-spacing: 1px;
-  padding: 6px 12px 2px;
+  padding: 5px 8px 2px;
 }
 
+/* ── Button row ── */
 .acc-option {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid #2F4A34;
+  gap: 9px;
+  padding: 5px 8px;
+  border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 7px;
   cursor: pointer;
-  font-size: 0.9rem;
   font-family: inherit;
-  color: #333;
-  transition: all 0.15s;
+  color: #2c2c2c;
+  transition: background 0.12s;
   text-align: left;
   width: 100%;
+  min-height: unset;
+}
+
+/* ── Font size control: − 100% + ── */
+.acc-font-control {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 3px 6px;
+  background: #f4f0ea;
+  border-radius: 8px;
+  margin-bottom: 2px;
+}
+
+.acc-font-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2F4A34;
+  flex-shrink: 0;
+  transition: background 0.12s;
+  padding: 0;
+}
+
+.acc-font-btn:hover:not(:disabled) {
+  background: #ddd8cf;
+}
+
+.acc-font-btn:focus-visible {
+  outline: 2px solid #2F4A34;
+  outline-offset: 1px;
+}
+
+.acc-font-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.acc-font-display {
+  flex: 1;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #2c2c2c;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
 }
 
 .acc-option:hover {
-  background: #f0ebe3;
+  background: #f2ede5;
 }
 
 .acc-option:focus-visible {
   outline: 2px solid #2F4A34;
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
 .acc-option.active {
@@ -104,20 +165,31 @@
 }
 
 .acc-option.active:hover {
-  background: #5E7F5E;
+  background: #3a5a3f;
 }
 
+.acc-option:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+/* ── Icon circle ── */
 .acc-icon {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
   border-radius: 50%;
-  background: #f0ebe3;
+  background: #eee9e1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
   color: #2F4A34;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+
+.acc-icon svg {
+  display: block;
 }
 
 .acc-option.active .acc-icon {
@@ -126,13 +198,23 @@
 }
 
 .acc-standalone .acc-icon {
-  background: #A7B8A0;
+  background: #7a9e80;
   color: white;
-  font-weight: 700;
 }
 
+/* ── Label ── */
+.acc-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+
+/* ── Flag icons ── */
 .acc-flag-icon {
   overflow: hidden;
+  border-radius: 50%;
 }
 
 .acc-flag-icon.lang-es {
@@ -140,7 +222,10 @@
 }
 
 .acc-flag-icon.lang-ca {
-  background: linear-gradient(180deg, #FFC400 10%, #C60B1E 10% 20%, #FFC400 20% 30%, #C60B1E 30% 40%, #FFC400 40% 50%, #C60B1E 50% 60%, #FFC400 60% 70%, #C60B1E 70% 80%, #FFC400 80% 90%, #C60B1E 90%);
+  background: linear-gradient(180deg,
+    #FFC400 10%, #C60B1E 10% 20%, #FFC400 20% 30%, #C60B1E 30% 40%,
+    #FFC400 40% 50%, #C60B1E 50% 60%, #FFC400 60% 70%, #C60B1E 70% 80%,
+    #FFC400 80% 90%, #C60B1E 90%);
 }
 
 .acc-flag-icon.lang-en {
@@ -154,34 +239,134 @@
   inset: 0;
   background:
     linear-gradient(180deg, transparent 41%, #fff 41% 43%, transparent 43% 57%, #fff 57% 59%, transparent 59%),
-    linear-gradient(90deg, transparent 41%, #fff 41% 43%, transparent 43% 57%, #fff 57% 59%, transparent 59%),
+    linear-gradient(90deg,  transparent 41%, #fff 41% 43%, transparent 43% 57%, #fff 57% 59%, transparent 59%),
     linear-gradient(180deg, transparent 39%, #C8102E 39% 44%, transparent 44% 56%, #C8102E 56% 61%, transparent 61%),
-    linear-gradient(90deg, transparent 39%, #C8102E 39% 44%, transparent 44% 56%, #C8102E 56% 61%, transparent 61%);
+    linear-gradient(90deg,  transparent 39%, #C8102E 39% 44%, transparent 44% 56%, #C8102E 56% 61%, transparent 61%);
 }
 
+/* ── Divider ── */
 .acc-divider {
   height: 1px;
-  background: #e0d8cc;
-  margin: 4px 0;
+  background: #eae4db;
+  margin: 3px 4px;
 }
 
+/* ── Reset ── */
 .acc-reset .acc-icon {
+  background: #fde8e6;
+  color: #c0392b;
+}
+
+.acc-reset:hover .acc-icon {
   background: #c0392b;
-  color: white;
+  color: #fff;
 }
 
-.acc-label {
-  font-size: 0.9rem;
+/* ── TTS sub-panel ── */
+.acc-tts-panel {
+  background: #f7f4f0;
+  border-radius: 8px;
+  padding: 6px 8px;
+  margin: 2px 0;
+  border: 1px solid #e4ddd4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* ── Accessibility body classes ── */
+.acc-tts-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.acc-tts-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #777;
+  flex-shrink: 0;
+}
+
+.acc-rate-btn {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 3px 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s;
+  flex: 1;
+}
+
+.acc-rate-btn:hover {
+  background: #ebe5dc;
+}
+
+.acc-rate-btn.active {
+  background: #2F4A34;
+  color: #fff;
+  border-color: #2F4A34;
+}
+
+/* Tour button */
+.acc-tts-tour {
+  background: #f0f6f1 !important;
+  border: 1px solid #b5d0ba !important;
+  color: #2F4A34 !important;
+}
+
+.acc-tts-tour:hover {
+  background: #deeee3 !important;
+}
+
+.acc-tts-tour.active {
+  background: #2F4A34 !important;
+  border-color: #2F4A34 !important;
+  color: #fff !important;
+}
+
+.acc-tts-tour .acc-icon {
+  background: #4a7554 !important;
+  color: #fff !important;
+}
+
+.acc-tts-tour.active .acc-icon {
+  background: rgba(255,255,255,0.22) !important;
+  animation: tourPulse 1.1s ease-in-out infinite;
+}
+
+@keyframes tourPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.88); }
+}
+
+/* Stop button */
+.acc-tts-stop {
+  background: #fff5f5 !important;
+  border: 1px solid #f0a8a0 !important;
+  color: #c0392b !important;
+}
+
+.acc-tts-stop:hover {
+  background: #ffe0de !important;
+}
+
+.acc-tts-stop .acc-icon {
+  background: #e74c3c !important;
+  color: #fff !important;
+}
+
+/* ============================================================
+   Accessibility body/root classes  (filter & color overrides)
+   ============================================================ */
 
 #root {
   --acc-grayscale: grayscale(0);
   --acc-negative: invert(0);
 }
 #root.acc-grayscale { --acc-grayscale: grayscale(1); }
-#root.acc-negative { --acc-negative: invert(1) hue-rotate(180deg); }
+#root.acc-negative  { --acc-negative: invert(1) hue-rotate(180deg); }
 #root.acc-grayscale, #root.acc-negative {
   filter: var(--acc-grayscale) var(--acc-negative) !important;
 }
@@ -189,10 +374,10 @@
   filter: invert(1) hue-rotate(180deg) !important;
 }
 #root.acc-high-contrast { --acc-bg: #000; --acc-fg: #fff; --acc-link: #ffff00; }
-#root.acc-light-bg { --acc-bg: #fff8f0; --acc-fg: #202020; --acc-link: #244b30; }
+#root.acc-light-bg      { --acc-bg: #fff8f0; --acc-fg: #202020; --acc-link: #244b30; }
 #root.acc-high-contrast, #root.acc-light-bg,
 #root.acc-high-contrast :where(*):not(svg):not(svg *),
-#root.acc-light-bg :where(*):not(svg):not(svg *) {
+#root.acc-light-bg      :where(*):not(svg):not(svg *) {
   background-color: var(--acc-bg) !important;
   background-image: none !important;
   color: var(--acc-fg) !important;
@@ -215,31 +400,25 @@
   letter-spacing: 0.03em !important;
   word-spacing: 0.05em !important;
 }
-.acc-option:disabled { opacity: 0.45; cursor: not-allowed; }
-.acc-menu { box-sizing: border-box; max-width: calc(100vw - 90px); }
-.acc-label { overflow-wrap: anywhere; }
 
 @media (max-width: 768px) {
   .acc-fab {
     left: 15px;
     bottom: 15px;
-    width: 48px;
-    height: 48px;
-    font-size: 1.2rem;
+    width: 46px;
+    height: 46px;
   }
-
   .acc-menu {
-    left: 75px;
+    left: 70px;
     bottom: 15px;
-    min-width: 0;
-    width: min(280px, calc(100vw - 90px));
+    width: min(210px, calc(100vw - 80px));
   }
 }
 
-/* Portaled floating controls stay anchored to the viewport, outside filtered #root. */
+/* ── Portaled controls outside filtered #root ── */
 body { --acc-grayscale: grayscale(0); --acc-negative: invert(0); }
 body.acc-grayscale { --acc-grayscale: grayscale(1); }
-body.acc-negative { --acc-negative: invert(1) hue-rotate(180deg); }
+body.acc-negative  { --acc-negative: invert(1) hue-rotate(180deg); }
 body:is(.acc-grayscale, .acc-negative) :is(.social-float, .whatsapp-float-container, .acc-fab) {
   filter: var(--acc-grayscale) var(--acc-negative);
 }
@@ -250,94 +429,70 @@ body.acc-readable-font .whatsapp-float-container * {
   font-family: Verdana, Arial, sans-serif !important;
 }
 body.acc-high-contrast :is(.social-float a, .whatsapp-btn, .whatsapp-option) {
-  background: #000 !important;
-  color: #fff !important;
-  border: 2px solid #fff;
+  background: #000 !important; color: #fff !important; border: 2px solid #fff;
 }
 body.acc-light-bg :is(.social-float a, .whatsapp-btn, .whatsapp-option) {
-  background: #fff8f0 !important;
-  color: #244b30 !important;
+  background: #fff8f0 !important; color: #244b30 !important;
 }
 
-/* Preserve the transparent link covering each embedded map. */
+/* ── Map overlay ── */
 #root:is(.acc-high-contrast, .acc-light-bg) .map-overlay {
   background: transparent !important;
 }
 
-/* Delineate cards and controls against the high-contrast background. */
+/* ── High-contrast card borders ── */
 #root.acc-high-contrast :is(.intro-card, .glass-card, .branch-card, .service-category-block, .cita-card, .work-form, .auth-card, .map-container) {
-  border: 2px solid #fff !important;
-  box-shadow: none !important;
+  border: 2px solid #fff !important; box-shadow: none !important;
 }
 #root.acc-high-contrast :is(button, input, select, textarea, .outline-button, .cta-button, .map-link, .submit-btn, .whatsapp-branch-btn, .whatsapp-button) {
   border: 2px solid #fff !important;
 }
 #root.acc-high-contrast :is(button, a)[aria-pressed="true"],
 #root.acc-high-contrast .chip-selected {
-  outline: 2px solid #ffff00;
-  outline-offset: 2px;
+  outline: 2px solid #ffff00; outline-offset: 2px;
 }
+
 body.acc-high-contrast .acc-menu {
-  background: #000;
-  color: #fff;
-  border: 2px solid #fff;
+  background: #000; color: #fff; border: 2px solid #fff;
 }
 body.acc-high-contrast .acc-option {
-  background: #000;
-  color: #fff;
-  border: 1px solid #fff;
+  background: #000; color: #fff; border: 1px solid #fff;
 }
 body.acc-high-contrast .acc-option.active {
-  border: 2px solid #ffff00;
-  color: #ffff00;
+  border: 2px solid #ffff00; color: #ffff00;
 }
-body.acc-high-contrast .acc-option:hover {
-  background: #222;
-}
+body.acc-high-contrast .acc-option:hover  { background: #222; }
 body.acc-high-contrast .acc-section-title { color: #fff; }
 
-/* Reflect the selected appearance on the accessibility trigger itself. */
 body.acc-high-contrast .acc-fab {
-  background: #000;
-  color: #fff;
-  border: 2px solid #fff;
+  background: #000; color: #fff; border: 2px solid #fff;
 }
 body.acc-high-contrast .acc-fab[aria-expanded="true"] {
-  color: #ffff00;
-  border-color: #ffff00;
+  color: #ffff00; border-color: #ffff00;
 }
 body.acc-light-bg .acc-fab {
-  background: #fff8f0;
-  color: #244b30;
-  border: 2px solid #244b30;
+  background: #fff8f0; color: #244b30; border: 2px solid #244b30;
 }
 
-/* Clear boundaries on the light background, matching high-contrast coverage. */
+/* ── Light-bg card borders ── */
 #root.acc-light-bg :is(.intro-card, .glass-card, .branch-card, .service-category-block, .cita-card, .work-form, .auth-card, .map-container) {
-  border: 2px solid #000 !important;
-  box-shadow: none !important;
+  border: 2px solid #000 !important; box-shadow: none !important;
 }
 #root.acc-light-bg :is(button, input, select, textarea, .premium-button, .outline-button, .cta-button, .map-link, .submit-btn, .whatsapp-branch-btn, .whatsapp-button) {
   border: 2px solid #000 !important;
 }
 body.acc-light-bg .acc-menu {
-  background: #fff8f0;
-  color: #000;
-  border: 2px solid #000;
+  background: #fff8f0; color: #000; border: 2px solid #000;
 }
 body.acc-light-bg .acc-option {
-  background: #fff8f0;
-  color: #000;
-  border: 1px solid #000;
+  background: #fff8f0; color: #000; border: 1px solid #000;
 }
-body.acc-light-bg .acc-option.active {
-  background: #000;
-  color: #fff;
-}
-body.acc-light-bg .acc-option:hover { background: #e8dfd4; }
+body.acc-light-bg .acc-option.active       { background: #000; color: #fff; }
+body.acc-light-bg .acc-option:hover        { background: #e8dfd4; }
 body.acc-light-bg .acc-option.active:hover { background: #222; }
-body.acc-light-bg .acc-section-title { color: #000; }
+body.acc-light-bg .acc-section-title       { color: #000; }
 
+/* ── Reading highlight (screen reader) ── */
 .acc-reading {
   outline: 3px solid #2F4A34 !important;
   outline-offset: 3px !important;
@@ -349,70 +504,4 @@ body.acc-light-bg .acc-section-title { color: #000; }
 body.acc-high-contrast .acc-reading {
   outline-color: #4CAF50 !important;
   background-color: rgba(76, 175, 80, 0.2) !important;
-}
-
-/* ── TTS Controls (Lector de Voz de Apoyo) ── */
-.acc-tts-panel {
-  background: #f8f6f2;
-  border-radius: 8px;
-  padding: 8px 10px;
-  margin: 4px 0;
-  border: 1px solid #e0d8cc;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.acc-tts-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.acc-tts-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #555;
-}
-
-.acc-rate-btn {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.acc-rate-btn:hover {
-  background: #ebe5dc;
-}
-
-.acc-rate-btn.active {
-  background: #2F4A34;
-  color: #fff;
-  border-color: #2F4A34;
-}
-
-.acc-tts-stop {
-  background: #fff0f0 !important;
-  border-color: #e74c3c !important;
-  color: #c0392b !important;
-  font-size: 0.85rem !important;
-  padding: 6px 10px !important;
-}
-
-.acc-tts-stop:hover {
-  background: #ffe0e0 !important;
-}
-
-.acc-tts-stop .acc-icon {
-  width: 28px !important;
-  height: 28px !important;
-  background: #e74c3c !important;
-  color: #fff !important;
-  font-size: 0.75rem !important;
 }

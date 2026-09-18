@@ -1,51 +1,226 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Empleados</h1>
+  <h1><i data-lucide="users"></i> Directorio de Empleados</h1>
 </div>
 
-<h3 style="margin-bottom:12px">Nuevo Empleado</h3>
-<form method="POST" action="/empleados" class="form-grid">
-  <div class="field"><label>Nombre *</label><input name="nombre" required></div>
-  <div class="field"><label>Sucursal</label>
-    <select name="id_sucursal">
-      <option value="">—</option>
-      <% sucursales.forEach(s => { %>
-      <option value="<%= s.id %>"><%= s.nombre %></option>
-      <% }) %>
-    </select>
-  </div>
-  <div class="field"><label>Especialidad</label><input name="especialidad" placeholder="Ej: Manicurista, Estilista"></div>
-  <div class="field"><label>Teléfono</label><input name="telefono"></div>
-  <div class="field" style="grid-column:1/-1"><label>Horario general</label><input name="horario" placeholder="Ej: L-V 9:00-18:00"></div>
-  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Agregar</button></div>
-</form>
+<div class="controls-bar" style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: flex-end;">
+  <button class="btn btn-primary" onclick="document.getElementById('form-empleado').classList.toggle('visible')">
+    <i data-lucide="user-plus"></i> Nuevo Empleado
+  </button>
+</div>
 
-<table>
-  <thead><tr><th>Nombre</th><th>Sucursal</th><th>Especialidad</th><th>Teléfono</th><th>Horario</th><th>Activo</th><th>Acciones</th></tr></thead>
-  <tbody>
-    <% if (empleados.length === 0) { %>
-    <tr><td colspan="7" class="empty">Sin empleados registrados</td></tr>
-    <% } %>
-    <% empleados.forEach(e => { %>
-    <tr>
-      <td><%= e.nombre %></td>
-      <td><%= e.sucursal || '—' %></td>
-      <td><%= e.especialidad || '—' %></td>
-      <td><%= e.telefono || '—' %></td>
-      <td><%= e.horario || '—' %></td>
-      <td><span class="badge badge-<%= e.activo %>"><%= e.activo ? 'Sí' : 'No' %></span></td>
-      <td>
-        <form method="POST" action="/empleados/<%= e.id %>/toggle" style="display:inline">
-          <button type="submit" class="btn btn-sm <%= e.activo ? 'btn-warning' : 'btn-success' %>">
-            <%= e.activo ? 'Desactivar' : 'Activar' %>
-          </button>
-        </form>
-        <form method="POST" action="/empleados/<%= e.id %>/delete" style="display:inline" data-confirm="¿Eliminar este empleado?">
-          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-        </form>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<div id="form-empleado" class="expandable-form" style="display: none; background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); margin-bottom: 24px;">
+  <h3 style="margin-bottom: 16px;">Registrar Empleado</h3>
+  <form method="POST" action="/empleados" class="form-grid" style="box-shadow: none; border: none; padding: 0; margin: 0; background: transparent;">
+    <div class="field"><label>Nombre *</label><input name="nombre" required></div>
+    <div class="field"><label>Sucursal</label>
+      <select name="id_sucursal">
+        <option value="">— Sin Asignar —</option>
+        <% sucursales.forEach(s => { %>
+        <option value="<%= s.id %>"><%= s.nombre %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="field"><label>Especialidad</label><input name="especialidad" placeholder="Ej: Manicurista, Estilista"></div>
+    <div class="field"><label>Teléfono</label><input name="telefono"></div>
+    <div class="field" style="grid-column:1/-1"><label>Horario general</label><input name="horario" placeholder="Ej: L-V 9:00-18:00"></div>
+    <div class="field" style="align-self:end; display:flex; gap:8px;">
+      <button type="button" class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text);" onclick="document.getElementById('form-empleado').classList.remove('visible')">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </form>
+</div>
+
+<!-- Vista Kanban de Empleados -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+  <% if (empleados.length === 0) { %>
+    <div class="empty" style="grid-column: 1 / -1;">No hay empleados en el directorio.</div>
+  <% } %>
+  <% empleados.forEach(e => { %>
+    <div class="emp-card <%= !e.activo ? 'inactive-card' : '' %>" onclick="openProfile(<%= JSON.stringify(e) %>)">
+      <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
+        <!-- Generación de Avatar gratuito (UI Avatars) con colores aleatorios -->
+        <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(e.nombre) %>&background=random&color=fff&size=128" alt="<%= e.nombre %>" class="emp-avatar">
+        
+        <div style="flex: 1; overflow: hidden;">
+          <h3 style="margin: 0 0 4px; font-size: 1.1rem; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: var(--primary);"><%= e.nombre %></h3>
+          <span class="badge badge-<%= e.activo %>" style="font-size: 0.7rem; padding: 2px 6px;"><%= e.activo ? 'Activo' : 'Inactivo' %></span>
+        </div>
+      </div>
+
+      <div style="font-size: 0.9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
+        <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="briefcase" style="width: 14px;"></i> <%= e.especialidad || 'Sin especialidad' %></span>
+        <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="store" style="width: 14px;"></i> <%= e.sucursal || 'Sin sucursal asignada' %></span>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<!-- Drawer (Modal lateral) de Perfil de Empleado -->
+<div id="profile-drawer" class="drawer-overlay" onclick="closeProfile(event)">
+  <div class="drawer-content" onclick="event.stopPropagation()">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+      <h2 style="margin: 0;"><i data-lucide="user"></i> Perfil del Empleado</h2>
+      <button class="btn" style="background: transparent; color: var(--text);" onclick="closeProfile(event, true)"><i data-lucide="x"></i></button>
+    </div>
+
+    <!-- Cabecera del Perfil -->
+    <div style="display: flex; gap: 24px; align-items: center; margin-bottom: 32px;">
+      <img id="prof-avatar" src="" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary);">
+      <div>
+        <h3 id="prof-nombre-title" style="margin: 0 0 8px; font-size: 1.5rem; color: var(--primary);">Nombre</h3>
+        <span id="prof-badge" class="badge">Estado</span>
+      </div>
+    </div>
+
+    <!-- Formulario de Edición de Perfil -->
+    <h4 style="margin-bottom: 16px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 8px;">Información General</h4>
+    <form id="form-edit-empleado" method="POST" action="">
+      <div class="field" style="margin-bottom: 12px;"><label>Nombre completo</label>
+        <input name="nombre" id="prof-nombre" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.3); background: var(--bg); color: var(--text);" required>
+      </div>
+      
+      <div class="field" style="margin-bottom: 12px;"><label>Sucursal Asignada</label>
+        <select name="id_sucursal" id="prof-sucursal" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.3); background: var(--bg); color: var(--text);">
+          <option value="">— Sin Asignar —</option>
+          <% sucursales.forEach(s => { %>
+          <option value="<%= s.id %>"><%= s.nombre %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="field" style="margin-bottom: 12px;"><label>Especialidad</label>
+        <input name="especialidad" id="prof-especialidad" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.3); background: var(--bg); color: var(--text);">
+      </div>
+
+      <div class="field" style="margin-bottom: 12px;"><label>Teléfono</label>
+        <input name="telefono" id="prof-telefono" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.3); background: var(--bg); color: var(--text);">
+      </div>
+
+      <div class="field" style="margin-bottom: 24px;"><label>Horario general</label>
+        <input name="horario" id="prof-horario" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.3); background: var(--bg); color: var(--text);">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 24px;"><i data-lucide="save"></i> Guardar Cambios</button>
+    </form>
+
+    <!-- Zona de Peligro (Acciones Rápidas) -->
+    <h4 style="margin-bottom: 16px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 8px; color: var(--danger);">Zona de Peligro</h4>
+    <div style="display: flex; gap: 12px;">
+      <form id="form-toggle-empleado" method="POST" action="" style="flex: 1;">
+        <button type="submit" id="prof-toggle-btn" class="btn" style="width: 100%; justify-content: center;">Alternar Estado</button>
+      </form>
+      <form id="form-delete-empleado" method="POST" action="" style="flex: 1;" data-confirm="¿Eliminar este empleado definitivamente?">
+        <button type="submit" class="btn btn-danger" style="width: 100%; justify-content: center;"><i data-lucide="trash-2"></i> Eliminar</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .expandable-form.visible { display: block !important; animation: fadeIn 0.3s; }
+  
+  .emp-card {
+    background: var(--surface);
+    border: 1px solid rgba(128,128,128,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .emp-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-color: var(--primary);
+  }
+  .emp-card.inactive-card {
+    opacity: 0.6;
+    filter: grayscale(100%);
+  }
+  .emp-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(128,128,128,0.2);
+  }
+  
+  /* CSS para el Drawer (Modal lateral) */
+  .drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: none;
+    justify-content: flex-end;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .drawer-overlay.open {
+    display: flex;
+    opacity: 1;
+  }
+  .drawer-content {
+    background: var(--surface);
+    width: 400px;
+    max-width: 100%;
+    height: 100%;
+    box-shadow: -5px 0 25px rgba(0,0,0,0.2);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 32px;
+    overflow-y: auto;
+  }
+  .drawer-overlay.open .drawer-content {
+    transform: translateX(0);
+  }
+  
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script>
+  function openProfile(emp) {
+    const drawer = document.getElementById('profile-drawer');
+    
+    // Rellenar cabecera
+    document.getElementById('prof-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(emp.nombre)}&background=random&color=fff&size=256`;
+    document.getElementById('prof-nombre-title').innerText = emp.nombre;
+    
+    const badge = document.getElementById('prof-badge');
+    badge.innerText = emp.activo ? 'Activo' : 'Inactivo';
+    badge.className = `badge badge-${emp.activo}`;
+    
+    // Rellenar formulario de edición
+    document.getElementById('form-edit-empleado').action = `/empleados/${emp.id}/edit`;
+    document.getElementById('prof-nombre').value = emp.nombre;
+    document.getElementById('prof-sucursal').value = emp.id_sucursal || '';
+    document.getElementById('prof-especialidad').value = emp.especialidad || '';
+    document.getElementById('prof-telefono').value = emp.telefono || '';
+    document.getElementById('prof-horario').value = emp.horario || '';
+    
+    // Acciones de peligro
+    document.getElementById('form-toggle-empleado').action = `/empleados/${emp.id}/toggle`;
+    const toggleBtn = document.getElementById('prof-toggle-btn');
+    toggleBtn.innerText = emp.activo ? 'Desactivar Cuenta' : 'Activar Cuenta';
+    toggleBtn.className = `btn ${emp.activo ? 'btn-warning' : 'btn-success'}`;
+    toggleBtn.style.width = '100%';
+    
+    document.getElementById('form-delete-empleado').action = `/empleados/${emp.id}/delete`;
+    
+    // Mostrar Drawer
+    drawer.classList.add('open');
+    document.body.style.overflow = 'hidden'; // prevenir scroll
+  }
+
+  function closeProfile(e, force = false) {
+    if (force || e.target.classList.contains('drawer-overlay')) {
+      document.getElementById('profile-drawer').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+</script>
+
 <%- include('partials/footer') %>

@@ -1,41 +1,60 @@
 <%- include('partials/header') %>
 <div class="top-bar">
-  <h1>Clientes</h1>
+  <h1><i data-lucide="users-round"></i> Directorio de Clientes</h1>
 </div>
 
-<h3 style="margin-bottom:12px">Registrar Cliente y Cita</h3>
-<form method="POST" action="/clientes" class="form-grid">
-  <div class="field"><label>Nombre</label><input name="nombre" required></div>
-  <div class="field"><label>Teléfono</label><input name="telefono" required></div>
-  <div class="field"><label>Correo</label><input name="correo" type="email"></div>
-  <div class="field"><label>Dirección</label><input name="direccion"></div>
-  <div class="field"><label>Alergias</label><input name="alergias"></div>
-  <div class="field"><label>Notas</label><input name="notas"></div>
-  <div class="field"><label>Sucursal</label>
-    <select name="id_sucursal">
-      <option value="">— Sin cita —</option>
-      <% sucursales.forEach(s => { %>
-      <option value="<%= s.id %>"><%= s.nombre %></option>
-      <% }) %>
-    </select>
-  </div>
-  <div class="field"><label>Servicio</label>
-    <select name="id_servicio">
-      <option value="">—</option>
-      <% servicios.forEach(s => { %>
-      <option value="<%= s.id %>"><%= s.nombre %></option>
-      <% }) %>
-    </select>
-  </div>
-  <div class="field"><label>Fecha</label><input name="fecha" id="cita-fecha" type="date"></div>
-  <div class="field" id="cita-grid-field" style="display:none">
-    <label>Hora disponible (solo horas libres)</label>
-    <div id="cita-slots" class="slots-grid-admin"></div>
-    <input type="hidden" name="hora" id="cita-hora">
-  </div>
-  <div class="field" style="align-self:end"><button type="submit" class="btn btn-primary">Registrar</button></div>
-</form>
+<div class="controls-bar" style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
+  <button class="btn btn-primary" onclick="document.getElementById('form-cliente').classList.toggle('visible')">
+    <i data-lucide="user-plus"></i> Registrar Cliente y Cita
+  </button>
+</div>
 
+<!-- Formulario Expansible -->
+<div id="form-cliente" class="expandable-form" style="display: none; background: var(--surface); padding: 24px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.2); margin-bottom: 32px;">
+  <h3 style="margin-bottom: 16px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 8px;">Nuevo Registro</h3>
+  <form method="POST" action="/clientes" class="form-grid" style="box-shadow: none; border: none; padding: 0; margin: 0; background: transparent;">
+    <div class="field"><label>Nombre *</label><input name="nombre" required></div>
+    <div class="field"><label>Teléfono *</label><input name="telefono" required></div>
+    <div class="field"><label>Correo</label><input name="correo" type="email"></div>
+    <div class="field"><label>Dirección</label><input name="direccion"></div>
+    <div class="field"><label>Alergias</label><input name="alergias"></div>
+    <div class="field"><label>Notas</label><input name="notas"></div>
+    
+    <div style="grid-column: 1 / -1; margin-top: 16px; margin-bottom: 8px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 8px;">
+      <h4 style="color: var(--primary);">Programar Cita (Opcional)</h4>
+    </div>
+
+    <div class="field"><label>Sucursal</label>
+      <select name="id_sucursal">
+        <option value="">— Sin cita —</option>
+        <% sucursales.forEach(s => { %>
+        <option value="<%= s.id %>"><%= s.nombre %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="field"><label>Servicio</label>
+      <select name="id_servicio">
+        <option value="">—</option>
+        <% servicios.forEach(s => { %>
+        <option value="<%= s.id %>"><%= s.nombre %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="field"><label>Fecha</label><input name="fecha" id="cita-fecha" type="date"></div>
+    <div class="field" id="cita-grid-field" style="display:none; grid-column: 1 / -1;">
+      <label>Hora disponible (solo horas libres)</label>
+      <div id="cita-slots" class="slots-grid-admin"></div>
+      <input type="hidden" name="hora" id="cita-hora">
+    </div>
+    
+    <div class="field" style="grid-column: 1 / -1; display:flex; gap:8px; justify-content: flex-end; margin-top: 16px;">
+      <button type="button" class="btn" style="background:transparent; border:1px solid var(--text-muted); color:var(--text);" onclick="document.getElementById('form-cliente').classList.remove('visible')">Cancelar</button>
+      <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Registrar</button>
+    </div>
+  </form>
+</div>
+
+<!-- Script de carga de disponibilidad para citas (Mantenido y adaptado) -->
 <script>
 (function () {
   var fecha = document.getElementById('cita-fecha');
@@ -43,30 +62,34 @@
   var serv = document.querySelector('select[name="id_servicio"]');
   var field = document.getElementById('cita-grid-field');
   var slots = document.getElementById('cita-slots');
-  var horaHidden = document.getElementById('cita-hora');
+  var horaInput = document.getElementById('cita-hora');
 
   function cargar() {
-    horaHidden.value = '';
-    if (!fecha.value || !suc.value || !serv.value) { field.style.display = 'none'; return; }
+    if (!fecha.value || !suc.value) { field.style.display = 'none'; return; }
+    slots.innerHTML = '<span class="slots-msg-admin">Buscando horarios...</span>';
     field.style.display = 'block';
-    slots.innerHTML = '<span class="slots-msg-admin">Cargando horarios…</span>';
-    fetch('/api/disponibilidad?fecha=' + fecha.value + '&id_sucursal=' + suc.value + '&servicios=' + serv.value)
-      .then(function (r) { return r.json(); })
+
+    var q = '?fecha=' + fecha.value + '&id_sucursal=' + suc.value;
+    if (serv.value) q += '&servicios=' + serv.value;
+
+    fetch('/api/disponibilidad' + q)
+      .then(res => res.json())
       .then(function (data) {
+        if (!data || data.length === 0) {
+          slots.innerHTML = '<span class="slots-msg-admin">Sin disponibilidad este día</span>';
+          return;
+        }
         slots.innerHTML = '';
-        data.slots.forEach(function (s) {
+        data.forEach(function (h) {
           var b = document.createElement('button');
           b.type = 'button';
-          b.textContent = s.hora;
-          b.className = s.ocupado ? 'slot-admin slot-ocupado' : 'slot-admin';
-          b.disabled = s.ocupado;
-          b.title = s.ocupado ? 'Ocupado' : 'Disponible';
-          if (!s.ocupado) {
-            b.onclick = function () {
-              slots.querySelectorAll('.slot-admin').forEach(function (x) { x.classList.remove('slot-selected'); });
-              b.classList.add('slot-selected');
-              horaHidden.value = s.hora;
-            };
+          b.className = 'seat-btn seat-free';
+          b.textContent = h;
+          b.onclick = function () {
+            var all = slots.querySelectorAll('.seat-btn');
+            for (var i = 0; i < all.length; i++) all[i].classList.remove('selected');
+            b.classList.add('selected');
+            horaInput.value = h;
           }
           slots.appendChild(b);
         });
@@ -82,33 +105,81 @@
 })();
 </script>
 
-<h3 style="margin:24px 0 12px">Clientes Existentes</h3>
-<table>
-  <thead><tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Citas</th><th>Última visita</th><th>Activo</th><th>Acciones</th></tr></thead>
-  <tbody>
-    <% if (clientes.length === 0) { %>
-    <tr><td colspan="7" class="empty">Sin clientes registrados</td></tr>
-    <% } %>
-    <% clientes.forEach(c => { %>
-    <tr>
-      <td><%= c.nombre %></td>
-      <td><%= c.telefono %></td>
-      <td><%= c.correo || '-' %></td>
-      <td><%= c.total_citas %></td>
-      <td><%= c.ultima_visita || '-' %></td>
-      <td><span class="badge badge-<%= c.activo %>"><%= c.activo ? 'Sí' : 'No' %></span></td>
-      <td>
-        <form method="POST" action="/clientes/<%= c.id %>/toggle" style="display:inline">
-          <button type="submit" class="btn btn-sm <%= c.activo ? 'btn-warning' : 'btn-success' %>">
-            <%= c.activo ? 'Desactivar' : 'Activar' %>
-          </button>
-        </form>
-        <form method="POST" action="/clientes/<%= c.id %>/delete" style="display:inline" data-confirm="¿Eliminar este cliente y sus citas?">
-          <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-        </form>
-      </td>
-    </tr>
-    <% }) %>
-  </tbody>
-</table>
+<!-- Data-Grid Corporativo -->
+<div style="background: var(--surface); border: 1px solid rgba(128,128,128,0.2); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+  <table style="margin: 0; box-shadow: none; border: none;">
+    <thead style="background: rgba(128,128,128,0.05);">
+      <tr>
+        <th style="padding-left: 24px;">Cliente</th>
+        <th>Contacto</th>
+        <th>Estadísticas</th>
+        <th>Última visita</th>
+        <th>Estado</th>
+        <th style="padding-right: 24px;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (clientes.length === 0) { %>
+      <tr><td colspan="6" class="empty" style="padding: 48px;">Sin clientes registrados</td></tr>
+      <% } %>
+      <% clientes.forEach(c => { %>
+      <tr style="border-bottom: 1px solid rgba(128,128,128,0.1); transition: background 0.2s;">
+        <td style="padding-left: 24px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(c.nombre) %>&background=random&color=fff&rounded=true&size=40" alt="Avatar" style="border: 2px solid var(--bg);">
+            <div style="display: flex; flex-direction: column;">
+              <strong style="color: var(--primary); font-size: 1.05rem;"><%= c.nombre %></strong>
+              <% if(c.alergias) { %>
+                <span style="font-size: 0.75rem; color: #ef4444; display: flex; align-items: center; gap: 4px;"><i data-lucide="alert-triangle" style="width:12px;"></i> <%= c.alergias %></span>
+              <% } %>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9rem;">
+            <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="phone" style="width: 14px; color: var(--text-muted);"></i> <%= c.telefono %></span>
+            <% if(c.correo) { %>
+              <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="mail" style="width: 14px; color: var(--text-muted);"></i> <%= c.correo %></span>
+            <% } %>
+          </div>
+        </td>
+        <td>
+          <span style="display: inline-flex; align-items: center; justify-content: center; background: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+            <i data-lucide="calendar" style="width: 14px; margin-right: 6px;"></i> <%= c.total_citas %> Citas
+          </span>
+        </td>
+        <td>
+          <% if(c.ultima_visita) { %>
+            <span style="font-size: 0.9rem; font-weight: 500; color: var(--text);"><%= c.ultima_visita %></span>
+          <% } else { %>
+            <span style="font-size: 0.9rem; color: var(--text-muted);">Nunca</span>
+          <% } %>
+        </td>
+        <td><span class="badge badge-<%= c.activo %>"><%= c.activo ? 'Activo' : 'Inactivo' %></span></td>
+        <td style="padding-right: 24px;">
+          <div style="display: flex; gap: 8px;">
+            <form method="POST" action="/clientes/<%= c.id %>/toggle" style="margin:0">
+              <button type="submit" class="btn btn-sm <%= c.activo ? 'btn-warning' : 'btn-success' %>" title="<%= c.activo ? 'Desactivar' : 'Activar' %>">
+                <i data-lucide="<%= c.activo ? 'user-minus' : 'user-check' %>" style="width:16px;"></i>
+              </button>
+            </form>
+            <form method="POST" action="/clientes/<%= c.id %>/delete" style="margin:0" data-confirm="¿Eliminar a <%= c.nombre %> y TODO su historial de citas?">
+              <button type="submit" class="btn btn-sm btn-danger" title="Eliminar"><i data-lucide="trash-2" style="width:16px;"></i></button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .expandable-form.visible { display: block !important; animation: fadeIn 0.3s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  /* Efecto hover suave en la tabla */
+  tbody tr:hover { background: rgba(128,128,128,0.03); }
+</style>
+
 <%- include('partials/footer') %>
