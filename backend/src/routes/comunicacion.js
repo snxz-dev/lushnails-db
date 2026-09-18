@@ -1,11 +1,12 @@
 const { Router } = require('express');
 const pool = require('../config/db');
 const bcrypt = require('bcrypt');
+const { requireAuth } = require('../middleware/auth');
 
 const router = Router();
 
 // Endpoint principal de Comunicación
-router.get('/', async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   try {
     // 0. Asegurarnos de que la tabla 'mensaje' exista
     await pool.query(`
@@ -96,7 +97,7 @@ router.get('/', async (req, res) => {
 });
 
 // Endpoint para obtener el historial de mensajes de un chat específico
-router.get('/mensajes/:userId', async (req, res) => {
+router.get('/mensajes/:userId', requireAuth, async (req, res) => {
   try {
     const otherUserId = req.params.userId;
     const myUserId = req.session.userId;
@@ -124,7 +125,7 @@ router.get('/mensajes/:userId', async (req, res) => {
 });
 
 // Endpoint para enviar un mensaje
-router.post('/mensajes', async (req, res) => {
+router.post('/mensajes', requireAuth, async (req, res) => {
   try {
     const { toUserId, text } = req.body;
     const myUserId = req.session.userId;
@@ -147,7 +148,7 @@ router.post('/mensajes', async (req, res) => {
 });
 
 // Endpoint para vaciar el historial de un chat
-router.delete('/mensajes/:userId', async (req, res) => {
+router.delete('/mensajes/:userId', requireAuth, async (req, res) => {
   try {
     const otherUserId = req.params.userId;
     const myUserId = req.session.userId;
