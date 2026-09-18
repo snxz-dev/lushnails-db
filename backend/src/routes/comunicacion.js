@@ -123,6 +123,29 @@ router.get('/mensajes/:userId', async (req, res) => {
   }
 });
 
+// Endpoint para enviar un mensaje
+router.post('/mensajes', async (req, res) => {
+  try {
+    const { toUserId, text } = req.body;
+    const myUserId = req.session.userId;
+    
+    if (!myUserId || !toUserId || !text || text.trim() === '') {
+      return res.status(400).json({ error: 'Datos inválidos' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO mensaje (remitente_id, destinatario_id, contenido) 
+       VALUES ($1, $2, $3) RETURNING id, remitente_id, destinatario_id, contenido, created_at, leido`,
+      [myUserId, toUserId, text.trim()]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error al enviar mensaje:', err);
+    res.status(500).json({ error: 'Error interno' });
+  }
+});
+
 // Endpoint para vaciar el historial de un chat
 router.delete('/mensajes/:userId', async (req, res) => {
   try {

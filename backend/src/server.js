@@ -3,7 +3,6 @@ const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const path = require('path');
 const http = require('http');
-const { Server } = require('socket.io');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const pool = require('./config/db');
@@ -94,49 +93,10 @@ app.use('/empleados', empleadosRoutes);
 app.use('/historial', historialRoutes);
 app.use('/comunicacion', comunicacionRoutes);
 
-const server = http.createServer(app);
-const io = new Server(server);
-
-// Compartir sesión con Socket.io
-io.engine.use(sessionMiddleware);
-
-io.on('connection', (socket) => {
-  const req = socket.request;
-  const userId = req.session?.userId;
-  
-  if (userId) {
-    // El usuario se une a una sala personal con su ID
-    socket.join(`user_${userId}`);
-    
-    socket.on('sendMessage', async (data) => {
-      try {
-        const { toUserId, text } = data;
-        if (!text || !toUserId) return;
-        
-        // Guardar mensaje en base de datos
-        const result = await pool.query(
-          `INSERT INTO mensaje (remitente_id, destinatario_id, contenido) 
-           VALUES ($1, $2, $3) RETURNING id, remitente_id, destinatario_id, contenido, created_at`,
-          [userId, toUserId, text]
-        );
-        const newMsg = result.rows[0];
-        
-        // Enviar a destinatario
-        io.to(`user_${toUserId}`).emit('receiveMessage', newMsg);
-        
-        // Enviar a remitente (confirmación)
-        io.to(`user_${userId}`).emit('receiveMessage', newMsg);
-      } catch (err) {
-        console.error('Socket.io sendMessage error:', err);
-      }
-    });
-  }
-});
-
 if (!process.env.VERCEL) {
-  server.listen(PORT, () => {
+  app.listen(PORT, () => {
     console.log(`Panel admin: http://localhost:${PORT}`);
   });
 }
 
-module.exports = { app, server };
+module.exports = { app };

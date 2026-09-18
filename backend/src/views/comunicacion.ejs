@@ -197,11 +197,12 @@
   
 </style>
 
-<script src="/socket.io/socket.io.js"></script>
 <script>
-  const socket = io();
   let currentChatUserId = null;
   const myUserId = <%= currentUser.id %>;
+  let pollingInterval = null;
+  let isPolling = false;
+  let currentMessagesCount = 0;
 
   function renderMessage(msg) {
     const isSent = msg.remitente_id == myUserId;
@@ -209,12 +210,21 @@
     
     const msgDiv = document.createElement('div');
     msgDiv.className = 'message ' + (isSent ? 'sent' : 'received');
-    msgDiv.innerHTML = `
-      <div class="message-content">
-        <p>${msg.contenido}</p>
-        <span class="message-time">${time}</span>
-      </div>
-    `;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    const p = document.createElement('p');
+    p.textContent = msg.contenido; // XSS protection
+    
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'message-time';
+    timeSpan.textContent = time;
+    
+    contentDiv.appendChild(p);
+    contentDiv.appendChild(timeSpan);
+    msgDiv.appendChild(contentDiv);
+    
     return msgDiv;
   }
 
@@ -232,60 +242,88 @@
       event.currentTarget.classList.add('active');
     }
     
-    // Fetch real history
+    if (pollingInterval) clearInterval(pollingInterval);
+    
+    await fetchMessages(id, true);
+    
+    pollingInterval = setInterval(() => {
+      if (currentChatUserId === id) {
+        fetchMessages(id, false);
+      }
+    }, 3000);
+  }
+
+  async function fetchMessages(id, forceScroll) {
+    if (isPolling) return;
+    isPolling = true;
+    
     const container = document.getElementById('chat-messages-container');
-    container.innerHTML = '<div class="message" style="align-self: center; color: var(--text-muted); font-size: 0.8rem; margin: auto;">Cargando mensajes...</div>';
+    if (forceScroll) {
+      container.innerHTML = '<div class="message" style="align-self: center; color: var(--text-muted); font-size: 0.8rem; margin: auto;">Cargando mensajes...</div>';
+      currentMessagesCount = 0;
+    }
     
     try {
       const res = await fetch(`/comunicacion/mensajes/${id}`);
       const messages = await res.json();
-      container.innerHTML = '';
       
-      if (messages.length === 0) {
-        container.innerHTML = '<div class="message" style="align-self: center; color: var(--text-muted); font-size: 0.8rem; margin: auto;">No hay mensajes aún. ¡Escribe algo!</div>';
-      } else {
-        messages.forEach(msg => {
-          container.appendChild(renderMessage(msg));
-        });
+      // Update only if count changed to avoid re-rendering and losing scroll position
+      if (forceScroll || messages.length !== currentMessagesCount) {
+        container.innerHTML = '';
+        currentMessagesCount = messages.length;
+        
+        if (messages.length === 0) {
+          container.innerHTML = '<div class="message" style="align-self: center; color: var(--text-muted); font-size: 0.8rem; margin: auto;">No hay mensajes aún. ¡Escribe algo!</div>';
+        } else {
+          messages.forEach(msg => {
+            container.appendChild(renderMessage(msg));
+          });
+        }
+        
+        // Auto scroll
+        if (forceScroll || container.scrollTop + container.clientHeight >= container.scrollHeight - 100) {
+          container.scrollTop = container.scrollHeight;
+        }
       }
-      container.scrollTop = container.scrollHeight;
     } catch (err) {
       console.error(err);
-      container.innerHTML = '<div class="message" style="align-self: center; color: var(--danger); font-size: 0.8rem; margin: auto;">Error cargando mensajes.</div>';
+      if (forceScroll) {
+        container.innerHTML = '<div class="message" style="align-self: center; color: var(--danger); font-size: 0.8rem; margin: auto;">Error cargando mensajes.</div>';
+      }
+    } finally {
+      isPolling = false;
     }
   }
 
-  socket.on('receiveMessage', (msg) => {
-    // Si el mensaje nos pertenece y estamos viendo el chat de la otra persona, o es de nosotros mismos
-    if (
-      (msg.remitente_id == myUserId && msg.destinatario_id == currentChatUserId) ||
-      (msg.remitente_id == currentChatUserId && msg.destinatario_id == myUserId)
-    ) {
-      const container = document.getElementById('chat-messages-container');
-      // Quitar el texto de "No hay mensajes" si existe
-      if (container.innerHTML.includes('No hay mensajes aún')) {
-        container.innerHTML = '';
-      }
-      container.appendChild(renderMessage(msg));
-      container.scrollTop = container.scrollHeight;
-    }
-  });
-
-  // Lógica para enviar mensajes reales por socket.io
-  function sendMessage() {
+  // Lógica para enviar mensajes HTTP
+  async function sendMessage() {
     if (!currentChatUserId) return;
     
     const input = document.getElementById('chat-input-box');
     const text = input.value.trim();
     if (!text) return;
 
-    socket.emit('sendMessage', {
-      toUserId: currentChatUserId,
-      text: text
-    });
-
+    // Guardar el texto original para no perderlo en caso de error
+    const originalText = text;
     input.value = '';
-    // El mensaje devuelto por el servidor via 'receiveMessage' hará que se pinte en pantalla
+    
+    try {
+      const res = await fetch('/comunicacion/mensajes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toUserId: currentChatUserId, text: originalText })
+      });
+      
+      if (!res.ok) throw new Error('Error al enviar mensaje');
+      
+      // Forzar carga inmediata
+      fetchMessages(currentChatUserId, false);
+    } catch (err) {
+      console.error(err);
+      alert('Hubo un problema al enviar el mensaje. Intenta de nuevo.');
+      // Restaurar el texto
+      input.value = originalText;
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
