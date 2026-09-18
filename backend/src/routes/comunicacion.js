@@ -123,4 +123,25 @@ router.get('/mensajes/:userId', async (req, res) => {
   }
 });
 
+// Endpoint para vaciar el historial de un chat
+router.delete('/mensajes/:userId', async (req, res) => {
+  try {
+    const otherUserId = req.params.userId;
+    const myUserId = req.session.userId;
+    
+    // Borrar los mensajes entre estos dos usuarios
+    await pool.query(
+      `DELETE FROM mensaje 
+       WHERE (remitente_id = $1 AND destinatario_id = $2) 
+          OR (remitente_id = $2 AND destinatario_id = $1)`,
+      [myUserId, otherUserId]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error al borrar mensajes:', err);
+    res.status(500).json({ error: 'Error interno' });
+  }
+});
+
 module.exports = router;

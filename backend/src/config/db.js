@@ -3,8 +3,13 @@ require('dotenv').config();
 
 const useSsl = process.env.DB_SSL === 'true' || !!process.env.DATABASE_URL;
 
-const poolConfig = process.env.DATABASE_URL ? {
-  connectionString: process.env.DATABASE_URL,
+let connStr = process.env.DATABASE_URL;
+if (connStr && !connStr.includes('uselibpqcompat=true')) {
+  connStr += connStr.includes('?') ? '&uselibpqcompat=true' : '?uselibpqcompat=true';
+}
+
+const poolConfig = connStr ? {
+  connectionString: connStr,
 } : {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT) || 5432,

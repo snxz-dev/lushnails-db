@@ -56,9 +56,7 @@
           </div>
         </div>
         <div class="chat-header-actions">
-          <button class="btn btn-sm" style="background: transparent; color: var(--text-muted);"><i data-lucide="phone"></i></button>
-          <button class="btn btn-sm" style="background: transparent; color: var(--text-muted);"><i data-lucide="video"></i></button>
-          <button class="btn btn-sm" style="background: transparent; color: var(--text-muted);"><i data-lucide="more-vertical"></i></button>
+          <button class="btn btn-sm" id="btn-clear-chat" title="Limpiar Conversación" style="background: transparent; color: var(--danger);"><i data-lucide="trash-2"></i></button>
         </div>
       </div>
       
@@ -70,9 +68,8 @@
       </div>
       
       <div class="chat-input-area">
-        <button class="btn btn-sm" style="background: transparent; color: var(--text-muted);"><i data-lucide="paperclip"></i></button>
         <input type="text" id="chat-input-box" placeholder="Escribe un mensaje..." class="chat-input">
-        <button class="btn btn-sm" id="btn-emoji" style="background: transparent; color: var(--text-muted);"><i data-lucide="smile"></i></button>
+        <button class="btn btn-sm" id="btn-emoji" style="background: transparent; color: var(--text-muted);"><i data-lucide="thumbs-up"></i></button>
         <button class="btn btn-primary btn-sm" id="btn-send" style="border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;"><i data-lucide="send"></i></button>
       </div>
     </div>
@@ -311,8 +308,27 @@
     if (btnEmoji) {
       btnEmoji.addEventListener('click', () => {
         if(input) {
-          input.value += '😊';
+          input.value += '👍';
           input.focus();
+        }
+      });
+    }
+
+    const btnClearChat = document.getElementById('btn-clear-chat');
+    if (btnClearChat) {
+      btnClearChat.addEventListener('click', async () => {
+        if (!currentChatUserId) return;
+        
+        if (confirm('¿Estás seguro de que deseas eliminar TODO el historial de esta conversación? (Esta acción no se puede deshacer)')) {
+          try {
+            const res = await fetch(`/comunicacion/mensajes/${currentChatUserId}`, { method: 'DELETE' });
+            if (res.ok) {
+              const container = document.getElementById('chat-messages-container');
+              container.innerHTML = '<div class="message" style="align-self: center; color: var(--text-muted); font-size: 0.8rem; margin: auto;">Historial borrado. ¡Escribe algo nuevo!</div>';
+            }
+          } catch (err) {
+            console.error('Error al borrar:', err);
+          }
         }
       });
     }

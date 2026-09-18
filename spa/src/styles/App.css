@@ -53,7 +53,7 @@ textarea:focus-visible,
   justify-content: space-between;
   align-items: center;
   padding: 15px 5%;
-  background: #E6DCCF;
+  background: var(--bg-secondary);
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
@@ -188,7 +188,7 @@ textarea:focus-visible,
 }
 
 .fab-menu button:hover {
-  background: #E6DCCF;
+  background: var(--bg-secondary);
   transform: translateX(-5px);
 }
 
@@ -274,7 +274,7 @@ textarea:focus-visible,
 }
 
 .fab-options button:hover {
-  background: #E6DCCF;
+  background: var(--bg-secondary);
   transform: translateX(-8px);
   box-shadow: 0 4px 15px rgba(47, 74, 52, 0.4);
 }
@@ -335,7 +335,7 @@ textarea:focus-visible,
   left: 0;
   width: 0;
   height: 2px;
-  background: #E6DCCF;
+  background: var(--bg-secondary);
   transition: var(--transition);
 }
 
@@ -344,7 +344,7 @@ textarea:focus-visible,
 }
 
 .nav-links a:hover {
-  color: #E6DCCF;
+  color: var(--bg-primary);
 }
 
 .hero {
@@ -643,7 +643,7 @@ textarea:focus-visible,
 }
 
 .about {
-  background: #E6DCCF;
+  background: var(--bg-secondary);
 }
 
 .about-grid {
@@ -735,7 +735,7 @@ textarea:focus-visible,
 }
 
 .services {
-  background: #E6DCCF;
+  background: var(--bg-secondary);
 }
 
 .services-container {
@@ -791,7 +791,7 @@ textarea:focus-visible,
 }
 
 .gallery {
-  background: #E6DCCF;
+  background: var(--bg-secondary);
   padding: 100px 5%;
 }
 
@@ -903,7 +903,7 @@ textarea:focus-visible,
 }
 
 .videos-section {
-  background: #E6DCCF;
+  background: var(--bg-secondary);
   padding: 100px 5%;
 }
 
@@ -927,7 +927,7 @@ textarea:focus-visible,
 }
 
 .branches {
-  background: #E6DCCF;
+  background: var(--bg-secondary);
   padding: 100px 5%;
 }
 
@@ -1007,7 +1007,7 @@ textarea:focus-visible,
 }
 
 .contact {
-  background: #E6DCCF;
+  background: var(--bg-secondary);
   padding: 100px 5%;
 }
 
@@ -1248,7 +1248,7 @@ textarea:focus-visible,
 .footer {
   padding: 40px 5%;
   text-align: center;
-  background-color: #E6DCCF;
+  background-color: var(--bg-secondary);
   color: #7A5A3A;
 }
 
@@ -2025,6 +2025,44 @@ textarea:focus-visible,
 .hero-content.intro-card .hero-cta { flex-wrap: wrap; }
 @media (max-width: 768px) {
   .intro-card { border-radius: 16px; }
+}
+
+/* =========================================================
+   3D FLOATING EFFECTS & GLASSMORPHISM (Premium Look)
+========================================================= */
+
+/* Aplicamos fondo, bordes suaves y sombra base a las tarjetas */
+.service-category-block,
+.gallery-item,
+.branch-card,
+.cita-card,
+.intro-card,
+.booking-container,
+.contact-container form {
+  background: var(--bg-secondary);
+  border-radius: 24px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--glass-border);
+  transition: var(--transition);
+  overflow: hidden;
+}
+
+/* Efecto 3D flotante al pasar el ratón */
+.service-category-block:hover,
+.gallery-item:hover,
+.branch-card:hover,
+.cita-card:hover,
+.intro-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(47, 74, 52, 0.3);
+}
+
+/* Para que las imágenes dentro de las tarjetas no se salgan del borde redondeado */
+.branch-card img,
+.gallery-item img,
+.service-image-button img {
+  border-radius: 24px 24px 0 0;
 }
 
 /* Use equal image frames for the three main service categories. */
