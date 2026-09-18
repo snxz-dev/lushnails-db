@@ -46,7 +46,11 @@ const fotosUnas = [
 ];
 
 const CORREO_TRABAJO = 'ibethcabrera1@gmail.com';
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+const API_URL = process.env.REACT_APP_API_URL || (
+  typeof window !== 'undefined' && !['localhost', '127.0.0.1'].includes(window.location.hostname)
+    ? 'https://lushnails-db.vercel.app/api'
+    : 'http://localhost:4000/api'
+);
 
 const WHATSAPP_LINKS = {
   general: 'https://wa.me/message/C756ADRGK277F1',
