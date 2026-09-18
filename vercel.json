@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "installCommand": "npm install --prefix backend && npm install --prefix spa --legacy-peer-deps",
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/index.js" }
   ]
