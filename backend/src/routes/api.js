@@ -283,6 +283,7 @@ router.post('/clientes/registro', async (req, res) => {
     return res.status(400).json({ error: 'Faltan campos requeridos' });
   }
   try {
+    await pool.query('ALTER TABLE cliente ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)');
     const existe = await pool.query('SELECT id FROM cliente WHERE LOWER(correo) = LOWER($1)', [correo]);
     if (existe.rows.length > 0) {
       return res.status(409).json({ error: 'Ya existe una cuenta con ese correo' });
@@ -295,7 +296,7 @@ router.post('/clientes/registro', async (req, res) => {
     res.json({ success: true, cliente: result.rows[0] });
   } catch (err) {
     console.error('Error al registrar cliente:', err);
-    res.status(500).json({ error: 'Error del servidor' });
+    res.status(500).json({ error: err.message || 'Error del servidor' });
   }
 });
 
@@ -305,6 +306,7 @@ router.post('/clientes/login', async (req, res) => {
     return res.status(400).json({ error: 'Faltan campos requeridos' });
   }
   try {
+    await pool.query('ALTER TABLE cliente ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)');
     const result = await pool.query(
       'SELECT id, nombre, correo, telefono, password_hash, activo FROM cliente WHERE LOWER(correo) = LOWER($1)',
       [correo]
@@ -326,7 +328,7 @@ router.post('/clientes/login', async (req, res) => {
     res.json({ success: true, cliente: { id: cliente.id, nombre: cliente.nombre, correo: cliente.correo, telefono: cliente.telefono } });
   } catch (err) {
     console.error('Error al iniciar sesión:', err);
-    res.status(500).json({ error: 'Error del servidor' });
+    res.status(500).json({ error: err.message || 'Error del servidor' });
   }
 });
 

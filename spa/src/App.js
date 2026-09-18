@@ -254,17 +254,18 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      const data = await res.json();
-      if (data.success) {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
         localStorage.setItem('lushnails_cliente', JSON.stringify(data.cliente));
         setCliente(data.cliente);
         setCitaForm(prev => ({ ...prev, nombre: data.cliente.nombre, telefono: data.cliente.telefono, correo: data.cliente.correo }));
         setAuthForm({ nombre: '', telefono: '', correo: '', password: '' });
       } else {
-        setAuthError(data.error || t('cita.error'));
+        setAuthError(data.error || (res.status ? `Error (${res.status})` : t('cita.error')));
       }
     } catch (err) {
-      setAuthError(t('cita.error'));
+      console.error('Error auth:', err);
+      setAuthError(err.message ? `${t('cita.error')} (${err.message})` : t('cita.error'));
     }
   };
 
